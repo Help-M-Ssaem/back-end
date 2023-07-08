@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.chatroom;
 
+import com.example.mssaem_backend.utils.BaseTimeEntity;
 import com.example.mssaem_backend.worryboard.WorryBoard;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +14,7 @@ import org.hibernate.annotations.ColumnDefault;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class ChatRoom {
+public class ChatRoom extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "chat_room_id")

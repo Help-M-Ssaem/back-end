@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.discussioncomment;
 
 import com.example.mssaem_backend.discussion.Discussion;
+import com.example.mssaem_backend.utils.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -14,7 +15,7 @@ import org.hibernate.annotations.LazyCollection;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class DiscussionComment {
+public class DiscussionComment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "discussion_comment_id")

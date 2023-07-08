@@ -2,6 +2,7 @@ package com.example.mssaem_backend.evaluation;
 
 
 import com.example.mssaem_backend.member.Member;
+import com.example.mssaem_backend.utils.BaseTimeEntity;
 import com.example.mssaem_backend.worryboard.WorryBoard;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -16,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Evaluation {
+public class Evaluation extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "evaluation_id")

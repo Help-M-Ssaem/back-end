@@ -2,6 +2,7 @@ package com.example.mssaem_backend.bookmark;
 
 import com.example.mssaem_backend.MbtiEnum;
 import com.example.mssaem_backend.member.Member;
+import com.example.mssaem_backend.utils.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -14,7 +15,7 @@ import org.hibernate.annotations.ColumnDefault;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class BookMark {
+public class BookMark extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_mark_id")

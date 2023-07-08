@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.boardimage;
 
 import com.example.mssaem_backend.board.Board;
+import com.example.mssaem_backend.utils.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class BoardImage {
+public class BoardImage extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_image_id")

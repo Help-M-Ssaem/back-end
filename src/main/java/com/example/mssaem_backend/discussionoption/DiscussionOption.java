@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.discussionoption;
 
+import com.example.mssaem_backend.utils.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import org.hibernate.annotations.ColumnDefault;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class DiscussionOption {
+public class DiscussionOption extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "discussion_option_id")
