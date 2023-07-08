@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @AllArgsConstructor
@@ -17,12 +18,14 @@ import lombok.NoArgsConstructor;
 public class ChatMessage extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "chat_message_id")
     private Long id;
 
     @NotNull
     private String content;
-    private boolean check; //true : 확인, false : 확인 안함
+
+    @ColumnDefault("false")
+    private boolean state; //true : 확인, false : 확인 안함
+
     private String imgUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

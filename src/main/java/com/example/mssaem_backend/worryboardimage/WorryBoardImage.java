@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class WorryBoardImage{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "worry_board_image_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

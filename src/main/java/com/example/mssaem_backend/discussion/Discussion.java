@@ -17,7 +17,6 @@ import org.hibernate.annotations.ColumnDefault;
 public class Discussion extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "discussion_id")
     private Long id;
 
     @NotNull

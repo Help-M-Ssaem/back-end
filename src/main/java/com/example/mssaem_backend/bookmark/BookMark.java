@@ -18,7 +18,6 @@ import org.hibernate.annotations.ColumnDefault;
 public class BookMark extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "book_mark_id")
     private Long id;
 
     @NotNull

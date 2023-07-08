@@ -16,7 +16,6 @@ import org.hibernate.annotations.ColumnDefault;
 public class BoardComment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_comment_id")
     private Long id;
 
     @NotNull
@@ -32,7 +31,7 @@ public class BoardComment extends BaseTimeEntity {
     private Integer parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
 
     @ColumnDefault("0")
-    private Integer order; //대댓글의 순서
+    private Integer orders; //대댓글의 순서
 
     @ColumnDefault("true")
     private boolean state; //true : 존재, false : 삭제

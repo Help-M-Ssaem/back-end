@@ -15,7 +15,6 @@ import org.hibernate.annotations.ColumnDefault;
 public class DiscussionOption extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "discussion_option_id")
     private Long id;
 
     private String imgUrl;

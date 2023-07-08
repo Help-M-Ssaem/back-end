@@ -18,7 +18,6 @@ import org.hibernate.annotations.ColumnDefault;
 public class WorryBoard extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "worry_board_id")
     private Long id;
 
     @NotNull
