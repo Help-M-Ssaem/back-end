@@ -26,6 +26,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // aws
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.2'
+    //implementation group: 'org.springframework.cloud', name: 'spring-cloud-aws', version: '2.2.1.RELEASE', ext: 'pom'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.13'
+    implementation 'io.awspring.cloud:spring-cloud-aws:2.4.2'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
