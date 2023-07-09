@@ -59,6 +59,6 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return !member.isDeleted();
+        return !member.isStatus();
     }
 }

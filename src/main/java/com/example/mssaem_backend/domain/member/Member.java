@@ -35,6 +35,9 @@ public class Member extends BaseTimeEntity {
     private boolean status;
 
     @NotNull
+    private String refreshToken;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -46,5 +49,11 @@ public class Member extends BaseTimeEntity {
 
     private String profileImageUrl;
 
+    @ColumnDefault("0")
     private Integer report; //신고수
+
+    public void changeRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
 }
