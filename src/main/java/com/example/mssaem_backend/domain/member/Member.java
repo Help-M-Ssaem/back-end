@@ -35,6 +35,10 @@ public class Member extends BaseTimeEntity {
     private boolean status;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @NotNull
     private String password;
 
     @NotNull
