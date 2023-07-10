@@ -32,7 +32,7 @@ public class Board extends BaseTimeEntity {
     private Long report;
 
     @ColumnDefault("0")
-    private Long heats;
+    private Long hits;
 
     @ColumnDefault("true")
     private boolean state; //true : 삭제아님, false : 삭제
