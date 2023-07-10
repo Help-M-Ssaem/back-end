@@ -28,13 +28,13 @@ public class EvaluationResultDto {
     private int sincereCount;
     private int hotCount;
 
-    public EvaluationCount(Member member, char[] result) {
+    public EvaluationCount(Member member, int[] result) {
       this.member = member;
-      this.likeCount = result[0] - '0';
-      this.usefulCount = result[1] - '0';
-      this.funCount = result[2] - '0';
-      this.sincereCount = result[3] - '0';
-      this.hotCount = result[4] - '0';
+      this.likeCount = result[0];
+      this.usefulCount = result[1];
+      this.funCount = result[2];
+      this.sincereCount = result[3];
+      this.hotCount = result[4];
     }
   }
 

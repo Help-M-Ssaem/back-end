@@ -84,11 +84,15 @@ public class EvaluationService {
 
     List<Evaluation> evaluations = evaluationRepository.findAllByMember(member);
 
-    int sum = 0;
+    int[] result = new int[5];
     for (Evaluation e : evaluations) {
-      sum += Integer.parseInt(e.getEvaluationCode());
+      char[] temp = e.getEvaluationCode().toCharArray();
+      result[0] += temp[0] - '0';
+      result[1] += temp[1] - '0';
+      result[2] += temp[2] - '0';
+      result[3] += temp[3] - '0';
+      result[4] += temp[4] - '0';
     }
-    char[] result = String.valueOf(sum).toCharArray();
     return new EvaluationCount(member, result);
   }
 }
