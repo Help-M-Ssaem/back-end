@@ -84,7 +84,7 @@ public class EvaluationService {
 
     List<Evaluation> evaluations = evaluationRepository.findAllByMember(member);
 
-    int[] result = new int[5];
+    int[] result = new int[EvaluationEnum.values().length];
     for (Evaluation e : evaluations) {
       char[] temp = e.getEvaluationCode().toCharArray();
       result[0] += temp[0] - '0';

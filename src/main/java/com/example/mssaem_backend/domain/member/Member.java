@@ -43,4 +43,13 @@ public class Member extends BaseTimeEntity {
     private String profileImageUrl;
 
     private Integer report; //신고수
+
+    //Test용 생성자(@Notnull 인 것만)
+    public Member(String email, String nickName, MbtiEnum mbti, String password, String caseSensitivity) {
+        this.email = email;
+        this.nickName = nickName;
+        this.mbti = mbti;
+        this.password = password;
+        this.caseSensitivity = caseSensitivity;
+    }
 }
