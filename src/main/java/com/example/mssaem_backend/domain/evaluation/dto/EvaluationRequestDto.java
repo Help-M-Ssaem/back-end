@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.evaluation.dto;
 
+
 import com.example.mssaem_backend.domain.evaluation.EvaluationEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
