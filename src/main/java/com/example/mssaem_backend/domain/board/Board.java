@@ -22,6 +22,9 @@ public class Board extends BaseTimeEntity {
     private Long recommendation;
 
     @NotNull
+    private String title;
+
+    @NotNull
     private String content;
 
     @NotNull
