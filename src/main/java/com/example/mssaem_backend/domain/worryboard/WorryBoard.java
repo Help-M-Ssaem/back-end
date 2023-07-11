@@ -43,6 +43,5 @@ public class WorryBoard extends BaseTimeEntity {
     private Member solveMember; //이 고민글을 해결해준 유저
 
     @ColumnDefault("0")
-    private Long heats;
-
+    private Long hits;
 }
