@@ -38,3 +38,5 @@ out/
 
 src/main/resources/application-dev.yml
 src/main/resources/application-main.yml
+
+src/test/resources/application.yml

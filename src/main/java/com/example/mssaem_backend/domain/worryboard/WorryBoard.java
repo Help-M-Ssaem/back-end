@@ -44,5 +44,4 @@ public class WorryBoard extends BaseTimeEntity {
 
     @ColumnDefault("0")
     private Long hits;
-
 }
