@@ -22,6 +22,9 @@ public class Discussion extends BaseTimeEntity {
     @NotNull
     private String content;
 
+    @NotNull
+    private String title;
+
     @ColumnDefault("0")
     private Long participants; // 참여자 수
 
