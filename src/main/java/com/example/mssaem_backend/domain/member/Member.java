@@ -35,6 +35,13 @@ public class Member extends BaseTimeEntity {
     private boolean status;
 
     @NotNull
+    private String refreshToken;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @NotNull
     private String password;
 
     @NotNull
@@ -42,14 +49,11 @@ public class Member extends BaseTimeEntity {
 
     private String profileImageUrl;
 
+    @ColumnDefault("0")
     private Integer report; //신고수
 
-    //Test용 생성자(@Notnull 인 것만)
-    public Member(String email, String nickName, MbtiEnum mbti, String password, String caseSensitivity) {
-        this.email = email;
-        this.nickName = nickName;
-        this.mbti = mbti;
-        this.password = password;
-        this.caseSensitivity = caseSensitivity;
+    public void changeRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
+
 }
