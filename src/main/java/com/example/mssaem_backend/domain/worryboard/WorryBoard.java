@@ -44,11 +44,4 @@ public class WorryBoard extends BaseTimeEntity {
 
     @ColumnDefault("0")
     private Long hits;
-
-    //Test용 생성자(@Notnull 인 것만)
-    public WorryBoard(String title, String content, MbtiEnum mbti) {
-        this.title = title;
-        this.content = content;
-        this.targetMbti = mbti;
-    }
 }

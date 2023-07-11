@@ -26,9 +26,7 @@ public class EvaluationService {
   /**
    * 평가 추가 하기
    */
-  public String insertEvaluation(EvaluationInfo evaluationInfo) {
-    //유저 임시 조회
-    Member member = memberRepository.findById(1L).orElseThrow();
+  public String insertEvaluation(Member member,EvaluationInfo evaluationInfo) {
     //현재 고민글 조회
     WorryBoard worryBoard = worryBoardRepository.findById(evaluationInfo.getWorryBoardId())
         .orElseThrow();
@@ -56,9 +54,7 @@ public class EvaluationService {
   /**
    * 평가 받은 사람의 평가 내용 조회
    */
-  public EvaluationResult selectEvaluation(Long worryBoardId) {
-    //유저 임시 조회
-    Member member = memberRepository.findById(1L).orElseThrow();
+  public EvaluationResult selectEvaluation(Member member, Long worryBoardId) {
     //고민글 조회
     WorryBoard worryBoard = worryBoardRepository.findById(worryBoardId)
         .orElseThrow();
@@ -78,10 +74,7 @@ public class EvaluationService {
   /**
    * 자신의 평가 count
    */
-  public EvaluationCount countEvaluation(Long memberId) {
-    //유저 임시 조회
-    Member member = memberRepository.findById(1L).orElseThrow();
-
+  public EvaluationCount countEvaluation(Member member) {
     List<Evaluation> evaluations = evaluationRepository.findAllByMember(member);
 
     int[] result = new int[EvaluationEnum.values().length];
