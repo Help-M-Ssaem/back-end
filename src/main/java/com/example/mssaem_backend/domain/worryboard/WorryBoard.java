@@ -7,10 +7,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
+@Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -44,4 +47,13 @@ public class WorryBoard extends BaseTimeEntity {
 
     @ColumnDefault("0")
     private Long hits;
+
+    //테스트 코드용
+    @Builder
+    public WorryBoard(String title, String content, MbtiEnum targetMbti, boolean state, Member member) {
+        this.title = title;
+        this.content = content;
+        this.targetMbti = targetMbti;
+        this.member = member;
+    }
 }
