@@ -20,6 +20,7 @@ public class MemberResponseDto {
     @NoArgsConstructor
     public static class MemberSimpleInfo {
 
+        private Long id;
         private String nickName;
         private MbtiEnum mbtiEnum;
         private String badge;
