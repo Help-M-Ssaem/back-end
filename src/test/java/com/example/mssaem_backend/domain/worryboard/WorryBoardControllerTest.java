@@ -165,4 +165,21 @@ class WorryBoardControllerTest {
         .andExpect(jsonPath("$[0].imgUrl").value("imgUrl5"))
         .andExpect(jsonPath("$[1].title").value("titleSolved2"));
   }
+
+  @DisplayName("특정 멤버 별 올린 고민 조회")
+  @Test
+  public void findWorriesByMemberId() throws Exception {
+    //given
+    final String url = "/worry-board/post-list/1";
+
+    //when
+    final ResultActions resultActions = mockMvc.perform(get(url)
+        .accept(MediaType.APPLICATION_JSON));
+
+    //then
+    resultActions
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].title").value("title1"))
+        .andExpect(jsonPath("$[1].title").value("title2"));
+  }
 }

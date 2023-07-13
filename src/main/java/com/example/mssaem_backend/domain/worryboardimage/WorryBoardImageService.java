@@ -1,7 +1,6 @@
 package com.example.mssaem_backend.domain.worryboardimage;
 
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;

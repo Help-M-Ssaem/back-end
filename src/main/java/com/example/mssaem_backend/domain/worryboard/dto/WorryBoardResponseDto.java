@@ -60,5 +60,6 @@ public class WorryBoardResponseDto {
       this.imgUrl = imgUrl;
     }
   }
+
 }
 

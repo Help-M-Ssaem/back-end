@@ -5,7 +5,6 @@ import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.Ge
 import com.example.mssaem_backend.domain.worryboardimage.WorryBoardImageService;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.WorryBoardErrorCode;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,13 +21,25 @@ public class WorryBoardService {
     List<WorryBoard> worryBoards = worryBoardRepository.findByState(state);
     return worryBoards
         .stream()
-        .map(worryBoard -> new GetWorriesRes(worryBoard, worryBoardImageService.getImgUrl(worryBoard)))
+        .map(worryBoard -> new GetWorriesRes(worryBoard,
+            worryBoardImageService.getImgUrl(worryBoard)))
         .toList();
   }
 
+  //고민 게시판 - 고민글 상세 조회
   public GetWorryRes findWorryById(Long id) {
     WorryBoard worryBoard = worryBoardRepository.findById(id)
         .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRYBOARD));
     return new GetWorryRes(worryBoard, worryBoardImageService.getImgUrls(worryBoard));
+  }
+
+  //특정 멤버 별 올린 고민 조회
+  public List<GetWorriesRes> findWorriesByMemberId(Long memberId) {
+    List<WorryBoard> worryBoards = worryBoardRepository.findByMemberId(memberId);
+    return worryBoards
+        .stream()
+        .map(worryBoard -> new GetWorriesRes(worryBoard,
+            worryBoardImageService.getImgUrl(worryBoard)))
+        .toList();
   }
 }
