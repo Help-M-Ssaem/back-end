@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum WorryBoardErrorCode implements ErrorCode {
-  EMPTY_WORRYBOARD("WORRYBOARD_001", "존재하지 않는 게시물입니다.", HttpStatus.NOT_FOUND);
+  EMPTY_WORRY_BOARD("WORRY-BOARD_001", "존재하지 않는 게시물입니다.", HttpStatus.NOT_FOUND);
 
 
   private final String errorCode;

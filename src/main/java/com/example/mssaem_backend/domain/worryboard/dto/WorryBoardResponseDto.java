@@ -6,6 +6,7 @@ import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,20 +22,22 @@ public class WorryBoardResponseDto {
     private String profileImgUrl;
     private MbtiEnum memberMbti;
     private MbtiEnum targetMbti;
+    private String representativeBadge;
     private String title;
     private String content;
     private String createdAt;
     private List<String> imgList;
 
-
-    public GetWorryRes(WorryBoard worryBoard, List<String> imgList) {
+    @Builder
+    public GetWorryRes(WorryBoard worryBoard, List<String> imgList, String representativeBadge, String createdAt) {
       this.nickName = worryBoard.getMember().getNickName();
       this.profileImgUrl = worryBoard.getMember().getProfileImageUrl();
       this.memberMbti = worryBoard.getMember().getMbti();
       this.targetMbti = worryBoard.getTargetMbti();
+      this.representativeBadge = representativeBadge;
       this.title = worryBoard.getTitle();
       this.content = worryBoard.getContent();
-      this.createdAt = calculateTime(worryBoard.getCreatedAt(), 2);
+      this.createdAt = createdAt;
       this.imgList = imgList;
     }
   }
@@ -51,12 +54,13 @@ public class WorryBoardResponseDto {
     private String createdDate;
     private String imgUrl;
 
-    public GetWorriesRes(WorryBoard worryBoard, String imgUrl) {
+    @Builder
+    public GetWorriesRes(WorryBoard worryBoard, String imgUrl, String createdAt) {
       this.title = worryBoard.getTitle();
       this.content = worryBoard.getContent();
       this.memberMbti = worryBoard.getMember().getMbti();
       this.targetMbti = worryBoard.getTargetMbti();
-      this.createdDate = calculateTime(worryBoard.getCreatedAt(), 3);
+      this.createdDate = createdAt;
       this.imgUrl = imgUrl;
     }
   }
