@@ -52,9 +52,9 @@ class WorryBoardControllerTest {
   @BeforeAll
   void beforeAll() {
     //member
-    Member member1 = new Member(1L, "junsuck@naver.com", "heron", MbtiEnum.ENFJ, true,
+    Member member1 = new Member(1L, "junsuck@naver.com", "heron", MbtiEnum.INFP, true,
         "tokenExample", Role.ROLE_MANAGER, "1234", "1100", "example1", 0);
-    Member member2 = new Member(2L, "Jinro@naver.com", "Jinro", MbtiEnum.ENFJ, true,
+    Member member2 = new Member(2L, "Jinro@naver.com", "Jinro", MbtiEnum.ENTJ, true,
         "tokenExample", Role.ROLE_MANAGER, "1234", "1100", "example2", 0);
 
     //worryBoard
@@ -62,35 +62,57 @@ class WorryBoardControllerTest {
     WorryBoard worryBoard1 = WorryBoard.builder()
         .title("title1")
         .content("content1")
-        .targetMbti(MbtiEnum.ENFJ)
+        .targetMbti(MbtiEnum.ESFJ)
+        .state(false)
+        .member(member1)
+        .build();
+    WorryBoard worryBoard2 = WorryBoard.builder()
+        .title("title2")
+        .content("content2")
+        .targetMbti(MbtiEnum.ENTP)
         .state(false)
         .member(member1)
         .build();
     //해결이 된 고민
-    WorryBoard worryBoard2 = WorryBoard.builder()
-        .title("title2")
-        .content("content2")
-        .targetMbti(MbtiEnum.ENFP)
-        .state(false)
+    WorryBoard worryBoardSolved1 = WorryBoard.builder()
+        .title("titleSolved1")
+        .content("contentSolved1")
+        .targetMbti(MbtiEnum.ENTJ)
+        .state(true)
         .member(member1)
         .build();
-    worryBoard2.setSolveMember(member2);
+    WorryBoard worryBoardSolved2 = WorryBoard.builder()
+        .title("titleSolved2")
+        .content("contentSolved2")
+        .targetMbti(MbtiEnum.ENTJ)
+        .state(true)
+        .member(member1)
+        .build();
+    worryBoardSolved1.setSolveMember(member2);
+    worryBoardSolved2.setSolveMember(member2);
 
     //worryBoardImage
     WorryBoardImage worryBoardImage1 = new WorryBoardImage(1L, worryBoard1, "imgUrl1");
     WorryBoardImage worryBoardImage2 = new WorryBoardImage(2L, worryBoard1, "imgUrl2");
-    WorryBoardImage worryBoardImage3 = new WorryBoardImage(3L, worryBoard2, "imgUrl3");
-    WorryBoardImage worryBoardImage4 = new WorryBoardImage(4L, worryBoard2, "imgUrl4");
+    WorryBoardImage worryBoardImage3 = new WorryBoardImage(3L, worryBoard1, "imgUrl3");
+    WorryBoardImage worryBoardImage4 = new WorryBoardImage(4L, worryBoard1, "imgUrl4");
+    WorryBoardImage worryBoardImage5 = new WorryBoardImage(5L, worryBoardSolved1, "imgUrl5");
+    WorryBoardImage worryBoardImage6 = new WorryBoardImage(6L, worryBoardSolved1, "imgUrl6");
 
     //save
     memberRepository.save(member1);
     memberRepository.save(member2);
     worryBoardRepository.save(worryBoard1);
     worryBoardRepository.save(worryBoard2);
+    worryBoardRepository.save(worryBoardSolved1);
+    worryBoardRepository.save(worryBoardSolved2);
     worryBoardImageRepository.save(worryBoardImage1);
     worryBoardImageRepository.save(worryBoardImage2);
     worryBoardImageRepository.save(worryBoardImage3);
     worryBoardImageRepository.save(worryBoardImage4);
+    worryBoardImageRepository.save(worryBoardImage5);
+    worryBoardImageRepository.save(worryBoardImage6);
+
   }
   @BeforeEach
   public void mockMvcSetup() {
@@ -100,7 +122,9 @@ class WorryBoardControllerTest {
 
   @AfterEach
   public void AfterEach() {
-
+    /*memberRepository.deleteAll();
+    worryBoardRepository.deleteAll();
+    worryBoardImageRepository.deleteAll();*/
   }
 
   @DisplayName("해결 기다리는 고민 조회")
@@ -117,10 +141,28 @@ class WorryBoardControllerTest {
     resultActions
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].title").value("title1"))
-        .andExpect(jsonPath("$[0].memberMbti").value("ENFJ"))
+        .andExpect(jsonPath("$[0].memberMbti").value("INFP"))
         .andExpect(jsonPath("$[0].imgUrl").value("imgUrl1"))
         .andExpect(jsonPath("$[1].title").value("title2"))
-        .andExpect(jsonPath("$[1].targetMbti").value("ENFP"))
-        .andExpect(jsonPath("$[1].imgUrl").value("imgUrl3"));
+        .andExpect(jsonPath("$[1].targetMbti").value("ENTP"))
+        .andExpect(jsonPath("$[1].imgUrl").value("default"));
+  }
+
+  @DisplayName("해결 완료된 고민 조회")
+  @Test
+  public void findWorriesSolved() throws Exception {
+    //given
+    final String url = "/worry-board/waiting";
+
+    //when
+    final ResultActions resultActions = mockMvc.perform(get(url)
+        .accept(MediaType.APPLICATION_JSON));
+
+    //then
+    resultActions
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].title").value("titleSolved1"))
+        .andExpect(jsonPath("$[0].imgUrl").value("imgUrl5"))
+        .andExpect(jsonPath("$[1].title").value("titleSolved2"));
   }
 }

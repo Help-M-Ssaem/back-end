@@ -54,6 +54,7 @@ public class WorryBoard extends BaseTimeEntity {
         this.title = title;
         this.content = content;
         this.targetMbti = targetMbti;
+        this.state = state;
         this.member = member;
     }
 }
