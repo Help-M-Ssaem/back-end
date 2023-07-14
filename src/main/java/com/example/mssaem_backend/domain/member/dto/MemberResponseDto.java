@@ -11,4 +11,10 @@ public class MemberResponseDto {
         private String accessToken;
         private String refreshToken;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class CheckNickNameRes {
+        private boolean isUsed;
+    }
 }

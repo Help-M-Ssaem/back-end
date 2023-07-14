@@ -3,7 +3,7 @@ package com.example.mssaem_backend.domain.member;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
-import com.example.mssaem_backend.domain.member.dto.MemberResponseDto;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
@@ -77,5 +77,10 @@ public class MemberService {
         if (flag) {
             throw new BaseException(MemberErrorCode.DUPLICATE_NICKNAME);
         }
+    }
+
+    public CheckNickNameRes checkNickName(CheckNickName checkNickName) {
+        return new CheckNickNameRes(
+                memberRepository.existsByNickName(checkNickName.getNickName()));
     }
 }
