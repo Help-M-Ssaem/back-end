@@ -3,8 +3,10 @@ package com.example.mssaem_backend.domain.worryboard;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
 import com.example.mssaem_backend.domain.badge.BadgeService;
+import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.GetWorriesReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorryRes;
 import com.example.mssaem_backend.domain.worryboardimage.WorryBoardImageService;
@@ -39,10 +41,12 @@ public class WorryBoardService {
     }
 
     //고민게시판 - 고민 목록 조회
-    public PageResponseDto<List<GetWorriesRes>> findWorriesByState(boolean state, int page, int size) {
+    public PageResponseDto<List<GetWorriesRes>> findWorriesByState(boolean state, int page,
+        int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<WorryBoard> result = worryBoardRepository.findByState(state, pageable);
-        return new PageResponseDto<>(result.getNumber(), result.getTotalPages(), makeGetWorriesResForm(result));
+        return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
+            makeGetWorriesResForm(result));
     }
 
     //고민 게시판 - 고민글 상세 조회
@@ -65,23 +69,62 @@ public class WorryBoardService {
                     member.getMbti(),
                     badgeService.findRepresentativeBadgeByMember(member),
                     member.getProfileImageUrl()
-                    )
                 )
+            )
             .isAllowed(isAllowed)
             .build();
     }
 
     //특정 멤버별 올린 고민 목록 조회
-    public PageResponseDto<List<GetWorriesRes>> findWorriesByMemberId(Long memberId, int page, int size) {
+    public PageResponseDto<List<GetWorriesRes>> findWorriesByMemberId(Long memberId, int page,
+        int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<WorryBoard> result = worryBoardRepository.findByMemberId(memberId, pageable);
-        return new PageResponseDto<>(result.getNumber(), result.getTotalPages(), makeGetWorriesResForm(result));
+        return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
+            makeGetWorriesResForm(result));
     }
 
     //특정 멤버별 해결한 고민 목록 조회
-    public PageResponseDto<List<GetWorriesRes>> findSolveWorriesByMemberId(Long memberId, int page, int size) {
+    public PageResponseDto<List<GetWorriesRes>> findSolveWorriesByMemberId(Long memberId, int page,
+        int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<WorryBoard> result = worryBoardRepository.findBySolveMemberId(memberId, pageable);
-        return new PageResponseDto<>(result.getNumber(), result.getTotalPages(), makeGetWorriesResForm(result));
+        return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
+            makeGetWorriesResForm(result));
+    }
+
+    // mbti 필터링 조회
+    public PageResponseDto<List<GetWorriesRes>> findWorriesByMbti(GetWorriesReq getWorriesReq,
+        Boolean isSolved, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        boolean isFromAll = getWorriesReq.getFromMbti().equals("ALL");
+        boolean isToAll = getWorriesReq.getToMbti().equals("ALL");
+
+        Page<WorryBoard> result;
+
+        // 전체 -> 전체
+        if (isFromAll && isToAll) {
+            result = worryBoardRepository.findByState(isSolved, pageable);
+        }
+        // 전체 -> mbti
+        else if (isFromAll) {
+            result = worryBoardRepository.findWorriesByStateAndToMbti(isSolved,
+                MbtiEnum.valueOf(getWorriesReq.getToMbti()), pageable);
+        }
+        // mbti -> 전체
+        else if (isToAll) {
+            result = worryBoardRepository.findWorriesByStateAndFromMbti(isSolved,
+                MbtiEnum.valueOf(getWorriesReq.getFromMbti()), pageable);
+        }
+        //mbti -> mbti
+        else {
+            result = worryBoardRepository.findWorriesByStateAndBothMbti(isSolved,
+                MbtiEnum.valueOf(getWorriesReq.getFromMbti()),
+                MbtiEnum.valueOf(getWorriesReq.getToMbti()), pageable
+            );
+        }
+        return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
+            makeGetWorriesResForm(result));
     }
 }

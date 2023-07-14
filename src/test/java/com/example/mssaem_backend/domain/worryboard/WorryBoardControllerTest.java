@@ -179,12 +179,13 @@ class WorryBoardControllerTest {
             .andExpect(jsonPath("$.result[0].imgUrl").value("imgUrl5"))
             .andExpect(jsonPath("$.result[1].title").value("titleSolved2"));
     }
+
     @DisplayName("고민글 상세 조회")
     @Test
     public void findWorry() throws Exception {
         //given
         final long worryBoardId = 1L;
-        final String url = "/worry-board/" + worryBoardId ;
+        final String url = "/worry-board/" + worryBoardId;
 
         //when
         final ResultActions resultActions = mockMvc.perform(get(url)
@@ -231,4 +232,11 @@ class WorryBoardControllerTest {
             .andExpect(jsonPath("$.result[0].title").value("titleSolved1"))
             .andExpect(jsonPath("$.result[1].title").value("titleSolved2"));
     }
+
+    /*@DisplayName("해결 기다리는 고민 필터링 조회")
+    @Test
+    public void findWaitingWorriesByMbti() throws Exception {
+        //given
+        String url = ""
+    }*/
 }

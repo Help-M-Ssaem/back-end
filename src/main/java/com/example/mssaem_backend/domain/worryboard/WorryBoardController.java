@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.domain.worryboard;
 
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.GetWorriesReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorryRes;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,5 +50,17 @@ public class WorryBoardController {
     @GetMapping("/worry-board/solve-list")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>>findSolveWorriesByMemberId(@RequestParam Long memberId, @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(worryBoardService.findSolveWorriesByMemberId(memberId, page, size));
+    }
+
+    //고민 게시판(해결 X) - mbti별 고민글 조회
+    @PostMapping("worry-board/waiting/filter")
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWaitingWorriesByMbti(@RequestBody GetWorriesReq getWorriesReq, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(worryBoardService.findWorriesByMbti(getWorriesReq, false, page, size));
+    }
+
+    //고민 게시판(해결 O) - mbti별 고민글 조회
+    @PostMapping("worry-board/solved/filter")
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findSolvedWorriesByMbti(@RequestBody GetWorriesReq getWorriesReq, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(worryBoardService.findWorriesByMbti(getWorriesReq, true, page, size));
     }
 }
