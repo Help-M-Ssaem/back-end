@@ -232,11 +232,4 @@ class WorryBoardControllerTest {
             .andExpect(jsonPath("$.result[0].title").value("titleSolved1"))
             .andExpect(jsonPath("$.result[1].title").value("titleSolved2"));
     }
-
-    /*@DisplayName("해결 기다리는 고민 필터링 조회")
-    @Test
-    public void findWaitingWorriesByMbti() throws Exception {
-        //given
-        String url = ""
-    }*/
 }
