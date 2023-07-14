@@ -29,7 +29,7 @@ public class WorryBoardService {
     private final BadgeService badgeService;
 
     //List<WorryBoard>를 받아서 List<GetWorriesRes> 리스트를 반환하는 함수
-    public List<GetWorriesRes> makeGetWorriesResForm(Page<WorryBoard> result) {
+    private List<GetWorriesRes> makeGetWorriesResForm(Page<WorryBoard> result) {
         return result
             .stream()
             .map(worryBoard -> GetWorriesRes.builder()
