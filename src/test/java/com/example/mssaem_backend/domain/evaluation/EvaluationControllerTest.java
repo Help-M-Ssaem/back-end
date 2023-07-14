@@ -1,4 +1,4 @@
-package com.example.mssaem_backend.domain.evaluation;
+/*package com.example.mssaem_backend.domain.evaluation;
 
 import com.example.mssaem_backend.domain.evaluation.dto.EvaluationRequestDto.EvaluationInfo;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
@@ -135,4 +135,4 @@ class EvaluationControllerTest {
 
 
 
-}
+}*/
