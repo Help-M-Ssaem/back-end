@@ -40,9 +40,6 @@ public class Member extends BaseTimeEntity {
     private Role role;
 
     @NotNull
-    private String password;
-
-    @NotNull
     private String caseSensitivity; //대소문자 구분
 
     private String profileImageUrl;

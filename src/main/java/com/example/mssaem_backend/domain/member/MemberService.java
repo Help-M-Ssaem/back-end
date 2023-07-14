@@ -10,6 +10,7 @@ import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorC
 import com.example.mssaem_backend.global.config.security.jwt.JwtTokenProvider;
 import com.example.mssaem_backend.global.config.security.oauth.KakaoLoginService;
 import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class MemberService {
     private final KakaoLoginService kakaoLoginService;
     private final MemberRepository memberRepository;
@@ -31,7 +33,9 @@ public class MemberService {
                 .email(registerMember.getEmail())
                 .nickName(registerMember.getNickname())
                 .mbti(registerMember.getMbti())
+                .caseSensitivity(registerMember.getCaseSensitivity())
                 .refreshToken("")
+                .report(0)
                 .role(Role.ROLE_MEMBER)
                 .build();
         save(member);

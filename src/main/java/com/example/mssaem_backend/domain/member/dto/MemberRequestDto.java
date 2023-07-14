@@ -3,6 +3,7 @@ package com.example.mssaem_backend.domain.member.dto;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,10 +28,8 @@ public class MemberRequestDto {
         @NotBlank(message = "닉네임은 공백일 수 없습니다.")
         private String nickname;
         private MbtiEnum mbti;
-        //private boolean option1;
-        //private boolean option2;
-        //private boolean option3;
-        //private boolean option4;
+        @NotBlank(message = "mbti를 골라주세요.")
+        private String caseSensitivity; //대소문자 구분
     }
 
     @Getter
