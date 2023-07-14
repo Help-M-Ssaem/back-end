@@ -94,6 +94,7 @@ class WorryBoardControllerTest {
             .state(true)
             .member(member1)
             .build();
+
         worryBoardSolved1.setSolveMember(member2);
         worryBoardSolved2.setSolveMember(member2);
 
@@ -144,7 +145,7 @@ class WorryBoardControllerTest {
     @Test
     public void findWorriesWaiting() throws Exception {
         //given
-        final String url = "/worry-board/waiting";
+        final String url = "/worry-board/waiting?page=0&size=3";
 
         //when
         final ResultActions resultActions = mockMvc.perform(get(url)
@@ -153,19 +154,19 @@ class WorryBoardControllerTest {
         //then
         resultActions
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].title").value("title1"))
-            .andExpect(jsonPath("$[0].memberMbti").value("INFP"))
-            .andExpect(jsonPath("$[0].imgUrl").value("imgUrl1"))
-            .andExpect(jsonPath("$[1].title").value("title2"))
-            .andExpect(jsonPath("$[1].targetMbti").value("ENTP"))
-            .andExpect(jsonPath("$[1].imgUrl").value("default"));
+            .andExpect(jsonPath("$.result[0].title").value("title1"))
+            .andExpect(jsonPath("$.result[0].memberMbti").value("INFP"))
+            .andExpect(jsonPath("$.result[0].imgUrl").value("imgUrl1"))
+            .andExpect(jsonPath("$.result[1].title").value("title2"))
+            .andExpect(jsonPath("$.result[1].targetMbti").value("ENTP"))
+            .andExpect(jsonPath("$.result[1].imgUrl").value("default"));
     }
 
     @DisplayName("해결 완료된 고민 조회")
     @Test
     public void findWorriesSolved() throws Exception {
         //given
-        final String url = "/worry-board/waiting";
+        final String url = "/worry-board/solved?page=0&size=3";
 
         //when
         final ResultActions resultActions = mockMvc.perform(get(url)
@@ -174,15 +175,15 @@ class WorryBoardControllerTest {
         //then
         resultActions
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].title").value("titleSolved1"))
-            .andExpect(jsonPath("$[0].imgUrl").value("imgUrl5"))
-            .andExpect(jsonPath("$[1].title").value("titleSolved2"));
+            .andExpect(jsonPath("$.result[0].title").value("titleSolved1"))
+            .andExpect(jsonPath("$.result[0].imgUrl").value("imgUrl5"))
+            .andExpect(jsonPath("$.result[1].title").value("titleSolved2"));
     }
     @DisplayName("고민글 상세 조회")
     @Test
     public void findWorry() throws Exception {
         //given
-        final Long worryBoardId = 1L;
+        final long worryBoardId = 1L;
         final String url = "/worry-board/" + worryBoardId ;
 
         //when
@@ -192,14 +193,14 @@ class WorryBoardControllerTest {
         //then
         resultActions
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].representativeBadge").value("엠비티라노"));
+            .andExpect(jsonPath("$.memberSimpleInfo.badge").value("엠비티라노"));
     }
 
     @DisplayName("특정 멤버 별 올린 고민 조회")
     @Test
     public void findWorriesByMemberId() throws Exception {
         //given
-        final String url = "/worry-board/post-list/1";
+        final String url = "/worry-board/post-list?memberId=1&page=0&size=3";
 
         //when
         final ResultActions resultActions = mockMvc.perform(get(url)
@@ -208,25 +209,26 @@ class WorryBoardControllerTest {
         //then
         resultActions
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].title").value("title1"))
-            .andExpect(jsonPath("$[1].title").value("title2"));
+            .andExpect(jsonPath("$.result[0].title").value("title1"))
+            .andExpect(jsonPath("$.result[1].title").value("title2"));
     }
 
     @DisplayName("특정 멤버 별 해결한 고민 조회")
     @Test
     public void findSolveWorriesByMemberId() throws Exception {
         //given
-        final String url = "/worry-board/solve-list";
-        final Long memberId = 2L;
+        final String url = "/worry-board/solve-list?memberId=2&page=0&size=3";
+        //final Long memberId = 2L;
+
         //when
         final ResultActions resultActions = mockMvc.perform(get(url)
-            .param("memberId", String.valueOf(memberId))
+            //.param("memberId", String.valueOf(memberId))
             .accept(MediaType.APPLICATION_JSON));
 
         //then
         resultActions
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0]").value("titleSolved1"))
-            .andExpect(jsonPath("$[1]").value("titleSolved2"));
+            .andExpect(jsonPath("$.result[0].title").value("titleSolved1"))
+            .andExpect(jsonPath("$.result[1].title").value("titleSolved2"));
     }
 }

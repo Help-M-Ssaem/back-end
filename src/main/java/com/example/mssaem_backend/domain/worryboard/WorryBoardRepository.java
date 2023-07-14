@@ -1,13 +1,14 @@
 package com.example.mssaem_backend.domain.worryboard;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
 
-    List<WorryBoard> findByState(boolean state);
+    Page<WorryBoard> findByState(boolean state,  Pageable pageable);
 
-    List<WorryBoard> findByMemberId(Long memberId);
+    Page<WorryBoard> findByMemberId(Long memberId, Pageable pageable);
 
-    List<WorryBoard> findBySolveMemberId(Long memberId);
+    Page<WorryBoard> findBySolveMemberId(Long memberId, Pageable pageable);
 }

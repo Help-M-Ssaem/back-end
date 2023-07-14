@@ -1,8 +1,7 @@
 package com.example.mssaem_backend.domain.worryboard.dto;
 
-import static com.example.mssaem_backend.global.common.Time.calculateTime;
-
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -17,28 +16,26 @@ public class WorryBoardResponseDto {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class GetWorryRes {
-
-    private String nickName;
-    private String profileImgUrl;
-    private MbtiEnum memberMbti;
+    private MemberSimpleInfo memberSimpleInfo;
+    private Long worryBoardId;
     private MbtiEnum targetMbti;
-    private String representativeBadge;
     private String title;
     private String content;
     private String createdAt;
     private List<String> imgList;
+    private Boolean isAllowed;
 
     @Builder
-    public GetWorryRes(WorryBoard worryBoard, List<String> imgList, String representativeBadge, String createdAt) {
-      this.nickName = worryBoard.getMember().getNickName();
-      this.profileImgUrl = worryBoard.getMember().getProfileImageUrl();
-      this.memberMbti = worryBoard.getMember().getMbti();
+    public GetWorryRes(WorryBoard worryBoard, List<String> imgList,
+        MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isAllowed) {
+      this.worryBoardId = worryBoard.getId();
+      this.memberSimpleInfo = memberSimpleInfo;
       this.targetMbti = worryBoard.getTargetMbti();
-      this.representativeBadge = representativeBadge;
       this.title = worryBoard.getTitle();
       this.content = worryBoard.getContent();
       this.createdAt = createdAt;
       this.imgList = imgList;
+      this.isAllowed = isAllowed;
     }
   }
 

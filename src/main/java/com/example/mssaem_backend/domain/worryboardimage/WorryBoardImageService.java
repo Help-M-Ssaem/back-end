@@ -18,7 +18,7 @@ public class WorryBoardImageService {
   public List<String> getImgUrls(WorryBoard worryBoard) {
     List<WorryBoardImage> worryBoardImages = worryBoardImageRepository.findAllByWorryBoard(worryBoard);
 
-    if(worryBoardImages == null) {
+    if(worryBoardImages.isEmpty()) {
       return Collections.singletonList("default");
     }
     return worryBoardImages.stream()
