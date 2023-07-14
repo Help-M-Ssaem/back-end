@@ -23,4 +23,9 @@ public class ChatParticipate extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public ChatParticipate(ChatRoom chatRoom, Member member) {
+        this.chatRoom = chatRoom;
+        this.member = member;
+    }
 }
