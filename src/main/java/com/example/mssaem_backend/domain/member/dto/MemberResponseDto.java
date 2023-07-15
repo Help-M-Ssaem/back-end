@@ -10,14 +10,17 @@ public class MemberResponseDto {
     @Getter
     @AllArgsConstructor
     public static class TokenInfo {
+
         private String accessToken;
         private String refreshToken;
     }
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class MemberSimpleInfo {
-        private Long memberId;
+
+        private Long id;
         private String nickName;
         private MbtiEnum mbtiEnum;
         private String badge;
