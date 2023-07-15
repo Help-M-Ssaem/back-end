@@ -16,12 +16,17 @@ public class MemberResponseDto {
 
     @Getter
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class MemberSimpleInfo {
         private Long memberId;
         private String nickName;
         private MbtiEnum mbtiEnum;
         private String badge;
         private String profileImgUrl;
+    }
+    
+    @Getter
+    @AllArgsConstructor
+    public static class CheckNickNameRes {
+        private boolean isUsed;
     }
 }
