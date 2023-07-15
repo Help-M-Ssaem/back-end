@@ -17,6 +17,7 @@ import org.hibernate.annotations.ColumnDefault;
 public class Badge extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "badge_id")
     private Long id;
 
     @NotNull
