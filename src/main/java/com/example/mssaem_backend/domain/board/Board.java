@@ -42,4 +42,13 @@ public class Board extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @Builder
+    public Board(String title, String content, MbtiEnum mbti, boolean state, Member member) {
+        this.title = title;
+        this.content = content;
+        this.mbti = mbti;
+        this.state = state;
+        this.member = member;
+    }
 }
