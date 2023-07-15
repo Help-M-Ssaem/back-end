@@ -101,29 +101,12 @@ public class WorryBoardService {
         boolean isFromAll = getWorriesReq.getFromMbti().equals("ALL");
         boolean isToAll = getWorriesReq.getToMbti().equals("ALL");
 
-        Page<WorryBoard> result;
+        // ALL인 경우에 mbti에는 null값이 들어감
+        MbtiEnum fromMbti = isFromAll ? null : MbtiEnum.valueOf(getWorriesReq.getFromMbti());
+        MbtiEnum toMbti = isToAll ? null : MbtiEnum.valueOf(getWorriesReq.getToMbti());
 
-        // 전체 -> 전체
-        if (isFromAll && isToAll) {
-            result = worryBoardRepository.findByState(isSolved, pageable);
-        }
-        // 전체 -> mbti
-        else if (isFromAll) {
-            result = worryBoardRepository.findWorriesByStateAndToMbti(isSolved,
-                MbtiEnum.valueOf(getWorriesReq.getToMbti()), pageable);
-        }
-        // mbti -> 전체
-        else if (isToAll) {
-            result = worryBoardRepository.findWorriesByStateAndFromMbti(isSolved,
-                MbtiEnum.valueOf(getWorriesReq.getFromMbti()), pageable);
-        }
-        //mbti -> mbti
-        else {
-            result = worryBoardRepository.findWorriesByStateAndBothMbti(isSolved,
-                MbtiEnum.valueOf(getWorriesReq.getFromMbti()),
-                MbtiEnum.valueOf(getWorriesReq.getToMbti()), pageable
-            );
-        }
+        Page<WorryBoard> result = worryBoardRepository.findWorriesByStateAndBothMbti(isSolved, fromMbti, toMbti, pageable);
+
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
             makeGetWorriesResForm(result));
     }

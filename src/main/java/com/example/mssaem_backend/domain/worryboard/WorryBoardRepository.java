@@ -15,24 +15,11 @@ public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
 
     Page<WorryBoard> findBySolveMemberId(Long memberId, Pageable pageable);
 
-    // Mbti -> Mbti
-    @Query("SELECT wb FROM WorryBoard wb WHERE wb.state = :state AND (wb.member.mbti = :fromMbti) AND (wb.targetMbti = :toMbti)")
+    @Query("SELECT wb FROM WorryBoard wb WHERE wb.state = :state AND (:fromMbti IS NULL OR wb.member.mbti = :fromMbti) AND (:toMbti IS NULL OR wb.targetMbti = :toMbti)")
     Page<WorryBoard> findWorriesByStateAndBothMbti(
         @Param("state") Boolean state,
         @Param("fromMbti") MbtiEnum fromMbti,
         @Param("toMbti") MbtiEnum toMbti,
         Pageable pageable
     );
-
-    // Mbti -> ALL
-    @Query("SELECT wb FROM WorryBoard wb WHERE wb.state = :state AND wb.member.mbti = :fromMbti")
-    Page<WorryBoard> findWorriesByStateAndFromMbti(@Param("state") Boolean state,
-        @Param("fromMbti") MbtiEnum fromMbti, Pageable pageable);
-
-    // ALL -> Mbti
-    @Query("SELECT wb FROM WorryBoard wb WHERE wb.state = :state AND wb.targetMbti = :toMbti")
-    Page<WorryBoard> findWorriesByStateAndToMbti(@Param("state") Boolean state,
-        @Param("toMbti") MbtiEnum toMbti, Pageable pageable);
-
-
 }
