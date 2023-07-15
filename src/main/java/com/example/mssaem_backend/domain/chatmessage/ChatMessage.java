@@ -1,6 +1,5 @@
 package com.example.mssaem_backend.domain.chatmessage;
 
-import com.example.mssaem_backend.domain.chatmessage.dto.ChatMessageRequestDto.ChatMessageInfo;
 import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
