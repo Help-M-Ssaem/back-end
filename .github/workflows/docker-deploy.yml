@@ -49,7 +49,7 @@ jobs:
       with:
         arguments: clean build -x test
         
-   # Docker
+      # Docker
     - name: 도커 이미지 빌드
       run: docker build -t parksewoong/mssaem:latest .
 
