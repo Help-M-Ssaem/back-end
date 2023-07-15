@@ -26,4 +26,10 @@ public class MemberResponseDto {
         private String badge;
         private String profileImgUrl;
     }
+    
+    @Getter
+    @AllArgsConstructor
+    public static class CheckNickNameRes {
+        private boolean isUsed;
+    }
 }
