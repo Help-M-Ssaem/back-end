@@ -36,7 +36,6 @@ jobs:
       # 서브 모듈 변경 점 있으면 update
     - name: Git Sumbodule Update
       run: |
-        git pull --recurse-submodules
         git submodule update --remote --recursive    
 
       # gradlew 권한 변경
