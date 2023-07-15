@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.boardcomment;
 
+import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import org.hibernate.annotations.ColumnDefault;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class BoardComment extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,4 +38,6 @@ public class BoardComment extends BaseTimeEntity {
     @ColumnDefault("true")
     private boolean state; //true : 존재, false : 삭제
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Board board;
 }
