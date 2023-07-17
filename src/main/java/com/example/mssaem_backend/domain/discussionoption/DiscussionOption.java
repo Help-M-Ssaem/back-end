@@ -13,6 +13,7 @@ import org.hibernate.annotations.ColumnDefault;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class DiscussionOption extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,6 +23,5 @@ public class DiscussionOption extends BaseTimeEntity {
     private String content;
 
     @ColumnDefault("0")
-    private Long selected; // 선택한 사람 수
-
+    private Long selectCount; // 선택한 사람 수
 }
