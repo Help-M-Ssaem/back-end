@@ -5,8 +5,10 @@ import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import redis.embedded.RedisServer;
 
+@Profile("dev")
 @Configuration
 public class EmbeddedRedisConfig {
 
@@ -18,14 +20,13 @@ public class EmbeddedRedisConfig {
   public void redisServer() throws IOException {
     redisServer = RedisServer.builder()
         .port(redisPort)
-        //.redisExecProvider(customRedisExec) //com.github.kstyrc (not com.orange.redis-embedded)
         .setting("maxmemory 128M") //maxheap 128M
         .build();
     redisServer.start();
   }
   @PreDestroy
   public void stopRedis() {
-    if (redisServer != null) {
+    if(redisServer != null) {
       redisServer.stop();
     }
   }
