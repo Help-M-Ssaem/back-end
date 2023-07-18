@@ -40,8 +40,7 @@ public class Board extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long hits;
 
-    @ColumnDefault("true")
-    private boolean state; //true : 삭제아님, false : 삭제
+    private boolean state = true; //true : 삭제아님, false : 삭제
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
