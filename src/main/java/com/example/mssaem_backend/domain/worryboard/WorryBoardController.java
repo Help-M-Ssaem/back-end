@@ -3,6 +3,7 @@ package com.example.mssaem_backend.domain.worryboard;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.GetWorriesReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorryRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.PatchWorrySolvedRes;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
@@ -78,8 +81,18 @@ public class WorryBoardController {
 
     //고민 해결 완료 처리
     @PostMapping("/member/worry-board/solved")
-    public ResponseEntity<PatchWorrySolvedRes> solvedWorryBoard(@CurrentMember Member currentMember, @RequestBody
-    PatchWorrySolvedReq patchWorryReq) {
+    public ResponseEntity<PatchWorrySolvedRes> solvedWorryBoard(@CurrentMember Member currentMember,
+        @RequestBody PatchWorrySolvedReq patchWorryReq) {
         return ResponseEntity.ok(worryBoardService.solvedWorryBoard(patchWorryReq));
+    }
+
+    //고민글 생성
+    @PostMapping("/member/worry-board")
+    public ResponseEntity<String> createWorryBoard(@CurrentMember Member currentMember,
+        @RequestPart(value = "postWorryBoardReq")
+        PostWorryReq postWorryReq,
+        @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
+        return ResponseEntity.ok(
+            worryBoardService.createWorryBoard(currentMember, postWorryReq, multipartFiles));
     }
 }

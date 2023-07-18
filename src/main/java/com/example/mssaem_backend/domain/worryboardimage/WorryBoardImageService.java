@@ -21,8 +21,7 @@ public class WorryBoardImageService {
         if (worryBoardImages.isEmpty()) {
             return Collections.singletonList("default");
         }
-        return worryBoardImages.stream()
-            .map(WorryBoardImage::getImgUrl)
+        return worryBoardImages.stream().map(WorryBoardImage::getImgUrl)
             .collect(Collectors.toList());
     }
 
@@ -34,5 +33,14 @@ public class WorryBoardImageService {
             return "default";
         }
         return worryBoardImage.getImgUrl();
+    }
+
+    //이미지 업로드
+    public void uploadImage(String worryBoardImageUrl, WorryBoard worryBoard) {
+        worryBoardImageRepository.save(
+            WorryBoardImage.builder().
+                imgUrl(worryBoardImageUrl)
+                .worryBoard(worryBoard).
+                build());
     }
 }

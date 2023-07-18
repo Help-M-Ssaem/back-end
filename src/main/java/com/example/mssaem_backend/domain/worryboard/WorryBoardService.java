@@ -9,20 +9,25 @@ import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.GetWorriesReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorryRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.PatchWorrySolvedRes;
+import com.example.mssaem_backend.domain.worryboardimage.WorryBoardImageRepository;
 import com.example.mssaem_backend.domain.worryboardimage.WorryBoardImageService;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.WorryBoardErrorCode;
+import com.example.mssaem_backend.global.s3.S3Service;
+import com.example.mssaem_backend.global.s3.dto.S3Result;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +37,7 @@ public class WorryBoardService {
     private final WorryBoardImageService worryBoardImageService;
     private final MemberRepository memberRepository;
     private final BadgeService badgeService;
+    private final S3Service s3Service;
 
     //List<WorryBoard>를 받아서 List<GetWorriesRes> 리스트를 반환하는 함수
     private List<GetWorriesRes> makeGetWorriesResForm(Page<WorryBoard> result) {
@@ -113,12 +119,30 @@ public class WorryBoardService {
         // 고민글의 상태 바꾸기
         worryBoard.solveWorryBoard(false, solveMember);
         // 평가창에 뜰 memberSimpleInfo, worryBoard Id 반환
-        return PatchWorrySolvedRes.builder().
-            memberSimpleInfo(
-                new MemberSimpleInfo(
-                    solveMember.getId(), solveMember.getNickName(), solveMember.getMbti(),
-                    badgeService.findRepresentativeBadgeByMember(solveMember),
-                    solveMember.getProfileImageUrl()))
-            .worryBoardId(worryBoard.getId()).build();
+        return PatchWorrySolvedRes.builder().memberSimpleInfo(
+            new MemberSimpleInfo(solveMember.getId(), solveMember.getNickName(),
+                solveMember.getMbti(), badgeService.findRepresentativeBadgeByMember(solveMember),
+                solveMember.getProfileImageUrl())).worryBoardId(worryBoard.getId()).build();
+    }
+
+    public String createWorryBoard(Member currentMember, PostWorryReq postWorryReq,
+        List<MultipartFile> multipartFiles) {
+        //고민글 내용 저장
+        WorryBoard worryBoard = WorryBoard.builder().title(postWorryReq.getTitle())
+            .content(postWorryReq.getContent())
+            .targetMbti(postWorryReq.getTargetMbti())
+            .member(currentMember)
+            .build();
+        worryBoardRepository.save(worryBoard);
+        if (multipartFiles != null) {
+            //s3에 파일 저장
+            List<S3Result> worryBoardImageList = s3Service.uploadFile(multipartFiles);
+            if (!worryBoardImageList.isEmpty()) {
+                for (S3Result s3Result : worryBoardImageList) {
+                    worryBoardImageService.uploadImage(s3Result.getImgUrl(), worryBoard);
+                }
+            }
+        }
+        return "고민글 생성 완료";
     }
 }
