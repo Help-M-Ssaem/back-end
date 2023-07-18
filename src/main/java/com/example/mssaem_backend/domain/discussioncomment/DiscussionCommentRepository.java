@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DiscussionCommentRepository extends JpaRepository<DiscussionComment, Long> {
 
-    Long countByDiscussionAndState(Discussion discussion, boolean state);
+    Long countWithStateTrueByDiscussion(Discussion discussion);
 }

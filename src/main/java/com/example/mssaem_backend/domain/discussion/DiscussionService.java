@@ -35,7 +35,7 @@ public class DiscussionService {
     public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionList(Member member,
         int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDays(
+        Page<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
             LocalDateTime.now().minusDays(3)
             , pageRequest);
 
@@ -72,22 +72,21 @@ public class DiscussionService {
                     discussion.getId(),
                     discussion.getTitle(),
                     discussion.getContent(),
-                    discussion.getParticipants(),
-                    discussionCommentRepository.countByDiscussionAndState(discussion, true),
+                    discussion.getParticipantCount(),
+                    discussionCommentRepository.countWithStateTrueByDiscussion(discussion),
                     Time.calculateTime(discussion.getCreatedAt(), 3),
                     new MemberSimpleInfo(
                         discussion.getMember().getId(),
                         discussion.getMember().getNickName(),
                         discussion.getMember().getMbti(),
-                        badgeRepository.findBadgeByMemberAndState(
-                                discussion.getMember(),
-                                true)
+                        badgeRepository.findBadgeWithStateTrueByMember(
+                                discussion.getMember())
                             .orElse(new Badge())
                             .getName(),
                         discussion.getMember().getProfileImageUrl()
                     ),
                     selectedOptionIdx != -1
-                        ? setDiscussionOptionSelectedInfo(discussion.getParticipants(),
+                        ? setDiscussionOptionSelectedInfo(discussion.getParticipantCount(),
                         discussionOptions, selectedOptionIdx)
                         : setDiscussionOptionInfo(discussionOptions)
                 )
@@ -100,10 +99,9 @@ public class DiscussionService {
     private int getSelectedOptionIdx(Member member, List<DiscussionOption> discussionOptions) {
         int selectedOptionIdx = -1;
         for (int i = 0; i < discussionOptions.size(); i++) {
-            if (discussionOptionSelectedRepository.findDiscussionOptionSelectedByMemberAndDiscussionOptionAndState(
+            if (discussionOptionSelectedRepository.findDiscussionOptionSelectedWithStateByMemberAndDiscussionOption(
                 member,
-                discussionOptions.get(i),
-                true) != null) {
+                discussionOptions.get(i)) != null) {
                 selectedOptionIdx = i;
             }
 

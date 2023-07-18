@@ -16,7 +16,7 @@ public class DiscussionResponseDto {
         private Long id;
         private String imgUrl;
         private String content;
-        private Long participants;
+        private Long participantCount;
         private Long commentCount;
         private String createdAt;
         private MemberSimpleInfo memberSimpleInfo;
