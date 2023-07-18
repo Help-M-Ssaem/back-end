@@ -14,6 +14,7 @@ import org.hibernate.annotations.DynamicInsert;
 @Setter
 @Entity
 public class ChatRoom extends BaseTimeEntity implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

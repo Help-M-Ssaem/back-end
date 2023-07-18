@@ -16,6 +16,7 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Board extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
