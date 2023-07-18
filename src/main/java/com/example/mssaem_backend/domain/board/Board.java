@@ -51,4 +51,14 @@ public class Board extends BaseTimeEntity {
         this.state = state;
         this.member = member;
     }
+
+    public void modifyBoard(String title, String content, MbtiEnum mbti) {
+        this.title = title;
+        this.content = content;
+        this.mbti = mbti;
+    }
+
+    public void deleteBoard(){
+        this.state = false;
+    }
 }
