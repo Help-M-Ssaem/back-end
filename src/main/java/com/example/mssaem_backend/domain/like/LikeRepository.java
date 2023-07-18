@@ -14,4 +14,5 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     @Query(value = "SELECT l.board FROM Like l WHERE l.createdAt >= :threeDaysAgo AND l.board.state = true GROUP BY l.board HAVING COUNT(l.board.id) >= 1 ORDER BY COUNT(l.board.id) DESC")
     Page<Board> findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(@Param("threeDaysAgo") LocalDateTime threeDaysAgo, PageRequest pageRequest);
 
+
 }

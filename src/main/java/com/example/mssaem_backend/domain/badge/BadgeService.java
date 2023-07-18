@@ -13,6 +13,6 @@ public class BadgeService {
     //멤버의 대표 뱃지 가져오기
     public String findRepresentativeBadgeByMember(Member member) {
         return badgeRepository.findBadgeWithStateTrueByMember(member).orElse(new Badge())
-            .getName();
+               .getName();
     }
 }
