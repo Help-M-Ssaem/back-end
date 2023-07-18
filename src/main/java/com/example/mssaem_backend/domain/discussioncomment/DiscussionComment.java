@@ -17,6 +17,7 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class DiscussionComment extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +26,7 @@ public class DiscussionComment extends BaseTimeEntity {
     private String content;
 
     @ColumnDefault("0")
-    private Long recommendation;
+    private Long likeCount;
 
     @ColumnDefault("0")
     private Integer depth; //댓글 : 0, 대 댓글 : 1
