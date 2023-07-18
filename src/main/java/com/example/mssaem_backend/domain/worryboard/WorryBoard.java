@@ -21,6 +21,7 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class WorryBoard extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,7 +39,6 @@ public class WorryBoard extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long report;
 
-    @ColumnDefault("false")
     private boolean state; //true : 해결, false : 해결 안함
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -52,7 +52,8 @@ public class WorryBoard extends BaseTimeEntity {
 
     //테스트 코드용
     @Builder
-    public WorryBoard(String title, String content, MbtiEnum targetMbti, boolean state, Member member) {
+    public WorryBoard(String title, String content, MbtiEnum targetMbti, boolean state,
+        Member member) {
         this.title = title;
         this.content = content;
         this.targetMbti = targetMbti;

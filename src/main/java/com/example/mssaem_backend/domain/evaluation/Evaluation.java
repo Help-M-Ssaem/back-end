@@ -19,22 +19,22 @@ import org.hibernate.annotations.DynamicInsert;
 @Entity
 public class Evaluation extends BaseTimeEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private WorryBoard worryBoard;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private WorryBoard worryBoard;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 
-  @NotNull
-  private String evaluationCode;
+    @NotNull
+    private String evaluationCode;
 
-  public Evaluation(WorryBoard worryBoard, Member member, String evaluationCode) {
-    this.worryBoard = worryBoard;
-    this.member = member;
-    this.evaluationCode = evaluationCode;
-  }
+    public Evaluation(WorryBoard worryBoard, Member member, String evaluationCode) {
+        this.worryBoard = worryBoard;
+        this.member = member;
+        this.evaluationCode = evaluationCode;
+    }
 }
