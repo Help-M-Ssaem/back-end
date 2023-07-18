@@ -22,7 +22,7 @@ public class Board extends BaseTimeEntity {
     private Long id;
 
     @ColumnDefault("0")
-    private Long recommendation;
+    private Long likeCount;
 
     @NotNull
     private String title;
