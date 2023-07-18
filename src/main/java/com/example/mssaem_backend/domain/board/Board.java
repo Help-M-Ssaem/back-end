@@ -14,6 +14,7 @@ import org.hibernate.annotations.ColumnDefault;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Board extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,21 +45,20 @@ public class Board extends BaseTimeEntity {
     private Member member;
 
     @Builder
-    public Board(String title, String content, MbtiEnum mbti, boolean state, Member member) {
+    public Board(String title, String content, MbtiEnum mbti, Member member) {
         this.title = title;
         this.content = content;
         this.mbti = mbti;
-        this.state = state;
         this.member = member;
     }
 
     public void modifyBoard(String title, String content, MbtiEnum mbti) {
-        this.title = title;
-        this.content = content;
-        this.mbti = mbti;
+        this.title = title != null ? title : this.title;
+        this.content = content != null ? content : this.content;
+        this.mbti = mbti != null ? mbti : this.mbti;
     }
 
-    public void deleteBoard(){
+    public void deleteBoard() {
         this.state = false;
     }
 }

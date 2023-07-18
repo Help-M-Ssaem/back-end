@@ -19,10 +19,10 @@ public class BoardImageService {
     }
 
     public List<BoardImage> loadImage(Long boardId) {
-        return boardImageRepository.findAllByBoard(boardId);
+        return boardImageRepository.findAllByBoardId(boardId);
     }
 
-    public void deleteImage(Long boardId) {
-        boardImageRepository.deleteById(boardId);
+    public void deleteImage(Board board) {
+        boardImageRepository.deleteAllByBoard(board);
     }
 }

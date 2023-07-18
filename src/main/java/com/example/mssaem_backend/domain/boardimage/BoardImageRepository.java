@@ -8,5 +8,7 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
 
     BoardImage findTopByBoardOrderById(Board board);
 
-    List<BoardImage> findAllByBoard(Long id);
+    List<BoardImage> findAllByBoardId(Long id);
+
+    List<BoardImage> deleteAllByBoard(Board board);
 }

@@ -53,8 +53,8 @@ public class BoardController {
      */
     @PatchMapping("/member/board/{id}")
     public ResponseEntity<String> modifyBoard(@CurrentMember Member member,
-        @RequestBody PatchBoardReq patchBoardReq, @PathVariable Long id,
-        @RequestParam List<MultipartFile> multipartFiles) {
+        @RequestPart(value = "patchBoardReq") PatchBoardReq patchBoardReq, @PathVariable Long id,
+        @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
         return ResponseEntity.ok(
             boardService.modifyBoard(member, patchBoardReq, id, multipartFiles));
     }

@@ -109,15 +109,11 @@ public class BoardService {
             .title(postBoardReq.getTitle())
             .content(postBoardReq.getContent())
             .mbti(postBoardReq.getMbti())
-            .state(true)
             .member(member)
             .build();
         boardRepository.save(board);
-        List<S3Result> boardImageList = s3Service.uploadFile(multipartFiles);
-        if (!boardImageList.isEmpty()) {
-            for (S3Result s3Result : boardImageList) {
-                boardImageService.uploadImage(s3Result.getImgUrl(), board);
-            }
+        if (multipartFiles != null) {
+            uploadBoardImage(board, multipartFiles);
         }
         return "게시글 생성 완료";
     }
@@ -130,23 +126,11 @@ public class BoardService {
                 .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
                 patchBoardReq.getMbti());
-
-            //현재 저장된 이미지 불러오기
-            List<BoardImage> dbBoardImageList = boardImageService.loadImage(boardId);
-            //S3 삭제
-            for (BoardImage boardImage : dbBoardImageList) {
-                s3Service.deleteFile(s3Service.parseFileName(boardImage.getImageUrl()));
-            }
-            //DB에 저장된 이미지 삭제
-            boardImageService.deleteImage(boardId);
-
-            //전달되어온 파일들
-            List<S3Result> newFileList = s3Service.uploadFile(multipartFiles);
-            //전달된 파일 다시 저장
-            if (!dbBoardImageList.isEmpty()) {
-                for (S3Result s3Result : newFileList) {
-                    boardImageService.uploadImage(s3Result.getImgUrl(), board);
-                }
+            //현재 저장된 이미지 삭제
+            deleteBoardImage(board);
+            //새로운 이미지 업로드
+            if (multipartFiles != null) {
+                uploadBoardImage(board, multipartFiles);
             }
             return "게시글 수정 완료";
         } else {
@@ -159,20 +143,36 @@ public class BoardService {
         if (member.getId() != null && member.getId() == deleteBoardReq.getMemberId()) {
             Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+            //게시글 Soft Delete
             board.deleteBoard();
-
-            //현재 저장된 이미지 불러오기
-            List<BoardImage> dbBoardImageList = boardImageService.loadImage(boardId);
-            //S3 삭제
-            for (BoardImage boardImage : dbBoardImageList) {
-                s3Service.deleteFile(s3Service.parseFileName(boardImage.getImageUrl()));
-            }
-            //DB에 저장된 이미지 삭제
-            boardImageService.deleteImage(boardId);
-
+            //현재 저장된 이미지 삭제
+            deleteBoardImage(board);
             return "게시글 삭제 완료";
         } else {
             throw new BaseException(BoardErrorCode.INVALID_MEMBER);
         }
     }
+
+    private void uploadBoardImage(Board board, List<MultipartFile> multipartFiles) {
+        //multipartFiles 로 부터 파일 받아오기
+        List<S3Result> boardImageList = s3Service.uploadFile(multipartFiles);
+        //이미지 저장
+        if (!boardImageList.isEmpty()) {
+            for (S3Result s3Result : boardImageList) {
+                boardImageService.uploadImage(s3Result.getImgUrl(), board);
+            }
+        }
+    }
+
+    private void deleteBoardImage(Board board) {
+        //현재 DB에 저장된 이미지 불러오기
+        List<BoardImage> dbBoardImageList = boardImageService.loadImage(board.getId());
+        //S3 삭제
+        for (BoardImage boardImage : dbBoardImageList) {
+            s3Service.deleteFile(s3Service.parseFileName(boardImage.getImageUrl()));
+        }
+        //DB에 저장된 이미지 삭제
+        boardImageService.deleteImage(board);
+    }
+
 }
