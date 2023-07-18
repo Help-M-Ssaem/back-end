@@ -40,7 +40,7 @@ public class EvaluationController {
   /**
    * 자신이 받은 평가 count
    */
-  @GetMapping("/count/{memberId}")
+  @GetMapping("/count")
   public ResponseEntity<EvaluationCount> countEvaluation(@CurrentMember Member member, @PathVariable Long memberId){
     return ResponseEntity.ok(evaluationService.countEvaluation(member));
   }

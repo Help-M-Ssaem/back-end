@@ -76,7 +76,6 @@ public class EvaluationService {
    */
   public EvaluationCount countEvaluation(Member member) {
     List<Evaluation> evaluations = evaluationRepository.findAllByMember(member);
-
     int[] result = new int[EvaluationEnum.values().length];
     for (Evaluation e : evaluations) {
       char[] temp = e.getEvaluationCode().toCharArray();
