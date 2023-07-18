@@ -4,6 +4,7 @@ import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
+import com.example.mssaem_backend.domain.boardimage.BoardImage;
 import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
@@ -70,7 +71,8 @@ public class BoardService {
                     board.getId(),
                     board.getTitle(),
                     board.getContent(),
-                    boardImageRepository.findTopByBoardOrderById(board).getImageUrl(),
+                    boardImageRepository.findTopByBoardOrderById(board).orElse(new BoardImage())
+                        .getImageUrl(),
                     board.getMbti(),
                     board.getRecommendation(),
                     boardCommentRepository.countByBoardAndState(board, true),
