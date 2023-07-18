@@ -28,4 +28,5 @@ public class DiscussionOption extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Discussion discussion;
+
 }
