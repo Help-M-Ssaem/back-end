@@ -32,6 +32,7 @@ public class DiscussionService {
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
 
+    // HOT 토론글 전체 조회
     public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionList(Member member,
         int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -48,6 +49,22 @@ public class DiscussionService {
                     .stream()
                     .collect(Collectors.toList()))
         );
+    }
+
+    // 최상위 제외한 HOT 토론글 2개만 조회
+    public List<DiscussionSimpleInfo> findHotDiscussionListForHome(Member member) {
+        PageRequest pageRequest = PageRequest.of(0, 3);
+        List<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDays(
+                LocalDateTime.now().minusDays(3)
+                , pageRequest)
+            .stream()
+            .collect(Collectors.toList());
+
+        if (!discussions.isEmpty()) {
+            discussions.remove(0);
+        }
+
+        return setDiscussionSimpleInfo(member, discussions);
     }
 
     // 토론글의 정보를 Dto에 매핑하는 메소드
