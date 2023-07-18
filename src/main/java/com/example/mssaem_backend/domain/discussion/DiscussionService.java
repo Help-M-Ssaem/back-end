@@ -54,7 +54,7 @@ public class DiscussionService {
     // 최상위 제외한 HOT 토론글 2개만 조회
     public List<DiscussionSimpleInfo> findHotDiscussionListForHome(Member member) {
         PageRequest pageRequest = PageRequest.of(0, 3);
-        List<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDays(
+        List<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
                 LocalDateTime.now().minusDays(3)
                 , pageRequest)
             .stream()
