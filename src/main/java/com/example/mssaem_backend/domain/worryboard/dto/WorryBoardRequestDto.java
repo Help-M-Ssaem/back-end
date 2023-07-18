@@ -1,7 +1,5 @@
 package com.example.mssaem_backend.domain.worryboard.dto;
 
-import com.example.mssaem_backend.domain.mbti.MbtiEnum;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

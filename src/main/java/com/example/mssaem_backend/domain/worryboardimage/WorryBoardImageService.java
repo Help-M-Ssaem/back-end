@@ -35,12 +35,4 @@ public class WorryBoardImageService {
         }
         return worryBoardImage.getImgUrl();
     }
-
-    public String uploadImage(String worryBoardImageUrl, WorryBoard worryBoard) {
-        WorryBoardImage worryBoardImage = WorryBoardImage.builder()
-            .worryBoard(worryBoard)
-            .imgUrl(worryBoardImageUrl)
-            .build();
-        return "이미지 업로드 완료";
-    }
 }
