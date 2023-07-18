@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.discussionoption;
 
+import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -24,4 +25,8 @@ public class DiscussionOption extends BaseTimeEntity {
 
     @ColumnDefault("0")
     private Long selectCount; // 선택한 사람 수
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Discussion discussion;
+
 }
