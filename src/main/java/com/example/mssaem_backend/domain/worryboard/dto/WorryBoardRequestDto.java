@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public class WorryBoardRequestDto {
+
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class GetWorriesReq {
+
         String fromMbti;
         String toMbti;
     }
@@ -18,6 +20,7 @@ public class WorryBoardRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PatchWorrySolvedReq {
+
         Long worryBoardId;
         Long worrySolverId; //해결한 사람 id
     }
@@ -26,6 +29,18 @@ public class WorryBoardRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PostWorryReq {
+
+        String title;
+        String content;
+        MbtiEnum targetMbti;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PatchWorryReq {
+
+        Long worryBoardId;
         String title;
         String content;
         MbtiEnum targetMbti;

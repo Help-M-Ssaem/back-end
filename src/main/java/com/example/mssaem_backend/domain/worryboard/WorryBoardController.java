@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.worryboard;
 
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.GetWorriesReq;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
@@ -13,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -89,10 +91,18 @@ public class WorryBoardController {
     //고민글 생성
     @PostMapping("/member/worry-board")
     public ResponseEntity<String> createWorryBoard(@CurrentMember Member currentMember,
-        @RequestPart(value = "postWorryBoardReq")
-        PostWorryReq postWorryReq,
+        @RequestPart(value = "postWorryReq") PostWorryReq postWorryReq,
         @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
         return ResponseEntity.ok(
             worryBoardService.createWorryBoard(currentMember, postWorryReq, multipartFiles));
+    }
+
+    //고민글 수정
+    @PatchMapping("/member/worry-board")
+    public ResponseEntity<String> modifyWorryBoard(@CurrentMember Member currentMember,
+        @RequestPart(value = "patchWorryReq") PatchWorryReq patchWorryReq,
+        @RequestPart(value ="image", required = false) List<MultipartFile> multipartFiles) {
+        return ResponseEntity.ok(
+            worryBoardService.modifyWorryBoard(currentMember, patchWorryReq, multipartFiles));
     }
 }

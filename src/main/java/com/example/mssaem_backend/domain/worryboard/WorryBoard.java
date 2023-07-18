@@ -62,4 +62,10 @@ public class WorryBoard extends BaseTimeEntity {
         this.state = state;
         this.solveMember = solveMember;
     }
+
+    public void modifyWorryBoard(String title, String content, MbtiEnum targetMbti) {
+        this.title = title;
+        this.content = content;
+        this.targetMbti = targetMbti;
+    }
 }
