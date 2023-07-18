@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
-@Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class WorryBoard extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,13 +48,17 @@ public class WorryBoard extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long hits;
 
-    //테스트 코드용
     @Builder
-    public WorryBoard(String title, String content, MbtiEnum targetMbti, boolean state, Member member) {
+    public WorryBoard(String title, String content, MbtiEnum targetMbti,
+        Member member) {
         this.title = title;
         this.content = content;
         this.targetMbti = targetMbti;
-        this.state = state;
         this.member = member;
+    }
+
+    public void solveWorryBoard(boolean state, Member solveMember) {
+        this.state = state;
+        this.solveMember = solveMember;
     }
 }

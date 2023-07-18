@@ -5,13 +5,17 @@ import static com.example.mssaem_backend.global.common.Time.calculateTime;
 import com.example.mssaem_backend.domain.badge.BadgeService;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.GetWorriesReq;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorryRes;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.PatchWorrySolvedRes;
 import com.example.mssaem_backend.domain.worryboardimage.WorryBoardImageService;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.WorryBoardErrorCode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +30,14 @@ public class WorryBoardService {
 
     private final WorryBoardRepository worryBoardRepository;
     private final WorryBoardImageService worryBoardImageService;
+    private final MemberRepository memberRepository;
     private final BadgeService badgeService;
 
     //List<WorryBoard>를 받아서 List<GetWorriesRes> 리스트를 반환하는 함수
     private List<GetWorriesRes> makeGetWorriesResForm(Page<WorryBoard> result) {
-        return result
-            .stream()
-            .map(worryBoard -> GetWorriesRes.builder()
-                .worryBoard(worryBoard)
-                .imgUrl(worryBoardImageService.getImgUrl(worryBoard))
-                .createdAt(calculateTime(worryBoard.getCreatedAt(), 3))
-                .build())
-            .toList();
+        return result.stream().map(worryBoard -> GetWorriesRes.builder().worryBoard(worryBoard)
+            .imgUrl(worryBoardImageService.getImgUrl(worryBoard))
+            .createdAt(calculateTime(worryBoard.getCreatedAt(), 3)).build()).toList();
     }
 
     //고민게시판 - 고민 목록 조회
@@ -58,21 +58,12 @@ public class WorryBoardService {
         //수정,삭제 권한 확인
         Boolean isAllowed = (viewer != null && viewer.equals(member));
 
-        return GetWorryRes.builder()
-            .worryBoard(worryBoard)
+        return GetWorryRes.builder().worryBoard(worryBoard)
             .imgList(worryBoardImageService.getImgUrls(worryBoard))
-            .createdAt(calculateTime(worryBoard.getCreatedAt(), 2))
-            .memberSimpleInfo(
-                new MemberSimpleInfo(
-                    member.getId(),
-                    member.getNickName(),
-                    member.getMbti(),
+            .createdAt(calculateTime(worryBoard.getCreatedAt(), 2)).memberSimpleInfo(
+                new MemberSimpleInfo(member.getId(), member.getNickName(), member.getMbti(),
                     badgeService.findRepresentativeBadgeByMember(member),
-                    member.getProfileImageUrl()
-                )
-            )
-            .isAllowed(isAllowed)
-            .build();
+                    member.getProfileImageUrl())).isAllowed(isAllowed).build();
     }
 
     //특정 멤버별 올린 고민 목록 조회
@@ -105,9 +96,29 @@ public class WorryBoardService {
         MbtiEnum fromMbti = isFromAll ? null : MbtiEnum.valueOf(getWorriesReq.getFromMbti());
         MbtiEnum toMbti = isToAll ? null : MbtiEnum.valueOf(getWorriesReq.getToMbti());
 
-        Page<WorryBoard> result = worryBoardRepository.findWorriesByStateAndBothMbti(isSolved, fromMbti, toMbti, pageable);
+        Page<WorryBoard> result = worryBoardRepository.findWorriesByStateAndBothMbti(isSolved,
+            fromMbti, toMbti, pageable);
 
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
             makeGetWorriesResForm(result));
+    }
+
+    // 고민 해결 완료
+    public PatchWorrySolvedRes solvedWorryBoard(PatchWorrySolvedReq patchWorryReq) {
+        WorryBoard worryBoard = worryBoardRepository.findById(patchWorryReq.getWorryBoardId())
+            .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
+
+        Member solveMember = memberRepository.findById(patchWorryReq.getWorrySolverId())
+            .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+        // 고민글의 상태 바꾸기
+        worryBoard.solveWorryBoard(false, solveMember);
+        // 평가창에 뜰 memberSimpleInfo, worryBoard Id 반환
+        return PatchWorrySolvedRes.builder().
+            memberSimpleInfo(
+                new MemberSimpleInfo(
+                    solveMember.getId(), solveMember.getNickName(), solveMember.getMbti(),
+                    badgeService.findRepresentativeBadgeByMember(solveMember),
+                    solveMember.getProfileImageUrl()))
+            .worryBoardId(worryBoard.getId()).build();
     }
 }

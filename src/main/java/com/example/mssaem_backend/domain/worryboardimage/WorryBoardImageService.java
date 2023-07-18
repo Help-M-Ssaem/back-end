@@ -11,25 +11,36 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorryBoardImageService {
 
-  private final WorryBoardImageRepository worryBoardImageRepository;
+    private final WorryBoardImageRepository worryBoardImageRepository;
 
+    //해당 고민글 이미지 url 리스트 가져오기
+    public List<String> getImgUrls(WorryBoard worryBoard) {
+        List<WorryBoardImage> worryBoardImages = worryBoardImageRepository.findAllByWorryBoard(
+            worryBoard);
 
-  //해당 고민글 이미지 url 리스트 가져오기
-  public List<String> getImgUrls(WorryBoard worryBoard) {
-    List<WorryBoardImage> worryBoardImages = worryBoardImageRepository.findAllByWorryBoard(worryBoard);
-
-    if(worryBoardImages.isEmpty()) {
-      return Collections.singletonList("default");
+        if (worryBoardImages.isEmpty()) {
+            return Collections.singletonList("default");
+        }
+        return worryBoardImages.stream()
+            .map(WorryBoardImage::getImgUrl)
+            .collect(Collectors.toList());
     }
-    return worryBoardImages.stream()
-        .map(WorryBoardImage::getImgUrl)
-        .collect(Collectors.toList());
-  }
 
-  //해당 고민글 대표 이미지 가져오기
-  public String  getImgUrl(WorryBoard worryBoard) {
-    WorryBoardImage worryBoardImage = worryBoardImageRepository.findTopByWorryBoardOrderById(worryBoard);
-    if(worryBoardImage == null) return "default";
-    return  worryBoardImage.getImgUrl();
-  }
+    //해당 고민글 대표 이미지 가져오기
+    public String getImgUrl(WorryBoard worryBoard) {
+        WorryBoardImage worryBoardImage = worryBoardImageRepository.findTopByWorryBoardOrderById(
+            worryBoard);
+        if (worryBoardImage == null) {
+            return "default";
+        }
+        return worryBoardImage.getImgUrl();
+    }
+
+    public String uploadImage(String worryBoardImageUrl, WorryBoard worryBoard) {
+        WorryBoardImage worryBoardImage = WorryBoardImage.builder()
+            .worryBoard(worryBoard)
+            .imgUrl(worryBoardImageUrl)
+            .build();
+        return "이미지 업로드 완료";
+    }
 }

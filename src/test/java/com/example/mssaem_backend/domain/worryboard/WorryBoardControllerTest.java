@@ -29,7 +29,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@TestInstance(Lifecycle.PER_CLASS)
 @SpringBootTest
 @AutoConfigureMockMvc
 class WorryBoardControllerTest {
@@ -59,9 +58,9 @@ class WorryBoardControllerTest {
     void beforeAll() {
         //member
         Member member1 = new Member(1L, "junsuck@naver.com", "heron", MbtiEnum.INFP, true,
-            "tokenExample", Role.ROLE_MANAGER, "1234", "1100", "example1", 0);
+            "tokenExample", Role.ROLE_MANAGER, "1234", "1100",  0);
         Member member2 = new Member(2L, "Jinro@naver.com", "Jinro", MbtiEnum.ENTJ, true,
-            "tokenExample", Role.ROLE_MANAGER, "1234", "1100", "example2", 0);
+            "tokenExample", Role.ROLE_MANAGER, "1234", "1100",  0);
 
         //worryBoard
         //해결 안된 고민
@@ -69,14 +68,12 @@ class WorryBoardControllerTest {
             .title("title1")
             .content("content1")
             .targetMbti(MbtiEnum.ESFJ)
-            .state(false)
             .member(member1)
             .build();
         WorryBoard worryBoard2 = WorryBoard.builder()
             .title("title2")
             .content("content2")
             .targetMbti(MbtiEnum.ENTP)
-            .state(false)
             .member(member1)
             .build();
         //해결이 된 고민
@@ -84,27 +81,22 @@ class WorryBoardControllerTest {
             .title("titleSolved1")
             .content("contentSolved1")
             .targetMbti(MbtiEnum.ENTJ)
-            .state(true)
             .member(member1)
             .build();
         WorryBoard worryBoardSolved2 = WorryBoard.builder()
             .title("titleSolved2")
             .content("contentSolved2")
             .targetMbti(MbtiEnum.ENTJ)
-            .state(true)
             .member(member1)
             .build();
 
-        worryBoardSolved1.setSolveMember(member2);
-        worryBoardSolved2.setSolveMember(member2);
-
         //worryBoardImage
-        WorryBoardImage worryBoardImage1 = new WorryBoardImage(1L, worryBoard1, "imgUrl1");
-        WorryBoardImage worryBoardImage2 = new WorryBoardImage(2L, worryBoard1, "imgUrl2");
-        WorryBoardImage worryBoardImage3 = new WorryBoardImage(3L, worryBoard1, "imgUrl3");
-        WorryBoardImage worryBoardImage4 = new WorryBoardImage(4L, worryBoard1, "imgUrl4");
-        WorryBoardImage worryBoardImage5 = new WorryBoardImage(5L, worryBoardSolved1, "imgUrl5");
-        WorryBoardImage worryBoardImage6 = new WorryBoardImage(6L, worryBoardSolved1, "imgUrl6");
+        WorryBoardImage worryBoardImage1 = new WorryBoardImage(worryBoard1, "imgUrl1");
+        WorryBoardImage worryBoardImage2 = new WorryBoardImage(worryBoard1, "imgUrl2");
+        WorryBoardImage worryBoardImage3 = new WorryBoardImage(worryBoard1, "imgUrl3");
+        WorryBoardImage worryBoardImage4 = new WorryBoardImage(worryBoard1, "imgUrl4");
+        WorryBoardImage worryBoardImage5 = new WorryBoardImage(worryBoardSolved1, "imgUrl5");
+        WorryBoardImage worryBoardImage6 = new WorryBoardImage(worryBoardSolved1, "imgUrl6");
 
         //badge
         Badge badge1 = new Badge(1L, "엠비티라노", member1, true);
