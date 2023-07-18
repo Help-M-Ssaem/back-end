@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.board;
 
+import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.DeleteBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
@@ -84,7 +85,8 @@ public class BoardService {
                     board.getId(),
                     board.getTitle(),
                     board.getContent(),
-                    boardImageRepository.findTopByBoardOrderById(board).getImageUrl(),
+                    boardImageRepository.findTopByBoardOrderById(board).orElse(new BoardImage())
+                        .getImageUrl(),
                     board.getMbti(),
                     board.getRecommendation(),
                     boardCommentRepository.countByBoardAndState(board, true),
@@ -94,7 +96,7 @@ public class BoardService {
                         board.getMember().getNickName(),
                         board.getMember().getMbti(),
                         badgeRepository.findBadgeByMemberAndState(board.getMember(), true)
-                            .getName(),
+                            .orElse(new Badge()).getName(),
                         board.getMember().getProfileImageUrl()
                     )
                 )
