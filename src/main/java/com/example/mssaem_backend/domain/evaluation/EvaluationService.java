@@ -85,6 +85,6 @@ public class EvaluationService {
       result[3] += temp[3] - '0';
       result[4] += temp[4] - '0';
     }
-    return new EvaluationCount(member, result);
+    return new EvaluationCount(result);
   }
 }
