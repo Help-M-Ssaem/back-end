@@ -144,15 +144,19 @@ public class BoardService {
     public String deleteBoard(Member member, Long boardId) {
         Board board = boardRepository.findById(boardId)
             .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
-        //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
-        if (member.getId().equals(board.getMember().getId())) {
-            //게시글 Soft Delete
-            board.deleteBoard();
-            //현재 저장된 이미지 삭제
-            deleteBoardImage(board);
-            return "게시글 삭제 완료";
+        if (board.isState()) {
+            //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
+            if (member.getId().equals(board.getMember().getId())) {
+                //게시글 Soft Delete
+                board.deleteBoard();
+                //현재 저장된 이미지 삭제
+                deleteBoardImage(board);
+                return "게시글 삭제 완료";
+            } else {
+                throw new BaseException(BoardErrorCode.INVALID_MEMBER);
+            }
         } else {
-            throw new BaseException(BoardErrorCode.INVALID_MEMBER);
+            throw new BaseException(BoardErrorCode.BOARD_NOT_FOUND);
         }
     }
 
@@ -177,6 +181,4 @@ public class BoardService {
         //DB에 저장된 이미지 삭제
         boardImageService.deleteImage(board);
     }
-
-
 }
