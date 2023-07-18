@@ -36,7 +36,6 @@ jobs:
       # 서브 모듈 변경 점 있으면 update
     - name: Git Sumbodule Update
       run: |
-        git pull --recurse-submodules
         git submodule update --remote --recursive    
 
       # gradlew 권한 변경
@@ -49,7 +48,7 @@ jobs:
       with:
         arguments: clean build -x test
         
-   # Docker
+      # Docker
     - name: 도커 이미지 빌드
       run: docker build -t parksewoong/mssaem:latest .
 

@@ -7,8 +7,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 
+@DynamicInsert
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -42,4 +44,13 @@ public class Board extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @Builder
+    public Board(String title, String content, MbtiEnum mbti, boolean state, Member member) {
+        this.title = title;
+        this.content = content;
+        this.mbti = mbti;
+        this.state = state;
+        this.member = member;
+    }
 }

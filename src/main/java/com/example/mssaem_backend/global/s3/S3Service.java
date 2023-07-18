@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.mssaem_backend.global.s3.dto.S3Result;
+import java.util.StringTokenizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -72,4 +73,8 @@ public class S3Service {
         s3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 
+    public String parseFileName(String imgURl){
+        String[] st = imgURl.split("/");
+        return st[st.length-1];
+    }
 }

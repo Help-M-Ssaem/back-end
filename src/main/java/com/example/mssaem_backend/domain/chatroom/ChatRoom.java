@@ -7,13 +7,14 @@ import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
+@DynamicInsert
 @Getter
 @Setter
 @Entity
 public class ChatRoom extends BaseTimeEntity implements Serializable {
     @Id
-    @Column(name = "chatroom_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
