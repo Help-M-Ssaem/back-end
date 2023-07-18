@@ -41,7 +41,7 @@ public class BoardService {
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Board> boards =
-            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDays(
+            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
                 LocalDateTime.now().minusDays(3),
                 pageRequest
             );
@@ -59,7 +59,7 @@ public class BoardService {
     public List<BoardSimpleInfo> findHotBoardListForHome() {
         PageRequest pageRequest = PageRequest.of(0, 5);
         List<Board> boards =
-            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDays(
+            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
                     LocalDateTime.now().minusDays(3)
                     , pageRequest
                 )
@@ -84,14 +84,14 @@ public class BoardService {
                     boardImageRepository.findTopByBoardOrderById(board).orElse(new BoardImage())
                         .getImageUrl(),
                     board.getMbti(),
-                    board.getRecommendation(),
-                    boardCommentRepository.countByBoardAndState(board, true),
+                    board.getLikeCount(),
+                    boardCommentRepository.countWithStateTrueByBoard(board),
                     Time.calculateTime(board.getCreatedAt(), 3),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getMbti(),
-                        badgeRepository.findBadgeByMemberAndState(board.getMember(), true)
+                        badgeRepository.findBadgeWithStateTrueByMember(board.getMember())
                             .orElse(new Badge()).getName(),
                         board.getMember().getProfileImageUrl()
                     )
