@@ -21,8 +21,7 @@ public class ChatRoom extends BaseTimeEntity implements Serializable {
 
     private static final long serialVersionUID = 6494678977089006639L;
 
-    @ColumnDefault("true")
-    private boolean state; //true : 열림, false : 닫힘
+    private boolean state = true; //true : 열림, false : 닫힘
 
     @NotNull
     private String title;

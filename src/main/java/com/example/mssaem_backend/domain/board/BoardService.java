@@ -2,14 +2,21 @@ package com.example.mssaem_backend.domain.board;
 
 import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
+import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
+import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImage;
 import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
+import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.like.LikeRepository;
+import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
+import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +25,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
 public class BoardService {
 
+    private final BoardRepository boardRepository;
+    private final BoardImageService boardImageService;
     private final LikeRepository likeRepository;
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
@@ -89,5 +99,61 @@ public class BoardService {
             );
         }
         return boardSimpleInfos;
+    }
+
+    public String createBoard(Member member, PostBoardReq postBoardReq,
+        List<MultipartFile> multipartFiles) {
+        Board board = Board.builder()
+            .title(postBoardReq.getTitle())
+            .content(postBoardReq.getContent())
+            .mbti(postBoardReq.getMbti())
+            .member(member)
+            .build();
+        boardRepository.save(board);
+        if (multipartFiles != null) {
+            boardImageService.uploadBoardImage(board, multipartFiles);
+        }
+        return "게시글 생성 완료";
+    }
+
+    @Transactional
+    public String modifyBoard(Member member, PatchBoardReq patchBoardReq, Long boardId,
+        List<MultipartFile> multipartFiles) {
+        Board board = boardRepository.findById(boardId)
+            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+        //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
+        if (member.getId().equals(board.getMember().getId())) {
+            board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
+                patchBoardReq.getMbti());
+            //현재 저장된 이미지 삭제
+            boardImageService.deleteBoardImage(board);
+            //새로운 이미지 업로드
+            if (multipartFiles != null) {
+                boardImageService.uploadBoardImage(board, multipartFiles);
+            }
+            return "게시글 수정 완료";
+        } else {
+            throw new BaseException(BoardErrorCode.INVALID_MEMBER);
+        }
+    }
+
+    @Transactional
+    public String deleteBoard(Member member, Long boardId) {
+        Board board = boardRepository.findById(boardId)
+            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+        if (board.isState()) {
+            //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
+            if (member.getId().equals(board.getMember().getId())) {
+                //게시글 Soft Delete
+                board.deleteBoard();
+                //현재 저장된 이미지 삭제
+                boardImageService.deleteBoardImage(board);
+                return "게시글 삭제 완료";
+            } else {
+                throw new BaseException(BoardErrorCode.INVALID_MEMBER);
+            }
+        } else {
+            throw new BaseException(BoardErrorCode.BOARD_NOT_FOUND);
+        }
     }
 }

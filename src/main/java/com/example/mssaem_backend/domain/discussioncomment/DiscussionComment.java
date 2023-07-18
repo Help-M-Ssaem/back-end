@@ -37,8 +37,7 @@ public class DiscussionComment extends BaseTimeEntity {
     @ColumnDefault("0")
     private Integer orders; //대댓글의 순서
 
-    @ColumnDefault("true")
-    private boolean state; //true : 존재, false : 삭제
+    private boolean state = true; //true : 존재, false : 삭제
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Discussion discussion;

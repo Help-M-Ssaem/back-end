@@ -32,8 +32,7 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MbtiEnum mbti;
 
-    @ColumnDefault("true")
-    private boolean status;
+    private boolean status = true;
 
     @NotNull
     private String refreshToken;

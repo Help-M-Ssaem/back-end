@@ -40,18 +40,26 @@ public class Board extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long hits;
 
-    @ColumnDefault("true")
-    private boolean state; //true : 삭제아님, false : 삭제
+    private boolean state = true; //true : 삭제아님, false : 삭제
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @Builder
-    public Board(String title, String content, MbtiEnum mbti, boolean state, Member member) {
+    public Board(String title, String content, MbtiEnum mbti, Member member) {
         this.title = title;
         this.content = content;
         this.mbti = mbti;
-        this.state = state;
         this.member = member;
+    }
+
+    public void modifyBoard(String title, String content, MbtiEnum mbti) {
+        this.title = title != null ? title : this.title;
+        this.content = content != null ? content : this.content;
+        this.mbti = mbti != null ? mbti : this.mbti;
+    }
+
+    public void deleteBoard() {
+        this.state = false;
     }
 }
