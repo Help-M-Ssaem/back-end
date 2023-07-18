@@ -28,7 +28,7 @@ public class Discussion extends BaseTimeEntity {
     private String title;
 
     @ColumnDefault("0")
-    private Long participants; // 참여자 수
+    private Long participantCount; // 참여자 수
 
     @ColumnDefault("0")
     private Long report;
@@ -37,7 +37,7 @@ public class Discussion extends BaseTimeEntity {
     private Long hits;
 
     @ColumnDefault("true")
-    private boolean state; //true : 삭제아님, false : 삭제
+    private boolean state; //true : 존재, false : 삭제
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;

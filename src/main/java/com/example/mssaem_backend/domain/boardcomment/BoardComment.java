@@ -26,7 +26,7 @@ public class BoardComment extends BaseTimeEntity {
     private String content;
 
     @ColumnDefault("0")
-    private Long recommendation;
+    private Long likeCount;
 
     @ColumnDefault("0")
     private Integer depth; //댓글 : 0, 대 댓글 : 1

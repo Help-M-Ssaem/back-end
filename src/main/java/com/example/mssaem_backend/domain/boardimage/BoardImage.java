@@ -20,6 +20,7 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor
 @Entity
 public class BoardImage extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
