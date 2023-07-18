@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
 
     // 생성된지 3일 이내이고, 참여자수가 10명 이상인 토론글들을 참여자수를 기준으로 내림차순 정렬
-    @Query(value = "SELECT d FROM Discussion d WHERE d.createdAt >= :threeDaysAgo AND d.participants >= 1 ORDER BY d.participants DESC")
-    Page<Discussion> findDiscussionWithMoreThanTenParticipantsInLastThreeDays(
+    @Query(value = "SELECT d FROM Discussion d WHERE d.createdAt >= :threeDaysAgo AND d.participantCount >= 1 AND d.state = true ORDER BY d.participantCount DESC")
+    Page<Discussion> findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
         @Param("threeDaysAgo") LocalDateTime threeDaysAgo, PageRequest pageRequest);
 }

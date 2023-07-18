@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BadgeRepository extends JpaRepository<Badge, Long> {
 
-    Optional<Badge> findBadgeByMemberAndState(Member member, boolean state);
+    Optional<Badge> findBadgeWithStateTrueByMember(Member member);
 }
