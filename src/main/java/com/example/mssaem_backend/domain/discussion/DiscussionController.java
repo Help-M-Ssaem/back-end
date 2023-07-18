@@ -17,9 +17,21 @@ public class DiscussionController {
 
     private final DiscussionService discussionService;
 
+    /**
+     * HOT 토론 더보기
+     */
     @GetMapping("/discussions/hot")
     public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findHotDiscussionList(
         @CurrentMember Member member, @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(discussionService.findHotDiscussionList(member, page, size));
+    }
+
+    /**
+     * 홈 화면 조회 - HOT 토론 2개
+     */
+    @GetMapping("/discussions/home")
+    public ResponseEntity<List<DiscussionSimpleInfo>> findHotDiscussionListForHome(
+        @CurrentMember Member member) {
+        return ResponseEntity.ok(discussionService.findHotDiscussionListForHome(member));
     }
 }
