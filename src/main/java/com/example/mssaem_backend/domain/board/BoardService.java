@@ -2,7 +2,6 @@ package com.example.mssaem_backend.domain.board;
 
 import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
-import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.DeleteBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
@@ -123,9 +122,10 @@ public class BoardService {
     @Transactional
     public String modifyBoard(Member member, PatchBoardReq patchBoardReq, Long boardId,
         List<MultipartFile> multipartFiles) {
-        if (member.getId() == patchBoardReq.getMemberId()) {
-            Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+        Board board = boardRepository.findById(boardId)
+            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+        //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
+        if (member.getId().equals(board.getMember().getId())) {
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
                 patchBoardReq.getMbti());
             //현재 저장된 이미지 삭제
@@ -141,10 +141,11 @@ public class BoardService {
     }
 
     @Transactional
-    public String deleteBoard(Member member, DeleteBoardReq deleteBoardReq, Long boardId) {
-        if (member.getId() != null && member.getId() == deleteBoardReq.getMemberId()) {
-            Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+    public String deleteBoard(Member member, Long boardId) {
+        Board board = boardRepository.findById(boardId)
+            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+        //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
+        if (member.getId().equals(board.getMember().getId())) {
             //게시글 Soft Delete
             board.deleteBoard();
             //현재 저장된 이미지 삭제

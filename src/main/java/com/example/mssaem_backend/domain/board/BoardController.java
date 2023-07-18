@@ -1,6 +1,5 @@
 package com.example.mssaem_backend.domain.board;
 
-import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.DeleteBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -63,8 +61,7 @@ public class BoardController {
      * 게시글 삭제
      */
     @DeleteMapping("/member/board/{id}")
-    public ResponseEntity<String> deleteBoard(@CurrentMember Member member,
-        @RequestBody DeleteBoardReq deleteBoardReq, @PathVariable Long id) {
-        return ResponseEntity.ok(boardService.deleteBoard(member, deleteBoardReq, id));
+    public ResponseEntity<String> deleteBoard(@CurrentMember Member member, @PathVariable Long id) {
+        return ResponseEntity.ok(boardService.deleteBoard(member, id));
     }
 }

@@ -26,15 +26,5 @@ public class BoardRequestDto {
         private String title;
         private String content;
         private MbtiEnum mbti;
-        private Long memberId;
     }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DeleteBoardReq {
-
-        private Long memberId;
-    }
-
 }
