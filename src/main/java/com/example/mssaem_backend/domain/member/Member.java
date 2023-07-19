@@ -46,6 +46,8 @@ public class Member extends BaseTimeEntity {
 
     private String profileImageUrl;
 
+    private String introduction;
+
     @ColumnDefault("0")
     private Integer report; //신고수
 
