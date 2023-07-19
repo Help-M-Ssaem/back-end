@@ -34,8 +34,7 @@ public class BookMark extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MbtiEnum mbti;
 
-    @ColumnDefault("true")
-    private boolean state; //true : 즐겨찾기 중, false : 즐겨찾기 아님
+    private boolean state = true; //true : 즐겨찾기 중, false : 즐겨찾기 아님
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;

@@ -36,8 +36,7 @@ public class Discussion extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long hits;
 
-    @ColumnDefault("true")
-    private boolean state; //true : 존재, false : 삭제
+    private boolean state = true; //true : 존재, false : 삭제
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;

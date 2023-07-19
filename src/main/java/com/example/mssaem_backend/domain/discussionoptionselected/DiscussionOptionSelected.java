@@ -26,8 +26,7 @@ public class DiscussionOptionSelected {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ColumnDefault("true")
-    private boolean state; // true : 선택함 , false : 선택 안함
+    private boolean state = true; // true : 선택함 , false : 선택 안함
 
     @ManyToOne(fetch = FetchType.LAZY)
     private DiscussionOption discussionOption;

@@ -23,8 +23,7 @@ public class Like extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ColumnDefault("true")
-    private boolean state; //true : 좋아요, false : 좋아요 아님
+    private boolean state = true; //true : 좋아요, false : 좋아요 아님
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
