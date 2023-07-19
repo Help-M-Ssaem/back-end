@@ -13,11 +13,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class ChatParticipateService {
+
   private final ChatParticipateRepository chatParticipateRepository;
   private final MemberRepository memberRepository;
 
-  public void insertChatParticipate(ChatRoom chatRoom, Long memberId){
-    Member member = memberRepository.findById(memberId).orElseThrow(()->new BaseException(EMPTY_MEMBER));
+  public void insertChatParticipate(ChatRoom chatRoom, Long memberId) {
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new BaseException(EMPTY_MEMBER));
     ChatParticipate chatParticipate = new ChatParticipate(chatRoom, member);
     chatParticipateRepository.save(chatParticipate);
   }

@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 public class ChatMessageResourceDto {
+
   @Setter
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class ChatMessageRes{
+  public static class ChatMessageRes {
+
     private Long chatRoomId;
     private Long worryBoardId;
     private MessageType type;

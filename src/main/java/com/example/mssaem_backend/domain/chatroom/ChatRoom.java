@@ -15,25 +15,25 @@ import org.hibernate.annotations.DynamicInsert;
 @Entity
 public class ChatRoom extends BaseTimeEntity implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private static final long serialVersionUID = 6494678977089006639L;
+  private static final long serialVersionUID = 6494678977089006639L;
 
-    @ColumnDefault("true")
-    private boolean state; //true : 열림, false : 닫힘
+  @ColumnDefault("true")
+  private boolean state; //true : 열림, false : 닫힘
 
-    @NotNull
-    private String title;
+  @NotNull
+  private String title;
 
-    @NotNull
-    private Long worryBoardId;
+  @NotNull
+  private Long worryBoardId;
 
-    public static ChatRoom create(String title, Long worryBoardId) {
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.title = title;
-        chatRoom.worryBoardId = worryBoardId;
-        return chatRoom;
-    }
+  public static ChatRoom create(String title, Long worryBoardId) {
+    ChatRoom chatRoom = new ChatRoom();
+    chatRoom.title = title;
+    chatRoom.worryBoardId = worryBoardId;
+    return chatRoom;
+  }
 }

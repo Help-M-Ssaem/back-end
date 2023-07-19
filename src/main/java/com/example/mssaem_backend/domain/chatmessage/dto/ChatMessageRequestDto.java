@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public class ChatMessageRequestDto {
+
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class ChatMessageInfo{
+  public static class ChatMessageInfo {
+
     private String content;
     private MessageType type;
     private Long memberId;

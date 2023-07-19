@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
+
   private final JwtTokenProvider jwtTokenProvider;
 
   // websocket을 통해 들어온 요청이 처리 되기전 실행된다.

@@ -17,7 +17,8 @@ import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
-public class ChatRoomCustomRepository  implements Serializable {
+public class ChatRoomCustomRepository implements Serializable {
+
   // 채팅방(topic)에 발행되는 메시지를 처리할 Listner
   private final RedisMessageListenerContainer redisMessageListener;
   // 구독 처리 서비스
@@ -36,9 +37,11 @@ public class ChatRoomCustomRepository  implements Serializable {
     opsHashChatRoom = redisTemplate.opsForHash();
     topics = new HashMap<>();
   }
+
   public List<ChatRoom> findAllRoom() {
     return opsHashChatRoom.values(CHAT_ROOMS);
   }
+
   public ChatRoom findRoomById(Long id) {
     return opsHashChatRoom.get(CHAT_ROOMS, id);
   }
@@ -64,6 +67,7 @@ public class ChatRoomCustomRepository  implements Serializable {
       topics.put(roomId, topic);
     }
   }
+
   public ChannelTopic getTopic(Long roomId) {
     return topics.get(roomId);
   }

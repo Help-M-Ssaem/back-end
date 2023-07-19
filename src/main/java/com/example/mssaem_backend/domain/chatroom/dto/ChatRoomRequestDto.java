@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public class ChatRoomRequestDto {
+
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class ChatRoomInfo{
+  public static class ChatRoomInfo {
+
     private String title;
     private Long worryBoardId;
   }
