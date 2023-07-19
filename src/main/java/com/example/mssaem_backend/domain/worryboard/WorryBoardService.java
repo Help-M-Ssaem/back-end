@@ -123,7 +123,7 @@ public class WorryBoardService {
             .map(worryBoard -> GetWorriesRes.builder()
                 .worryBoard(worryBoard)
                 .imgUrl(worryBoardImageService.getImgUrl(worryBoard))
-                .createdAt(calculateTime(worryBoard.getCreatedAt(), 3))
+                .createdAt(calculateTime(worryBoard.getCreatedAt(), 1))
                 .build())
             .toList();
     }
