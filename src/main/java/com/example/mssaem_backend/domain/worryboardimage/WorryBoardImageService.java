@@ -56,7 +56,20 @@ public class WorryBoardImageService {
     }
 
     //worryBoardImage 삭제
-    public void deleteWorryImage(WorryBoard worryBoard) {
-        worryBoardImageRepository.findAllByWorryBoard(worryBoard);
+    public void deleteWorryImage(WorryBoard worryBoard, List<MultipartFile> multipartFiles) {
+        List<WorryBoardImage> worryBoardImages = worryBoardImageRepository.findAllByWorryBoard(
+            worryBoard);
+
+        //해당 worryBoard에 존재하는 s3 파일 삭제
+        if (!worryBoardImages.isEmpty()) {
+            for (WorryBoardImage worryBoardImage : worryBoardImages) {
+                s3Service.deleteFile(
+                    s3Service.parseFileName(worryBoardImage.getImgUrl())
+                );
+            }
+        }
+
+        //해당 worryBoard에 존재하는 worryBoardImage 삭제
+        worryBoardImageRepository.deleteAllByWorryBoard(worryBoard);
     }
 }

@@ -126,9 +126,10 @@ public class WorryBoardService {
         return PatchWorrySolvedRes.builder()
             .memberSimpleInfo(
                 new MemberSimpleInfo(
-                solveMember.getId(), solveMember.getNickName(),
-                solveMember.getMbti(), badgeService.findRepresentativeBadgeByMember(solveMember),
-                solveMember.getProfileImageUrl())
+                    solveMember.getId(), solveMember.getNickName(),
+                    solveMember.getMbti(),
+                    badgeService.findRepresentativeBadgeByMember(solveMember),
+                    solveMember.getProfileImageUrl())
             )
             .worryBoardId(worryBoard.getId()).build();
     }
@@ -145,7 +146,7 @@ public class WorryBoardService {
             .build();
         worryBoardRepository.save(worryBoard);
 
-        //worryBoardImageService에 전달
+        //S3 처리 worryBoardImageService에 전달
         if (multipartFiles != null) {
             worryBoardImageService.uploadWorryImage(worryBoard, multipartFiles);
         }
@@ -163,25 +164,15 @@ public class WorryBoardService {
         }
 
         //worryBoard 수정하기
-        worryBoard.modifyWorryBoard(patchWorryReq.getTitle(), patchWorryReq.getContent(),
-            patchWorryReq.getTargetMbti());
+        worryBoard.modifyWorryBoard(
+            patchWorryReq.getTitle(),
+            patchWorryReq.getContent(),
+            patchWorryReq.getTargetMbti()
+        );
 
-        //worryBoardImageService에 있던 imgUrl 삭제
-        worryBoardImageService.deleteWorryImage(worryBoard);
-
-        //S3에서 파일 삭제하기 && 해당 worryBoard의 worryBoardImage 삭제
-        List<String> worryBoardImgUrls = worryBoardImageService.getImgUrls(worryBoard);
-        worryBoardImgUrls.stream().map(s3Service::parseFileName).forEach(s3Service::deleteFile);
-
-        //S3 새로운 파일 업로드 하기 && worryBoard의 worryBoardImage 생성
-        if (multipartFiles != null) {
-            List<S3Result> worryBoardImageList = s3Service.uploadFile(multipartFiles);
-            if (!worryBoardImageList.isEmpty()) {
-                for (S3Result s3Result : worryBoardImageList) {
-                    worryBoardImageService.uploadWorryImage(worryBoard, multipartFiles);
-                }
-            }
-        }
+        //S3 처리 worryBoardImageService로 전달
+        worryBoardImageService.deleteWorryImage(worryBoard, multipartFiles);
+        worryBoardImageService.uploadWorryImage(worryBoard, multipartFiles);
 
         return "고민글 수정 완료";
     }
