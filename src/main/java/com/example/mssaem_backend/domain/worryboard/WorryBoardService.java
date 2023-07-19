@@ -19,8 +19,6 @@ import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.WorryBoardErrorCode;
-import com.example.mssaem_backend.global.s3.S3Service;
-import com.example.mssaem_backend.global.s3.dto.S3Result;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,7 +35,6 @@ public class WorryBoardService {
     private final WorryBoardImageService worryBoardImageService;
     private final MemberRepository memberRepository;
     private final BadgeService badgeService;
-    private final S3Service s3Service;
 
     //List<WorryBoard>를 받아서 List<GetWorriesRes> 리스트를 반환하는 함수
     private List<GetWorriesRes> makeGetWorriesResForm(Page<WorryBoard> result) {
@@ -148,7 +145,7 @@ public class WorryBoardService {
 
         //S3 처리 worryBoardImageService에 전달
         if (multipartFiles != null) {
-            worryBoardImageService.uploadWorryImage(worryBoard, multipartFiles);
+            worryBoardImageService.saveWorryImage(worryBoard, multipartFiles);
         }
         return "고민글 생성 완료";
     }
@@ -172,7 +169,7 @@ public class WorryBoardService {
 
         //S3 처리 worryBoardImageService로 전달
         worryBoardImageService.deleteWorryImage(worryBoard, multipartFiles);
-        worryBoardImageService.uploadWorryImage(worryBoard, multipartFiles);
+        worryBoardImageService.saveWorryImage(worryBoard, multipartFiles);
 
         return "고민글 수정 완료";
     }
