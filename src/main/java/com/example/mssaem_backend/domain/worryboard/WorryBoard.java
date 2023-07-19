@@ -37,7 +37,6 @@ public class WorryBoard extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long report;
 
-    @ColumnDefault("false")
     private boolean state; //true : 해결, false : 해결 안함
 
     @ManyToOne(fetch = FetchType.LAZY)

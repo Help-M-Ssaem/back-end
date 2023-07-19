@@ -38,5 +38,6 @@ out/
 
 src/main/resources/application-dev.yml
 src/main/resources/application-main.yml
+src/main/resources/keystore.p12
 
 src/test/resources/application.yml

@@ -20,6 +20,7 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor
 @Entity
 public class BoardImage extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,4 +30,12 @@ public class BoardImage extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
+
+    public BoardImage(String imageUrl){
+        this.imageUrl = imageUrl;
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
+    }
 }

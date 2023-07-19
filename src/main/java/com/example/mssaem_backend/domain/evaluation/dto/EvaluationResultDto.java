@@ -21,15 +21,13 @@ public class EvaluationResultDto {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class EvaluationCount{
-    private Member member;
     private int likeCount;
     private int usefulCount;
     private int funCount;
     private int sincereCount;
     private int hotCount;
 
-    public EvaluationCount(Member member, int[] result) {
-      this.member = member;
+    public EvaluationCount(int[] result) {
       this.likeCount = result[0];
       this.usefulCount = result[1];
       this.funCount = result[2];

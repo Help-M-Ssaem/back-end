@@ -16,6 +16,7 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Member extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,8 +32,7 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MbtiEnum mbti;
 
-    @ColumnDefault("false")
-    private boolean status;
+    private boolean status = true;
 
     @NotNull
     private String refreshToken;
