@@ -61,10 +61,11 @@ public class BoardService {
                 boards
                     .stream()
                     .collect(Collectors.toList()),
-                1)
+                3)
         );
     }
 
+    // 홈 화면 - 최상위 제외한 HOT 게시물 4개만 조회
     public List<BoardSimpleInfo> findHotBoardListForHome() {
         PageRequest pageRequest = PageRequest.of(0, 5);
         List<Board> boards =
@@ -176,18 +177,16 @@ public class BoardService {
                     LocalDateTime.now().minusDays(3)
                     , pageRequest
                 )
-                .stream()
-                .collect(Collectors.toList());
+                .stream().toList();
         List<Discussion> discussions =
             discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
-                    LocalDateTime.now().minusDays(3)
-                    , pageRequest
-                ).stream()
-                .collect(Collectors.toList());
+                LocalDateTime.now().minusDays(3)
+                , pageRequest
+            ).stream().toList();
         WorryBoard worryBoard = worryBoardRepository.findTopByStateFalseOrderByCreatedAtDesc();
 
         return ThreeHotInfo.builder()
-            .board(!boards.isEmpty()? boards.get(0) : null)
+            .board(!boards.isEmpty() ? boards.get(0) : null)
             .discussion(!discussions.isEmpty() ? discussions.get(0) : null)
             .worryBoard(worryBoard)
             .build();
