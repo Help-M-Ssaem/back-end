@@ -47,6 +47,7 @@ public class ChatController {
     if (ChatMessage.MessageType.ENTER.equals(chatMessageRes.getType())) {
       chatService.enterChatRoom(request.getRoomId());
       chatMessageRes.setMessage(chatMessageRes.getSender() + "님이 입장하셨습니다.");
+      //참여자 저장
       chatParticipateService.insertChatParticipate(chatRoom,member.getId());
     }
     // Websocket에 발행된 메시지를 redis로 발행(publish)
