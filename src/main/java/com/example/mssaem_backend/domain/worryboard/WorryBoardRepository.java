@@ -21,6 +21,8 @@ public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
 
     List<WorryBoard> findTop7ByStateFalseOrderByCreatedAtDesc();
 
+    WorryBoard findTopByStateFalseOrderByCreatedAtDesc();
+
     @Query("SELECT wb FROM WorryBoard wb WHERE wb.state = :state AND (:fromMbti IS NULL OR wb.member.mbti = :fromMbti) AND (:toMbti IS NULL OR wb.targetMbti = :toMbti)")
     Page<WorryBoard> findWorriesByStateAndBothMbti(
         @Param("state") Boolean state,
