@@ -5,7 +5,6 @@ import static com.example.mssaem_backend.global.config.exception.errorCode.Membe
 import com.example.mssaem_backend.domain.chatmessage.ChatMessage;
 import com.example.mssaem_backend.domain.chatmessage.ChatMessageService;
 import com.example.mssaem_backend.domain.chatmessage.dto.ChatMessageResourceDto.ChatMessageRes;
-import com.example.mssaem_backend.domain.chatparticipate.ChatParticipateRepository;
 import com.example.mssaem_backend.domain.chatparticipate.ChatParticipateService;
 import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.chatroom.ChatRoomCustomRepository;
@@ -13,11 +12,8 @@ import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.redis.RedisPublisher;
-import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import com.example.mssaem_backend.global.config.security.jwt.JwtTokenProvider;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 

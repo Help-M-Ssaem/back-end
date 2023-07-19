@@ -6,7 +6,6 @@ import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.global.config.exception.BaseException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
