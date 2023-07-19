@@ -117,7 +117,6 @@ public class WorryBoardService {
         List<WorryBoard> worryBoards = worryBoardRepository.findTop7ByStateFalseOrderByCreatedAtDesc();
         if (!worryBoards.isEmpty()) {
             worryBoards.remove(0);
-            System.out.println("최상위 1개 삭제 완료");
         }
 
         return worryBoards.stream()
