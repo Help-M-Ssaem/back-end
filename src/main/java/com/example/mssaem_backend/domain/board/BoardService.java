@@ -1,5 +1,7 @@
 package com.example.mssaem_backend.domain.board;
 
+import static com.example.mssaem_backend.global.common.Time.calculateTime;
+
 import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
@@ -12,7 +14,6 @@ import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
-import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,7 +88,7 @@ public class BoardService {
                     board.getMbti(),
                     board.getLikeCount(),
                     boardCommentRepository.countWithStateTrueByBoard(board),
-                    Time.calculateTime(board.getCreatedAt(), 3),
+                    calculateTime(board.getCreatedAt(), 3),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
@@ -156,4 +158,20 @@ public class BoardService {
             throw new BaseException(BoardErrorCode.BOARD_NOT_FOUND);
         }
     }
+
+
+    //게시글 전체 조회
+    public PageResponseDto<List<BoardSimpleInfo>> findBoards(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Board> result = boardRepository.findAllByStateIsTrue(pageable);
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setBoardSimpleInfo(
+                result
+                    .stream()
+                    .collect(Collectors.toList()))
+        );
+    }
+
 }

@@ -64,4 +64,14 @@ public class BoardController {
     public ResponseEntity<String> deleteBoard(@CurrentMember Member member, @PathVariable Long id) {
         return ResponseEntity.ok(boardService.deleteBoard(member, id));
     }
+
+    /**
+     * 게시글 전체 조회
+     */
+    @GetMapping("/board")
+    public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoards(@RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(boardService.findBoards(page, size));
+    }
+
 }
