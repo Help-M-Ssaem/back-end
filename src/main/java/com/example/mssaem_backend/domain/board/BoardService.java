@@ -12,6 +12,7 @@ import com.example.mssaem_backend.domain.boardimage.BoardImage;
 import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.like.LikeRepository;
+import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -164,6 +165,21 @@ public class BoardService {
     public PageResponseDto<List<BoardSimpleInfo>> findBoards(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Board> result = boardRepository.findAllByStateIsTrue(pageable);
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setBoardSimpleInfo(
+                result
+                    .stream()
+                    .collect(Collectors.toList()))
+        );
+    }
+
+    //Mbti 카테고리 별 게시글 전체 조회
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardsByMbti(MbtiEnum mbti, int page,
+        int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Board> result = boardRepository.findAllByStateIsTrueAndMbti(mbti, pageable);
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),

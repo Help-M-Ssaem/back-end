@@ -3,6 +3,7 @@ package com.example.mssaem_backend.domain.board;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
+import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
@@ -74,4 +75,12 @@ public class BoardController {
         return ResponseEntity.ok(boardService.findBoards(page, size));
     }
 
+    /**
+     * Mbti 카테고리 별 게시글 전체 조회
+     */
+    @GetMapping("/board/{mbti}")
+    public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardsByMbti(
+        @RequestParam MbtiEnum mbti, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(boardService.findBoardsByMbti(mbti,page,size));
+    }
 }
