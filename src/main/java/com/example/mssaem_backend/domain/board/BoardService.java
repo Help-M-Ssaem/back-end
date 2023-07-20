@@ -190,4 +190,18 @@ public class BoardService {
         );
     }
 
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardsByMemberId(Long id, int page,
+        int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Board> result = boardRepository.findAllByMemberId(id, pageable);
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setBoardSimpleInfo(
+                result
+                    .stream()
+                    .collect(Collectors.toList()))
+        );
+    }
+
 }

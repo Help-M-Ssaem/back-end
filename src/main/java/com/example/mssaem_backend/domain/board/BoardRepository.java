@@ -10,4 +10,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Page<Board> findAllByStateIsTrue(Pageable pageable);
 
     Page<Board> findAllByStateIsTrueAndMbti(MbtiEnum mbtiEnum, Pageable pageable);
+
+    Page<Board> findAllByMemberId(Long memberId, Pageable pageable);
 }

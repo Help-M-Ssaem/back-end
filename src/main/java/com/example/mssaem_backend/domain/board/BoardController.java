@@ -80,7 +80,13 @@ public class BoardController {
      */
     @GetMapping("/board/{mbti}")
     public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardsByMbti(
-        @RequestParam MbtiEnum mbti, @RequestParam int page, @RequestParam int size) {
+        @RequestParam(required = false) MbtiEnum mbti, @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(boardService.findBoardsByMbti(mbti,page,size));
+    }
+
+    @GetMapping("/board/{id}")
+    public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardsById(
+        @RequestParam Long memberId, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(boardService.findBoardsByMemberId(memberId, page, size));
     }
 }
