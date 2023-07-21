@@ -77,8 +77,5 @@ public class WorryBoardImageService {
 
         //해당 worryBoard에 존재하는 worryBoardImage 삭제
         worryBoardImageRepository.deleteAllByWorryBoard(worryBoard);
-
-        //이미지 저장 및 worryBoardImage 생성
-        uploadImage(worryBoard, multipartFiles);
     }
 }

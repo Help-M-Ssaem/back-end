@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
@@ -151,6 +152,7 @@ public class WorryBoardService {
     }
 
     //고민글 수정
+    @Transactional
     public String modifyWorryBoard(Member currentMember, PatchWorryReq patchWorryReq,
         List<MultipartFile> multipartFiles) {
         //현재 멤버와 작성자 일치하는 지 확인
