@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.domain.discussioncomment;
 
 import com.example.mssaem_backend.domain.discussion.Discussion;
+import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -41,4 +42,6 @@ public class DiscussionComment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Discussion discussion;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 }
