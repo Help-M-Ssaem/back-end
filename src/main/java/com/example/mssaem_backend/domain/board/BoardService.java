@@ -165,9 +165,9 @@ public class BoardService {
 
 
     //게시글 전체 조회
-    public PageResponseDto<List<BoardSimpleInfo>> findBoards(int page, int size) {
+    public PageResponseDto<List<BoardSimpleInfo>> findBoards(int page, int size , Long boardId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Board> result = boardRepository.findAllByStateIsTrue(pageable);
+        Page<Board> result = boardRepository.findAllByStateIsTrueAndId(boardId , pageable);
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),

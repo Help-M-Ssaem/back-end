@@ -72,8 +72,8 @@ public class BoardController {
      */
     @GetMapping("/board")
     public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoards(@RequestParam int page,
-        @RequestParam int size) {
-        return ResponseEntity.ok(boardService.findBoards(page, size));
+        @RequestParam int size, @RequestParam(required = false) Long boardId) {
+        return ResponseEntity.ok(boardService.findBoards(page, size, boardId));
     }
 
     /**
