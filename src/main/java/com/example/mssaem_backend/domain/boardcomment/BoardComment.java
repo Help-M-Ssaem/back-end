@@ -45,4 +45,5 @@ public class BoardComment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
 }
