@@ -39,7 +39,9 @@ public class WorryBoard extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long report;
 
-    private boolean state; //true : 해결, false : 해결 안함
+    private boolean state = true; //고민글 삭제시 : false
+
+    private boolean isSolved; //true : 해결, false : 해결 안함
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member; //이 고민글을 신청한 유저
