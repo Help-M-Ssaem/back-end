@@ -3,6 +3,7 @@ package com.example.mssaem_backend.domain.board;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -78,15 +79,29 @@ public class BoardController {
     /**
      * Mbti 카테고리 별 게시글 전체 조회
      */
-    @GetMapping("/board/{mbti}")
+    @GetMapping("/board/mbti/{mbti}")
     public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardsByMbti(
-        @RequestParam(required = false) MbtiEnum mbti, @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(boardService.findBoardsByMbti(mbti,page,size));
+        @RequestParam(required = false) MbtiEnum mbti, @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(boardService.findBoardsByMbti(mbti, page, size));
     }
 
-    @GetMapping("/board/{id}")
+    /**
+     * 특정 멤버별 게시글 전체 조회
+     */
+    @GetMapping("/board/member/{memberId}")
     public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardsById(
         @RequestParam Long memberId, @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(boardService.findBoardsByMemberId(memberId, page, size));
     }
+
+    /**
+     * 게시글 상세조회
+     */
+    @GetMapping("/board/{boardId}")
+    public ResponseEntity<GetBoardRes> findBoardById(@CurrentMember Member viewer,
+        @PathVariable Long boardId) {
+        return ResponseEntity.ok(boardService.findBoardById(viewer, boardId));
+    }
+
 }

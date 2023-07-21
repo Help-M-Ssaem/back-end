@@ -11,5 +11,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findAllByStateIsTrueAndMbti(MbtiEnum mbtiEnum, Pageable pageable);
 
-    Page<Board> findAllByMemberId(Long memberId, Pageable pageable);
+    Page<Board> findAllByMemberIdAndStateIsTrue(Long memberId, Pageable pageable);
 }

@@ -7,7 +7,9 @@ import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
+import com.example.mssaem_backend.domain.boardcomment.BoardCommentService;
 import com.example.mssaem_backend.domain.boardimage.BoardImage;
 import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
@@ -40,6 +42,7 @@ public class BoardService {
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
     private final BoardImageRepository boardImageRepository;
+    private final BoardCommentService boardCommentService;
 
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -190,10 +193,11 @@ public class BoardService {
         );
     }
 
+    //특정 멤버별 게시글 전체 조회
     public PageResponseDto<List<BoardSimpleInfo>> findBoardsByMemberId(Long id, int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Board> result = boardRepository.findAllByMemberId(id, pageable);
+        Page<Board> result = boardRepository.findAllByMemberIdAndStateIsTrue(id, pageable);
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),
@@ -204,4 +208,32 @@ public class BoardService {
         );
     }
 
+    //게시글 상세 조회
+    public GetBoardRes findBoardById(Member viewer, Long id) {
+        Board board = boardRepository.findById(id)
+            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+        Member member = board.getMember();
+        //게시글 수정, 삭제 권한 확인
+        Boolean isAllowed = (viewer != null && viewer.getId().equals(member.getId()));
+
+        return GetBoardRes.builder()
+            .memberSimpleInfo(
+                new MemberSimpleInfo(
+                    board.getMember().getId(),
+                    board.getMember().getNickName(),
+                    board.getMember().getMbti(),
+                    badgeRepository.findBadgeWithStateTrueByMember(board.getMember())
+                        .orElse(new Badge()).getName(),
+                    board.getMember().getProfileImageUrl()
+                )
+            )
+            .board(board)
+            .imgUrlList(boardImageService.getImgUrls(board))
+            .createdAt(calculateTime(board.getCreatedAt(), 2))
+            .commentCount(boardCommentRepository.countWithStateTrueByBoard(board))
+            .isAllowed(isAllowed)
+            .boardCommentSimpleInfo(boardCommentService.setBoardCommentSimpleInfo(
+                boardCommentService.boardCommentList(board.getId())))
+            .build();
+    }
 }
