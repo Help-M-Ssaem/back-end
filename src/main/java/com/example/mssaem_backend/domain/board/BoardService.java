@@ -95,7 +95,7 @@ public class BoardService {
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getMbti(),
-                        badgeRepository.findBadgeWithStateTrueByMember(board.getMember())
+                        badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
                             .orElse(new Badge()).getName(),
                         board.getMember().getProfileImageUrl()
                     )
