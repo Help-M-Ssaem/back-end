@@ -111,6 +111,22 @@ public class WorryBoardService {
             makeGetWorriesResForm(result));
     }
 
+    // 홈 화면에 보여줄 해결안된 고민글 최신순으로 조회
+    public List<GetWorriesRes> findWorriesForHome() {
+        List<WorryBoard> worryBoards = worryBoardRepository.findTop7ByStateFalseOrderByCreatedAtDesc();
+        if (!worryBoards.isEmpty()) {
+            worryBoards.remove(0);
+        }
+
+        return worryBoards.stream()
+            .map(worryBoard -> GetWorriesRes.builder()
+                .worryBoard(worryBoard)
+                .imgUrl(worryBoardImageService.getImgUrl(worryBoard))
+                .createdAt(calculateTime(worryBoard.getCreatedAt(), 1))
+                .build())
+            .toList();
+    }
+
     // 고민 해결 완료
     public PatchWorrySolvedRes solvedWorryBoard(PatchWorrySolvedReq patchWorryReq) {
         WorryBoard worryBoard = worryBoardRepository.findById(patchWorryReq.getWorryBoardId())

@@ -81,6 +81,13 @@ public class WorryBoardController {
             worryBoardService.findWorriesByMbti(getWorriesReq, true, page, size));
     }
 
+    //홈 화면 조회 - 고민글 6개 조회 (해결 X, 최신순)
+    @GetMapping("/worry-board/home")
+    public ResponseEntity<List<GetWorriesRes>> findWaitingWorriesForHome() {
+        return ResponseEntity.ok(worryBoardService.findWorriesForHome());
+    }
+
+
     //고민 해결 완료 처리
     @PostMapping("/member/worry-board/solved")
     public ResponseEntity<PatchWorrySolvedRes> solvedWorryBoard(@CurrentMember Member currentMember,

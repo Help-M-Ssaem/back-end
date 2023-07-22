@@ -26,10 +26,23 @@ public class MemberResponseDto {
         private String badge;
         private String profileImgUrl;
     }
-    
+
     @Getter
     @AllArgsConstructor
     public static class CheckNickNameRes {
+
         private boolean isUsed;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class TeacherInfo {
+
+        private Long id;
+        private String nickName;
+        private MbtiEnum mbtiEnum;
+        private String badge;
+        private String profileImgUrl;
+        private String introduction;
     }
 }

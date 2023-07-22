@@ -45,6 +45,7 @@ public class WorryBoardResponseDto {
     @NoArgsConstructor
     public static class GetWorriesRes {
 
+        private Long id;
         private String title;
         private String content;
         private MbtiEnum memberMbti;
@@ -54,6 +55,7 @@ public class WorryBoardResponseDto {
 
         @Builder
         public GetWorriesRes(WorryBoard worryBoard, String imgUrl, String createdAt) {
+            this.id = worryBoard.getId();
             this.title = worryBoard.getTitle();
             this.content = worryBoard.getContent();
             this.memberMbti = worryBoard.getMember().getMbti();
