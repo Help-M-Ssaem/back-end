@@ -62,7 +62,7 @@ public class WorryBoardImageService {
     }
 
     //worryBoardImage 삭제
-    public void deleteWorryImage(WorryBoard worryBoard, List<MultipartFile> multipartFiles) {
+    public void deleteWorryImage(WorryBoard worryBoard) {
         List<WorryBoardImage> worryBoardImages = worryBoardImageRepository.findAllByWorryBoard(
             worryBoard);
 

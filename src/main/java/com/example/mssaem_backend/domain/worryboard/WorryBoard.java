@@ -79,4 +79,8 @@ public class WorryBoard extends BaseTimeEntity {
         this.content = content;
         this.targetMbti = targetMbti;
     }
+
+    public void deleteWorryBoard() {
+        this.state = false;
+    }
 }

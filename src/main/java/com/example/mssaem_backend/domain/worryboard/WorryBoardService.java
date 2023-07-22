@@ -186,9 +186,25 @@ public class WorryBoardService {
         );
 
         //S3 처리 worryBoardImageService로 전달
-        worryBoardImageService.deleteWorryImage(worryBoard, multipartFiles);
-        worryBoardImageService.saveWorryImage(worryBoard, multipartFiles);
-
+        worryBoardImageService.deleteWorryImage(worryBoard);
+        if (multipartFiles != null) {
+            worryBoardImageService.saveWorryImage(worryBoard, multipartFiles);
+        }
         return "고민글 수정 완료";
+    }
+
+    //고민글 삭제
+    public String deleteWorryBoard(Member currentMember, Long id) {
+        //현재 멤버와 작성자 일치하는 지 확인
+        WorryBoard worryBoard = worryBoardRepository.findById(id)
+            .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
+        if (!currentMember.getId().equals(worryBoard.getMember().getId())) {
+            throw new BaseException(MemberErrorCode.INVALID_MEMBER);
+        }
+
+        worryBoard.deleteWorryBoard();
+        worryBoardImageService.deleteWorryImage(worryBoard);
+
+        return "고민글 삭제 완료";
     }
 }

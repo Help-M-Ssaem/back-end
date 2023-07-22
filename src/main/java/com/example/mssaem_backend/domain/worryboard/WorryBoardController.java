@@ -13,6 +13,7 @@ import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -108,8 +109,16 @@ public class WorryBoardController {
     @PatchMapping("/member/worry-board")
     public ResponseEntity<String> modifyWorryBoard(@CurrentMember Member currentMember,
         @RequestPart(value = "patchWorryReq") PatchWorryReq patchWorryReq,
-        @RequestPart(value ="image", required = false) List<MultipartFile> multipartFiles) {
+        @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
         return ResponseEntity.ok(
             worryBoardService.modifyWorryBoard(currentMember, patchWorryReq, multipartFiles));
+    }
+
+    //고민글 삭제
+    @DeleteMapping("/member/worry-board/{id}")
+    public ResponseEntity<String> deleteWorryBoard(@CurrentMember Member currentMember,
+        @PathVariable Long id) {
+        return ResponseEntity.ok(
+            worryBoardService.deleteWorryBoard(currentMember, id));
     }
 }
