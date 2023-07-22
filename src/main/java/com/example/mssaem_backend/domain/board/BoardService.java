@@ -186,9 +186,12 @@ public class BoardService {
         WorryBoard worryBoard = worryBoardRepository.findTopByStateFalseOrderByCreatedAtDesc();
 
         return ThreeHotInfo.builder()
-            .board(!boards.isEmpty() ? boards.get(0) : null)
-            .discussion(!discussions.isEmpty() ? discussions.get(0) : null)
-            .worryBoard(worryBoard)
+            .boardId(!boards.isEmpty() ? boards.get(0).getId() : null)
+            .boardTitle(!boards.isEmpty() ? boards.get(0).getTitle() : null)
+            .discussionId(!discussions.isEmpty() ? discussions.get(0).getId() : null)
+            .discussionTitle(!discussions.isEmpty() ? discussions.get(0).getTitle() : null)
+            .worryBoardId(worryBoard != null ? worryBoard.getId() : null)
+            .worryBoardTitle(worryBoard != null ? worryBoard.getTitle() : null)
             .build();
 
     }
