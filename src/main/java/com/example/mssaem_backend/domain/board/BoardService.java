@@ -45,6 +45,7 @@ public class BoardService {
     private final BoardImageRepository boardImageRepository;
     private final BoardCommentService boardCommentService;
 
+    // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Board> boards =
@@ -59,7 +60,8 @@ public class BoardService {
             setBoardSimpleInfo(
                 boards
                     .stream()
-                    .collect(Collectors.toList()))
+                    .collect(Collectors.toList()),
+                1)
         );
     }
 
@@ -76,10 +78,12 @@ public class BoardService {
             boards.remove(0);
         }
 
-        return setBoardSimpleInfo(boards);
+        return setBoardSimpleInfo(boards, 1);
     }
 
-    private List<BoardSimpleInfo> setBoardSimpleInfo(List<Board> boards) {
+
+    // 게시물 전체 조회시 각 게시물의 간단한 정보 Dto에 매핑
+    private List<BoardSimpleInfo> setBoardSimpleInfo(List<Board> boards, int dateType) {
         List<BoardSimpleInfo> boardSimpleInfos = new ArrayList<>();
 
         for (Board board : boards) {
@@ -93,7 +97,7 @@ public class BoardService {
                     board.getMbti(),
                     board.getLikeCount(),
                     boardCommentRepository.countByBoardAndStateTrue(board),
-                    Time.calculateTime(board.getCreatedAt(), 3),
+                    Time.calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),

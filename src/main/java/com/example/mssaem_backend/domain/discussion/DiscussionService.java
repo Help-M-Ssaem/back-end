@@ -47,7 +47,8 @@ public class DiscussionService {
                 member,
                 discussions
                     .stream()
-                    .collect(Collectors.toList()))
+                    .collect(Collectors.toList()),
+                1)
         );
     }
 
@@ -64,12 +65,12 @@ public class DiscussionService {
             discussions.remove(0);
         }
 
-        return setDiscussionSimpleInfo(member, discussions);
+        return setDiscussionSimpleInfo(member, discussions, 1);
     }
 
     // 토론글의 정보를 Dto에 매핑하는 메소드
     private List<DiscussionSimpleInfo> setDiscussionSimpleInfo(Member member,
-        List<Discussion> discussions) {
+        List<Discussion> discussions, int dateType) {
         List<DiscussionSimpleInfo> discussionSimpleInfos = new ArrayList<>();
 
         int selectedOptionIdx = -1;
@@ -91,7 +92,7 @@ public class DiscussionService {
                     discussion.getContent(),
                     discussion.getParticipantCount(),
                     discussionCommentRepository.countByDiscussionAndStateTrue(discussion),
-                    Time.calculateTime(discussion.getCreatedAt(), 3),
+                    Time.calculateTime(discussion.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         discussion.getMember().getId(),
                         discussion.getMember().getNickName(),

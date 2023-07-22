@@ -105,9 +105,26 @@ public class WorryBoardService {
         MbtiEnum fromMbti = isFromAll ? null : MbtiEnum.valueOf(getWorriesReq.getFromMbti());
         MbtiEnum toMbti = isToAll ? null : MbtiEnum.valueOf(getWorriesReq.getToMbti());
 
-        Page<WorryBoard> result = worryBoardRepository.findWorriesByStateAndBothMbti(isSolved, fromMbti, toMbti, pageable);
+        Page<WorryBoard> result = worryBoardRepository.findWorriesByStateAndBothMbti(isSolved,
+            fromMbti, toMbti, pageable);
 
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
             makeGetWorriesResForm(result));
+    }
+
+    // 홈 화면에 보여줄 해결안된 고민글 최신순으로 조회
+    public List<GetWorriesRes> findWorriesForHome() {
+        List<WorryBoard> worryBoards = worryBoardRepository.findTop7ByStateFalseOrderByCreatedAtDesc();
+        if (!worryBoards.isEmpty()) {
+            worryBoards.remove(0);
+        }
+
+        return worryBoards.stream()
+            .map(worryBoard -> GetWorriesRes.builder()
+                .worryBoard(worryBoard)
+                .imgUrl(worryBoardImageService.getImgUrl(worryBoard))
+                .createdAt(calculateTime(worryBoard.getCreatedAt(), 1))
+                .build())
+            .toList();
     }
 }

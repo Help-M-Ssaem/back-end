@@ -1,28 +1,39 @@
 package com.example.mssaem_backend.domain.member;
 
-import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
+import com.example.mssaem_backend.domain.badge.Badge;
+import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
+import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
+import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import com.example.mssaem_backend.global.config.security.jwt.JwtTokenProvider;
 import com.example.mssaem_backend.global.config.security.oauth.KakaoLoginService;
 import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 @Transactional
 public class MemberService {
+
     private final KakaoLoginService kakaoLoginService;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final WorryBoardRepository worryBoardRepository;
+    private final BadgeRepository badgeRepository;
 
     public void save(Member member) {
         memberRepository.save(member);
@@ -30,14 +41,14 @@ public class MemberService {
 
     public Member register(RegisterMember registerMember) {
         Member member = Member.builder()
-                .email(registerMember.getEmail())
-                .nickName(registerMember.getNickname())
-                .mbti(registerMember.getMbti())
-                .caseSensitivity(registerMember.getCaseSensitivity())
-                .refreshToken("")
-                .report(0)
-                .role(Role.ROLE_MEMBER)
-                .build();
+            .email(registerMember.getEmail())
+            .nickName(registerMember.getNickname())
+            .mbti(registerMember.getMbti())
+            .caseSensitivity(registerMember.getCaseSensitivity())
+            .refreshToken("")
+            .report(0)
+            .role(Role.ROLE_MEMBER)
+            .build();
         save(member);
         return member;
     }
@@ -51,7 +62,7 @@ public class MemberService {
     }
 
     public TokenInfo socialLogin(SocialLoginType socialLoginType,
-                                 SocialLoginToken socialLoginToken) throws BaseException, IOException {
+        SocialLoginToken socialLoginToken) throws BaseException, IOException {
         String idToken = socialLoginToken.getIdToken();
         String email = "";
         switch (socialLoginType) {
@@ -85,6 +96,31 @@ public class MemberService {
 
     public CheckNickNameRes checkNickName(CheckNickName checkNickName) {
         return new CheckNickNameRes(
-                memberRepository.existsByNickName(checkNickName.getNickName()));
+            memberRepository.existsByNickName(checkNickName.getNickName()));
+    }
+
+    // 홈 화면에 보여줄 인기 M쌤 조회
+    public List<TeacherInfo> findHotTeacherForHome() {
+        PageRequest pageRequest = PageRequest.of(0, 4);
+        Page<Member> solveMembers = worryBoardRepository.findSolveMemberWithMoreThanOneIdAndStateTrue(
+            LocalDateTime.now().minusMonths(1),
+            pageRequest);
+        List<TeacherInfo> teacherInfos = new ArrayList<>();
+
+        for (Member solveMember : solveMembers) {
+            teacherInfos.add(
+                new TeacherInfo(
+                    solveMember.getId(),
+                    solveMember.getNickName(),
+                    solveMember.getMbti(),
+                    badgeRepository.findBadgeWithStateTrueByMember(solveMember)
+                        .orElse(new Badge())
+                        .getName(),
+                    solveMember.getProfileImageUrl(),
+                    solveMember.getIntroduction()
+                )
+            );
+        }
+        return teacherInfos;
     }
 }

@@ -24,43 +24,59 @@ public class WorryBoardController {
 
     //고민글 조회 (해결 X)
     @GetMapping("/worry-board/waiting")
-    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesWaiting(@RequestParam int page, @RequestParam int size) {
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesWaiting(
+        @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(worryBoardService.findWorriesByState(false, page, size));
     }
 
     //고민글 조회 (해결 O)
     @GetMapping("/worry-board/solved")
-    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesSolved(@RequestParam int page, @RequestParam int size) {
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesSolved(
+        @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(worryBoardService.findWorriesByState(true, page, size));
     }
 
     //고민글 상세 조회
     @GetMapping("/worry-board/{id}")
-    public ResponseEntity<GetWorryRes> findWorryById(@CurrentMember Member viewer,@PathVariable Long id) {
+    public ResponseEntity<GetWorryRes> findWorryById(@CurrentMember Member viewer,
+        @PathVariable Long id) {
         return ResponseEntity.ok(worryBoardService.findWorryById(viewer, id));
     }
 
     //특정 멤버별 올린 고민글 조회
     @GetMapping("/worry-board/post-list")
-    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesByMemberId(@RequestParam Long memberId, @RequestParam int page, @RequestParam int size) {
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesByMemberId(
+        @RequestParam Long memberId, @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(worryBoardService.findWorriesByMemberId(memberId, page, size));
     }
 
     //특정 멤버별 해결한 고민글 조회
     @GetMapping("/worry-board/solve-list")
-    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>>findSolveWorriesByMemberId(@RequestParam Long memberId, @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findSolveWorriesByMemberId(memberId, page, size));
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findSolveWorriesByMemberId(
+        @RequestParam Long memberId, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(
+            worryBoardService.findSolveWorriesByMemberId(memberId, page, size));
     }
 
     //고민 게시판(해결 X) - mbti별 고민글 조회
     @PostMapping("worry-board/waiting/filter")
-    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWaitingWorriesByMbti(@RequestBody GetWorriesReq getWorriesReq, @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesByMbti(getWorriesReq, false, page, size));
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWaitingWorriesByMbti(
+        @RequestBody GetWorriesReq getWorriesReq, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(
+            worryBoardService.findWorriesByMbti(getWorriesReq, false, page, size));
     }
 
     //고민 게시판(해결 O) - mbti별 고민글 조회
     @PostMapping("worry-board/solved/filter")
-    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findSolvedWorriesByMbti(@RequestBody GetWorriesReq getWorriesReq, @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesByMbti(getWorriesReq, true, page, size));
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findSolvedWorriesByMbti(
+        @RequestBody GetWorriesReq getWorriesReq, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(
+            worryBoardService.findWorriesByMbti(getWorriesReq, true, page, size));
+    }
+
+    //홈 화면 조회 - 고민글 6개 조회 (해결 X, 최신순)
+    @GetMapping("/worry-board/home")
+    public ResponseEntity<List<GetWorriesRes>> findWaitingWorriesForHome() {
+        return ResponseEntity.ok(worryBoardService.findWorriesForHome());
     }
 }
