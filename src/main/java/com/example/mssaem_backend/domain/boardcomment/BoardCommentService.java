@@ -36,7 +36,7 @@ public class BoardCommentService {
                         boardComment.getMember().getId(),
                         boardComment.getMember().getNickName(),
                         boardComment.getMember().getMbti(),
-                        badgeRepository.findBadgeWithStateTrueByMember(boardComment.getMember())
+                        badgeRepository.findBadgeByMemberAndStateTrue(boardComment.getMember())
                             .orElse(new Badge()).getName(),
                         boardComment.getMember().getProfileImageUrl()
                     )

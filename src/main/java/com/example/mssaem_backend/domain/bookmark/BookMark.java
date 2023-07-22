@@ -16,7 +16,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @DynamicInsert
@@ -38,4 +37,18 @@ public class BookMark extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public BookMark(MbtiEnum mbti , Member member) {
+        this.mbti = mbti;
+        this.member = member;
+    }
+
+    public void updateBookMark() {
+        //현재 상태가 true 라면 false로 변경
+        if (this.state == true) {
+            this.state = false;
+        } else {
+            this.state = true;
+        }
+    }
 }

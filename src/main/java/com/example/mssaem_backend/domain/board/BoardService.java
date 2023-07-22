@@ -223,7 +223,7 @@ public class BoardService {
                     board.getMember().getId(),
                     board.getMember().getNickName(),
                     board.getMember().getMbti(),
-                    badgeRepository.findBadgeWithStateTrueByMember(board.getMember())
+                    badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
                         .orElse(new Badge()).getName(),
                     board.getMember().getProfileImageUrl()
                 )
@@ -231,7 +231,7 @@ public class BoardService {
             .board(board)
             .imgUrlList(boardImageService.getImgUrls(board))
             .createdAt(calculateTime(board.getCreatedAt(), 2))
-            .commentCount(boardCommentRepository.countWithStateTrueByBoard(board))
+            .commentCount(boardCommentRepository.countByBoardAndStateTrue(board))
             .isAllowed(isAllowed)
             .boardCommentSimpleInfo(boardCommentService.setBoardCommentSimpleInfo(
                 boardCommentService.boardCommentList(board.getId())))
