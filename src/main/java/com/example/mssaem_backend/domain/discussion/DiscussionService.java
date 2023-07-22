@@ -91,7 +91,7 @@ public class DiscussionService {
                     discussion.getTitle(),
                     discussion.getContent(),
                     discussion.getParticipantCount(),
-                    discussionCommentRepository.countWithStateTrueByDiscussion(discussion),
+                    discussionCommentRepository.countByDiscussionAndStateTrue(discussion),
                     Time.calculateTime(discussion.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         discussion.getMember().getId(),
