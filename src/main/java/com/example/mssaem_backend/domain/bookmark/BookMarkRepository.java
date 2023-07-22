@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.bookmark;
 
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BookMarkRepository extends JpaRepository<BookMark, Long> {
@@ -10,4 +11,5 @@ public interface BookMarkRepository extends JpaRepository<BookMark, Long> {
 
     Boolean existsBookMarkByMemberAndMbti(Member member, MbtiEnum mbtiEnum);
 
+    List<BookMark> findAllByStateIsTrueAndMember(Member member);
 }
