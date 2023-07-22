@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.domain.boardcomment;
 
 import com.example.mssaem_backend.domain.board.Board;
+import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -41,4 +42,6 @@ public class BoardComment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 }

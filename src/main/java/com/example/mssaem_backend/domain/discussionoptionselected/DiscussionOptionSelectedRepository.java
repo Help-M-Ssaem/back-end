@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface DiscussionOptionSelectedRepository extends
     JpaRepository<DiscussionOptionSelected, Long> {
 
-    DiscussionOptionSelected findDiscussionOptionSelectedWithStateByMemberAndDiscussionOption(
+    DiscussionOptionSelected findDiscussionOptionSelectedByMemberAndDiscussionOptionAndStateTrue(
         Member member, DiscussionOption discussionOption);
 }

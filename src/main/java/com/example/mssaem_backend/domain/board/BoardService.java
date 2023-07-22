@@ -89,13 +89,13 @@ public class BoardService {
                         .getImageUrl(),
                     board.getMbti(),
                     board.getLikeCount(),
-                    boardCommentRepository.countWithStateTrueByBoard(board),
+                    boardCommentRepository.countByBoardAndStateTrue(board),
                     Time.calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getMbti(),
-                        badgeRepository.findBadgeWithStateTrueByMember(board.getMember())
+                        badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
                             .orElse(new Badge()).getName(),
                         board.getMember().getProfileImageUrl()
                     )
