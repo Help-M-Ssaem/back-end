@@ -17,6 +17,7 @@ import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
@@ -91,13 +92,13 @@ public class BoardService {
                         .getImageUrl(),
                     board.getMbti(),
                     board.getLikeCount(),
-                    boardCommentRepository.countWithStateTrueByBoard(board),
-                    calculateTime(board.getCreatedAt(), 3),
+                    boardCommentRepository.countByBoardAndStateTrue(board),
+                    Time.calculateTime(board.getCreatedAt(), 3),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getMbti(),
-                        badgeRepository.findBadgeWithStateTrueByMember(board.getMember())
+                        badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
                             .orElse(new Badge()).getName(),
                         board.getMember().getProfileImageUrl()
                     )

@@ -90,13 +90,13 @@ public class DiscussionService {
                     discussion.getTitle(),
                     discussion.getContent(),
                     discussion.getParticipantCount(),
-                    discussionCommentRepository.countWithStateTrueByDiscussion(discussion),
+                    discussionCommentRepository.countByDiscussionAndStateTrue(discussion),
                     Time.calculateTime(discussion.getCreatedAt(), 3),
                     new MemberSimpleInfo(
                         discussion.getMember().getId(),
                         discussion.getMember().getNickName(),
                         discussion.getMember().getMbti(),
-                        badgeRepository.findBadgeWithStateTrueByMember(
+                        badgeRepository.findBadgeByMemberAndStateTrue(
                                 discussion.getMember())
                             .orElse(new Badge())
                             .getName(),
@@ -116,7 +116,7 @@ public class DiscussionService {
     private int getSelectedOptionIdx(Member member, List<DiscussionOption> discussionOptions) {
         int selectedOptionIdx = -1;
         for (int i = 0; i < discussionOptions.size(); i++) {
-            if (discussionOptionSelectedRepository.findDiscussionOptionSelectedWithStateByMemberAndDiscussionOption(
+            if (discussionOptionSelectedRepository.findDiscussionOptionSelectedByMemberAndDiscussionOptionAndStateTrue(
                 member,
                 discussionOptions.get(i)) != null) {
                 selectedOptionIdx = i;
