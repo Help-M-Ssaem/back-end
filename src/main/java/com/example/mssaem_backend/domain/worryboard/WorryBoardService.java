@@ -61,7 +61,7 @@ public class WorryBoardService {
         Member member = worryBoard.getMember();
 
         //수정,삭제 권한 확인
-        Boolean isEditAllowed = (viewer != null && viewer.equals(member));
+        Boolean isEditAllowed = (viewer != null && viewer.getId().equals(worryBoard.getMember().getId()));
 
         //채팅 시작 권한 확인
         Boolean isChatAllowed = (viewer != null && viewer.getMbti().equals(worryBoard.getTargetMbti()));
