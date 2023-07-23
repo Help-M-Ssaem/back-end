@@ -2,10 +2,13 @@ package com.example.mssaem_backend.domain.chatparticipate;
 
 import static com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode.EMPTY_MEMBER;
 
+import com.example.mssaem_backend.domain.chatparticipate.dto.ChatParticipateResponseDto.ChatParticipateRes;
 import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.global.config.exception.BaseException;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,4 +25,11 @@ public class ChatParticipateService {
     ChatParticipate chatParticipate = new ChatParticipate(chatRoom, member);
     chatParticipateRepository.save(chatParticipate);
   }
+
+  public List<ChatParticipateRes> selectChatRooms(Member member) {
+    List<ChatParticipate> allByMember = chatParticipateRepository.findAllByMember(member);
+    return allByMember.stream()
+        .map(ChatParticipateRes::new).collect(Collectors.toList());
+  }
+
 }
