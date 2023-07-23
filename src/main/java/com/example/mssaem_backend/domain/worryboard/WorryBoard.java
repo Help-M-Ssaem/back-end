@@ -18,12 +18,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @DynamicInsert
-@Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,7 +47,7 @@ public class WorryBoard extends BaseTimeEntity {
 
     private boolean state = true; //고민글 삭제시 : false
 
-    private boolean isSolved; //true : 해결, false : 해결 안함
+    private Boolean isSolved = false; //true : 해결, false : 해결 안함
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member; //이 고민글을 신청한 유저
@@ -62,14 +60,28 @@ public class WorryBoard extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long hits;
 
-    //테스트 코드용
     @Builder
-    public WorryBoard(String title, String content, MbtiEnum targetMbti, boolean state,
+    public WorryBoard(String title, String content, MbtiEnum targetMbti,
         Member member) {
         this.title = title;
         this.content = content;
         this.targetMbti = targetMbti;
-        this.state = state;
         this.member = member;
+    }
+
+    public void solveWorryBoard(Member solveMember) {
+        this.isSolved = true;
+        this.solveMember = solveMember;
+        this.solvedAt = LocalDateTime.now();
+    }
+
+    public void modifyWorryBoard(String title, String content, MbtiEnum targetMbti) {
+        this.title = title;
+        this.content = content;
+        this.targetMbti = targetMbti;
+    }
+
+    public void deleteWorryBoard() {
+        this.state = false;
     }
 }
