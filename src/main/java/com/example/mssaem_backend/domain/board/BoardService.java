@@ -169,7 +169,7 @@ public class BoardService {
     }
 
 
-    //게시글 전체 조회
+    //게시글 전체 조회 , 게시글 상세 조회시 boardId 입력 받아 현재 게시글 제외하고 전체 조회
     public PageResponseDto<List<BoardSimpleInfo>> findBoards(int page, int size, Long boardId) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Board> result = boardRepository.findAllByStateIsTrueAndId(boardId, pageable);
