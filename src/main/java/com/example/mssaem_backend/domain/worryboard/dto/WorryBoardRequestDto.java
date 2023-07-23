@@ -10,15 +10,6 @@ public class WorryBoardRequestDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class GetWorriesReq {
-
-        String fromMbti;
-        String toMbti;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class PatchWorrySolvedReq {
 
         Long worrySolverId; //해결한 사람 id

@@ -7,7 +7,6 @@ import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
-import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.GetWorriesReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
@@ -111,20 +110,21 @@ public class WorryBoardService {
     }
 
     // mbti 필터링 조회
-    public PageResponseDto<List<GetWorriesRes>> findWorriesByMbti(GetWorriesReq getWorriesReq,
-        Boolean isSolved, int page, int size) {
+    public PageResponseDto<List<GetWorriesRes>> findWorriesByMbti(Boolean isSolved,
+        String strFromMbti,
+        String strToMbti,
+        int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        boolean isFromAll = getWorriesReq.getFromMbti().equals("ALL");
-        boolean isToAll = getWorriesReq.getToMbti().equals("ALL");
+        boolean isFromAll = strFromMbti.equals("ALL");
+        boolean isToAll = strToMbti.equals("ALL");
 
         // ALL인 경우에 mbti에는 null값이 들어감
-        MbtiEnum fromMbti = isFromAll ? null : MbtiEnum.valueOf(getWorriesReq.getFromMbti());
-        MbtiEnum toMbti = isToAll ? null : MbtiEnum.valueOf(getWorriesReq.getToMbti());
+        MbtiEnum fromMbti = isFromAll ? null : MbtiEnum.valueOf(strFromMbti);
+        MbtiEnum toMbti = isToAll ? null : MbtiEnum.valueOf(strToMbti);
 
         Page<WorryBoard> result = worryBoardRepository.findWorriesBySolvedAndBothMbtiAndStateTrue(
-            isSolved,
-            fromMbti, toMbti, pageable);
+            isSolved, fromMbti, toMbti, pageable);
 
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
             makeGetWorriesResForm(result));

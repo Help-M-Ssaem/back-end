@@ -1,7 +1,6 @@
 package com.example.mssaem_backend.domain.worryboard;
 
 import com.example.mssaem_backend.domain.member.Member;
-import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.GetWorriesReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
@@ -67,19 +66,21 @@ public class WorryBoardController {
     }
 
     //고민 게시판(해결 X) - mbti별 고민글 조회
-    @PostMapping("worry-board/waiting/filter")
+    @GetMapping("worry-board/waiting/filter")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWaitingWorriesByMbti(
-        @RequestBody GetWorriesReq getWorriesReq, @RequestParam int page, @RequestParam int size) {
+        @RequestParam("fromMbti") String strFromMbti, @RequestParam("toMbti") String strToMbti,
+        @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(
-            worryBoardService.findWorriesByMbti(getWorriesReq, false, page, size));
+            worryBoardService.findWorriesByMbti(false, strFromMbti, strToMbti, page, size));
     }
 
     //고민 게시판(해결 O) - mbti별 고민글 조회
-    @PostMapping("worry-board/solved/filter")
+    @GetMapping("worry-board/solved/filter")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findSolvedWorriesByMbti(
-        @RequestBody GetWorriesReq getWorriesReq, @RequestParam int page, @RequestParam int size) {
+        @RequestParam("fromMbti") String strFromMbti, @RequestParam("toMbti") String strToMbti,
+        @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(
-            worryBoardService.findWorriesByMbti(getWorriesReq, true, page, size));
+            worryBoardService.findWorriesByMbti(true, strFromMbti, strToMbti, page, size));
     }
 
     //홈 화면 조회 - 고민글 6개 조회 (해결 X, 최신순)
@@ -94,7 +95,8 @@ public class WorryBoardController {
     public ResponseEntity<PatchWorrySolvedRes> solveWorryBoard(@CurrentMember Member currentMember,
         @PathVariable Long id,
         @RequestBody PatchWorrySolvedReq patchWorryReq) {
-        return ResponseEntity.ok(worryBoardService.solveWorryBoard(currentMember, id, patchWorryReq));
+        return ResponseEntity.ok(
+            worryBoardService.solveWorryBoard(currentMember, id, patchWorryReq));
     }
 
     //고민글 생성
