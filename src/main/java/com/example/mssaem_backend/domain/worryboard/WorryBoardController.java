@@ -68,7 +68,7 @@ public class WorryBoardController {
     //고민 게시판(해결 X) - mbti별 고민글 조회
     @GetMapping("worry-board/waiting/filter")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWaitingWorriesByMbti(
-        @RequestParam("fromMbti") String strFromMbti, @RequestParam("toMbti") String strToMbti,
+        @RequestParam String strFromMbti, @RequestParam String strToMbti,
         @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(
             worryBoardService.findWorriesByMbti(false, strFromMbti, strToMbti, page, size));
@@ -77,7 +77,7 @@ public class WorryBoardController {
     //고민 게시판(해결 O) - mbti별 고민글 조회
     @GetMapping("worry-board/solved/filter")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findSolvedWorriesByMbti(
-        @RequestParam("fromMbti") String strFromMbti, @RequestParam("toMbti") String strToMbti,
+        @RequestParam String strFromMbti, @RequestParam String strToMbti,
         @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(
             worryBoardService.findWorriesByMbti(true, strFromMbti, strToMbti, page, size));
@@ -88,7 +88,6 @@ public class WorryBoardController {
     public ResponseEntity<List<GetWorriesRes>> findWaitingWorriesForHome() {
         return ResponseEntity.ok(worryBoardService.findWorriesForHome());
     }
-
 
     //고민 해결 완료 처리
     @PatchMapping("/member/worry-board/{id}/solved")
