@@ -1,7 +1,6 @@
 package com.example.mssaem_backend.domain.chatroom;
 
 import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatRoomInfo;
-import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.config.redis.RedisSubscriber;
 import jakarta.annotation.PostConstruct;
 import java.io.Serializable;
@@ -30,7 +29,6 @@ public class ChatRoomCustomRepository implements Serializable {
   // 채팅방의 대화 메시지를 발행하기 위한 redis topic 정보. 서버별로 채팅방에 매치되는 topic정보를 Map에 넣어 roomId로 찾을수 있도록 한다.
   private Map<Long, ChannelTopic> topics;
   private final ChatRoomRepository chatRoomRepository;
-  private final WorryBoardRepository worryBoardRepository;
 
   @PostConstruct
   private void init() {
