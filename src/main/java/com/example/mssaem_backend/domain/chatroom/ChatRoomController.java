@@ -6,12 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/chat")
+
 public class ChatRoomController {
 
   private final ChatRoomService chatRoomService;
@@ -19,7 +18,7 @@ public class ChatRoomController {
   /**
    * 채팅방 개설
    */
-  @PostMapping("member/rooms")
+  @PostMapping("member/chat/rooms")
   public String createRoom(@RequestBody ChatRoomInfo chatRoomInfo) {
     return chatRoomService.createRoom(chatRoomInfo);
   }
