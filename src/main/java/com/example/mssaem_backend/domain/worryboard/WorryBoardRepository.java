@@ -21,6 +21,8 @@ public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
 
     List<WorryBoard> findTop7ByIsSolvedFalseAndStateTrueOrderByCreatedAtDesc();
 
+    WorryBoard findTopByStateFalseOrderByCreatedAtDesc();
+
     @Query("SELECT wb FROM WorryBoard wb WHERE wb.state = true AND wb.isSolved = :isSolved AND (:fromMbti IS NULL OR wb.member.mbti = :fromMbti) AND (:toMbti IS NULL OR wb.targetMbti = :toMbti) ORDER BY wb.createdAt DESC")
     Page<WorryBoard> findWorriesBySolvedAndBothMbtiAndStateTrue(
         @Param("isSolved") Boolean isSolved,
