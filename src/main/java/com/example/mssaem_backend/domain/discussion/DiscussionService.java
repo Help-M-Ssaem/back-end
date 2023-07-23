@@ -32,7 +32,7 @@ public class DiscussionService {
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
 
-    // HOT 토론글 전체 조회
+    // HOT 토론글 더보기 조회
     public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionList(Member member,
         int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -47,11 +47,12 @@ public class DiscussionService {
                 member,
                 discussions
                     .stream()
-                    .collect(Collectors.toList()))
+                    .collect(Collectors.toList()),
+                3)
         );
     }
 
-    // 최상위 제외한 HOT 토론글 2개만 조회
+    // 홈 화면 - 최상위 제외한 HOT 토론글 2개만 조회
     public List<DiscussionSimpleInfo> findHotDiscussionListForHome(Member member) {
         PageRequest pageRequest = PageRequest.of(0, 3);
         List<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
@@ -64,12 +65,12 @@ public class DiscussionService {
             discussions.remove(0);
         }
 
-        return setDiscussionSimpleInfo(member, discussions);
+        return setDiscussionSimpleInfo(member, discussions, 1);
     }
 
     // 토론글의 정보를 Dto에 매핑하는 메소드
     private List<DiscussionSimpleInfo> setDiscussionSimpleInfo(Member member,
-        List<Discussion> discussions) {
+        List<Discussion> discussions, int dateType) {
         List<DiscussionSimpleInfo> discussionSimpleInfos = new ArrayList<>();
 
         int selectedOptionIdx = -1;
@@ -90,13 +91,13 @@ public class DiscussionService {
                     discussion.getTitle(),
                     discussion.getContent(),
                     discussion.getParticipantCount(),
-                    discussionCommentRepository.countWithStateTrueByDiscussion(discussion),
-                    Time.calculateTime(discussion.getCreatedAt(), 3),
+                    discussionCommentRepository.countByDiscussionAndStateTrue(discussion),
+                    Time.calculateTime(discussion.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         discussion.getMember().getId(),
                         discussion.getMember().getNickName(),
                         discussion.getMember().getMbti(),
-                        badgeRepository.findBadgeWithStateTrueByMember(
+                        badgeRepository.findBadgeByMemberAndStateTrue(
                                 discussion.getMember())
                             .orElse(new Badge())
                             .getName(),
@@ -116,7 +117,7 @@ public class DiscussionService {
     private int getSelectedOptionIdx(Member member, List<DiscussionOption> discussionOptions) {
         int selectedOptionIdx = -1;
         for (int i = 0; i < discussionOptions.size(); i++) {
-            if (discussionOptionSelectedRepository.findDiscussionOptionSelectedWithStateByMemberAndDiscussionOption(
+            if (discussionOptionSelectedRepository.findDiscussionOptionSelectedByMemberAndDiscussionOptionAndStateTrue(
                 member,
                 discussionOptions.get(i)) != null) {
                 selectedOptionIdx = i;

@@ -1,21 +1,23 @@
 package com.example.mssaem_backend.domain.member;
 
-import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
-import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
+import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
+import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
 import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
@@ -53,5 +55,11 @@ public class MemberController {
                 HttpStatus.OK);
     }
 
-
+    /**
+     * 홈 화면 조회 - 인기 M쌤
+     */
+    @GetMapping("/teacher")
+    public ResponseEntity<List<TeacherInfo>> findHotTeacherForHome() {
+        return ResponseEntity.ok(memberService.findHotTeacherForHome());
+    }
 }

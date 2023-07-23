@@ -5,13 +5,18 @@ import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImage;
 import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
+import com.example.mssaem_backend.domain.discussion.Discussion;
+import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
 import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.worryboard.WorryBoard;
+import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
@@ -37,7 +42,10 @@ public class BoardService {
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
     private final BoardImageRepository boardImageRepository;
+    private final DiscussionRepository discussionRepository;
+    private final WorryBoardRepository worryBoardRepository;
 
+    // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Board> boards =
@@ -52,10 +60,12 @@ public class BoardService {
             setBoardSimpleInfo(
                 boards
                     .stream()
-                    .collect(Collectors.toList()))
+                    .collect(Collectors.toList()),
+                3)
         );
     }
 
+    // 홈 화면 - 최상위 제외한 HOT 게시물 4개만 조회
     public List<BoardSimpleInfo> findHotBoardListForHome() {
         PageRequest pageRequest = PageRequest.of(0, 5);
         List<Board> boards =
@@ -69,10 +79,12 @@ public class BoardService {
             boards.remove(0);
         }
 
-        return setBoardSimpleInfo(boards);
+        return setBoardSimpleInfo(boards, 1);
     }
 
-    private List<BoardSimpleInfo> setBoardSimpleInfo(List<Board> boards) {
+
+    // 게시물 전체 조회시 각 게시물의 간단한 정보 Dto에 매핑
+    private List<BoardSimpleInfo> setBoardSimpleInfo(List<Board> boards, int dateType) {
         List<BoardSimpleInfo> boardSimpleInfos = new ArrayList<>();
 
         for (Board board : boards) {
@@ -85,13 +97,13 @@ public class BoardService {
                         .getImageUrl(),
                     board.getMbti(),
                     board.getLikeCount(),
-                    boardCommentRepository.countWithStateTrueByBoard(board),
-                    Time.calculateTime(board.getCreatedAt(), 3),
+                    boardCommentRepository.countByBoardAndStateTrue(board),
+                    Time.calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getMbti(),
-                        badgeRepository.findBadgeWithStateTrueByMember(board.getMember())
+                        badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
                             .orElse(new Badge()).getName(),
                         board.getMember().getProfileImageUrl()
                     )
@@ -155,5 +167,32 @@ public class BoardService {
         } else {
             throw new BaseException(BoardErrorCode.BOARD_NOT_FOUND);
         }
+    }
+
+    // 홈 화면에 보여줄 HOT 게시물, HOT 토론, 가장 최신 고민글 조회
+    public ThreeHotInfo findThreeHotForHome() {
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        List<Board> boards =
+            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
+                    LocalDateTime.now().minusDays(3)
+                    , pageRequest
+                )
+                .stream().toList();
+        List<Discussion> discussions =
+            discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
+                LocalDateTime.now().minusDays(3)
+                , pageRequest
+            ).stream().toList();
+        WorryBoard worryBoard = worryBoardRepository.findTopByStateFalseOrderByCreatedAtDesc();
+
+        return ThreeHotInfo.builder()
+            .boardId(!boards.isEmpty() ? boards.get(0).getId() : null)
+            .boardTitle(!boards.isEmpty() ? boards.get(0).getTitle() : null)
+            .discussionId(!discussions.isEmpty() ? discussions.get(0).getId() : null)
+            .discussionTitle(!discussions.isEmpty() ? discussions.get(0).getTitle() : null)
+            .worryBoardId(worryBoard != null ? worryBoard.getId() : null)
+            .worryBoardTitle(worryBoard != null ? worryBoard.getTitle() : null)
+            .build();
+
     }
 }

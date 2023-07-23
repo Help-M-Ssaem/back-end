@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
 
-    Long countWithStateTrueByBoard(Board board);
+    Long countByBoardAndStateTrue(Board board);
 }

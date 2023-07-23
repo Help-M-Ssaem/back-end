@@ -14,7 +14,7 @@ public class DiscussionResponseDto {
     public static class DiscussionSimpleInfo<T> {
 
         private Long id;
-        private String imgUrl;
+        private String title;
         private String content;
         private Long participantCount;
         private Long commentCount;

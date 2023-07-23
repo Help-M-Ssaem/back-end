@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @DynamicInsert
