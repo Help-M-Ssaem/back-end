@@ -21,7 +21,6 @@ public class WorryBoardRequestDto {
     @AllArgsConstructor
     public static class PatchWorrySolvedReq {
 
-        Long worryBoardId;
         Long worrySolverId; //해결한 사람 id
     }
 
@@ -40,7 +39,6 @@ public class WorryBoardRequestDto {
     @AllArgsConstructor
     public static class PatchWorryReq {
 
-        Long worryBoardId;
         String title;
         String content;
         MbtiEnum targetMbti;

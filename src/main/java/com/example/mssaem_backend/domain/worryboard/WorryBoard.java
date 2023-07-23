@@ -47,7 +47,7 @@ public class WorryBoard extends BaseTimeEntity {
 
     private boolean state = true; //고민글 삭제시 : false
 
-    private boolean isSolved; //true : 해결, false : 해결 안함
+    private Boolean isSolved = false; //true : 해결, false : 해결 안함
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member; //이 고민글을 신청한 유저
@@ -69,9 +69,10 @@ public class WorryBoard extends BaseTimeEntity {
         this.member = member;
     }
 
-    public void solveWorryBoard(boolean state, Member solveMember) {
-        this.state = state;
+    public void solveWorryBoard(Member solveMember) {
+        this.isSolved = true;
         this.solveMember = solveMember;
+        this.solvedAt = LocalDateTime.now();
     }
 
     public void modifyWorryBoard(String title, String content, MbtiEnum targetMbti) {

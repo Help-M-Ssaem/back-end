@@ -102,7 +102,8 @@ public class MemberService {
     // 홈 화면에 보여줄 인기 M쌤 조회
     public List<TeacherInfo> findHotTeacherForHome() {
         PageRequest pageRequest = PageRequest.of(0, 4);
-        Page<Member> solveMembers = worryBoardRepository.findSolveMemberWithMoreThanOneIdAndStateTrue(
+        Page<Member> solveMembers = worryBoardRepository.findSolveMemberWithMoreThanOneIdAndIsSolvedTrueAndStateTrue(
+
             LocalDateTime.now().minusMonths(1),
             pageRequest);
         List<TeacherInfo> teacherInfos = new ArrayList<>();
@@ -113,7 +114,7 @@ public class MemberService {
                     solveMember.getId(),
                     solveMember.getNickName(),
                     solveMember.getMbti(),
-                    badgeRepository.findBadgeWithStateTrueByMember(solveMember)
+                    badgeRepository.findBadgeByMemberAndStateTrue(solveMember)
                         .orElse(new Badge())
                         .getName(),
                     solveMember.getProfileImageUrl(),

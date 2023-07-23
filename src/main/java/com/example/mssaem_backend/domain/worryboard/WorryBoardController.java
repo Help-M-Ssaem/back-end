@@ -34,14 +34,14 @@ public class WorryBoardController {
     @GetMapping("/worry-board/waiting")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesWaiting(
         @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesByState(false, page, size));
+        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(false, page, size));
     }
 
     //고민글 조회 (해결 O)
     @GetMapping("/worry-board/solved")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesSolved(
         @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesByState(true, page, size));
+        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(true, page, size));
     }
 
     //고민글 상세 조회
@@ -90,10 +90,11 @@ public class WorryBoardController {
 
 
     //고민 해결 완료 처리
-    @PostMapping("/member/worry-board/solved")
-    public ResponseEntity<PatchWorrySolvedRes> solvedWorryBoard(@CurrentMember Member currentMember,
+    @PatchMapping("/member/worry-board/{id}/solved")
+    public ResponseEntity<PatchWorrySolvedRes> solveWorryBoard(@CurrentMember Member currentMember,
+        @PathVariable Long id,
         @RequestBody PatchWorrySolvedReq patchWorryReq) {
-        return ResponseEntity.ok(worryBoardService.solvedWorryBoard(patchWorryReq));
+        return ResponseEntity.ok(worryBoardService.solveWorryBoard(currentMember, id, patchWorryReq));
     }
 
     //고민글 생성
@@ -106,12 +107,13 @@ public class WorryBoardController {
     }
 
     //고민글 수정
-    @PatchMapping("/member/worry-board")
+    @PatchMapping("/member/worry-board/{id}")
     public ResponseEntity<String> modifyWorryBoard(@CurrentMember Member currentMember,
+        @PathVariable Long id,
         @RequestPart(value = "patchWorryReq") PatchWorryReq patchWorryReq,
         @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
         return ResponseEntity.ok(
-            worryBoardService.modifyWorryBoard(currentMember, patchWorryReq, multipartFiles));
+            worryBoardService.modifyWorryBoard(currentMember, id, patchWorryReq, multipartFiles));
     }
 
     //고민글 삭제

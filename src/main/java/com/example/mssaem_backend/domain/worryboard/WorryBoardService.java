@@ -45,10 +45,11 @@ public class WorryBoardService {
     }
 
     //고민게시판 - 고민 목록 조회
-    public PageResponseDto<List<GetWorriesRes>> findWorriesByState(boolean state, int page,
+    public PageResponseDto<List<GetWorriesRes>> findWorriesBySolved(boolean isSolved, int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<WorryBoard> result = worryBoardRepository.findByState(state, pageable);
+        Page<WorryBoard> result = worryBoardRepository.findByIsSolvedAndStateTrueOrderByCreatedAtDesc(
+            isSolved, pageable);
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
             makeGetWorriesResForm(result));
     }
@@ -78,7 +79,9 @@ public class WorryBoardService {
     public PageResponseDto<List<GetWorriesRes>> findWorriesByMemberId(Long memberId, int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<WorryBoard> result = worryBoardRepository.findByMemberId(memberId, pageable);
+        Page<WorryBoard> result = worryBoardRepository.findByMemberIdAndStateTrueOrderByCreatedAtDesc(
+            memberId,
+            pageable);
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
             makeGetWorriesResForm(result));
     }
@@ -87,7 +90,9 @@ public class WorryBoardService {
     public PageResponseDto<List<GetWorriesRes>> findSolveWorriesByMemberId(Long memberId, int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<WorryBoard> result = worryBoardRepository.findBySolveMemberId(memberId, pageable);
+        Page<WorryBoard> result = worryBoardRepository.findBySolveMemberIdAndStateTrueOrderByCreatedAtDesc(
+            memberId,
+            pageable);
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
             makeGetWorriesResForm(result));
     }
@@ -104,7 +109,8 @@ public class WorryBoardService {
         MbtiEnum fromMbti = isFromAll ? null : MbtiEnum.valueOf(getWorriesReq.getFromMbti());
         MbtiEnum toMbti = isToAll ? null : MbtiEnum.valueOf(getWorriesReq.getToMbti());
 
-        Page<WorryBoard> result = worryBoardRepository.findWorriesByStateAndBothMbti(isSolved,
+        Page<WorryBoard> result = worryBoardRepository.findWorriesBySolvedAndBothMbtiAndStateTrue(
+            isSolved,
             fromMbti, toMbti, pageable);
 
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
@@ -113,7 +119,7 @@ public class WorryBoardService {
 
     // 홈 화면에 보여줄 해결안된 고민글 최신순으로 조회
     public List<GetWorriesRes> findWorriesForHome() {
-        List<WorryBoard> worryBoards = worryBoardRepository.findTop7ByStateFalseOrderByCreatedAtDesc();
+        List<WorryBoard> worryBoards = worryBoardRepository.findTop7ByIsSolvedFalseAndStateTrueOrderByCreatedAtDesc();
         if (!worryBoards.isEmpty()) {
             worryBoards.remove(0);
         }
@@ -127,15 +133,20 @@ public class WorryBoardService {
             .toList();
     }
 
+    @Transactional
     // 고민 해결 완료
-    public PatchWorrySolvedRes solvedWorryBoard(PatchWorrySolvedReq patchWorryReq) {
-        WorryBoard worryBoard = worryBoardRepository.findById(patchWorryReq.getWorryBoardId())
+    public PatchWorrySolvedRes solveWorryBoard(Member currentMember, Long id,
+        PatchWorrySolvedReq patchWorryReq) {
+        WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
+        if (!currentMember.getId().equals(worryBoard.getMember().getId())) {
+            throw new BaseException(MemberErrorCode.INVALID_MEMBER);
+        }
 
         Member solveMember = memberRepository.findById(patchWorryReq.getWorrySolverId())
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
         // 고민글의 상태 바꾸기
-        worryBoard.solveWorryBoard(false, solveMember);
+        worryBoard.solveWorryBoard(solveMember);
         // 평가창에 뜰 memberSimpleInfo, worryBoard Id 반환
         return PatchWorrySolvedRes.builder()
             .memberSimpleInfo(
@@ -145,7 +156,7 @@ public class WorryBoardService {
                     badgeService.findRepresentativeBadgeByMember(solveMember),
                     solveMember.getProfileImageUrl())
             )
-            .worryBoardId(worryBoard.getId()).build();
+            .worryBoardId(id).build();
     }
 
     //고민글 생성
@@ -169,10 +180,10 @@ public class WorryBoardService {
 
     //고민글 수정
     @Transactional
-    public String modifyWorryBoard(Member currentMember, PatchWorryReq patchWorryReq,
+    public String modifyWorryBoard(Member currentMember, Long id, PatchWorryReq patchWorryReq,
         List<MultipartFile> multipartFiles) {
         //현재 멤버와 작성자 일치하는 지 확인
-        WorryBoard worryBoard = worryBoardRepository.findById(patchWorryReq.getWorryBoardId())
+        WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
         if (!currentMember.getId().equals(worryBoard.getMember().getId())) {
             throw new BaseException(MemberErrorCode.INVALID_MEMBER);
@@ -193,6 +204,7 @@ public class WorryBoardService {
         return "고민글 수정 완료";
     }
 
+    @Transactional
     //고민글 삭제
     public String deleteWorryBoard(Member currentMember, Long id) {
         //현재 멤버와 작성자 일치하는 지 확인
