@@ -61,7 +61,10 @@ public class WorryBoardService {
         Member member = worryBoard.getMember();
 
         //수정,삭제 권한 확인
-        Boolean isAllowed = (viewer != null && viewer.equals(member));
+        Boolean isEditAllowed = (viewer != null && viewer.equals(member));
+
+        //채팅 시작 권한 확인
+        Boolean isChatAllowed = (viewer != null && viewer.getMbti().equals(worryBoard.getTargetMbti()));
 
         return GetWorryRes.builder()
             .worryBoard(worryBoard)
@@ -71,7 +74,8 @@ public class WorryBoardService {
                 new MemberSimpleInfo(member.getId(), member.getNickName(), member.getMbti(),
                     badgeService.findRepresentativeBadgeByMember(member),
                     member.getProfileImageUrl()))
-            .isAllowed(isAllowed)
+            .isEditAllowed(isEditAllowed)
+            .isChatAllowed(isChatAllowed)
             .build();
     }
 
