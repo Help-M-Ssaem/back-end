@@ -113,7 +113,7 @@ public class MemberService {
                     solveMember.getId(),
                     solveMember.getNickName(),
                     solveMember.getMbti(),
-                    badgeRepository.findBadgeWithStateTrueByMember(solveMember)
+                    badgeRepository.findBadgeByMemberAndStateTrue(solveMember)
                         .orElse(new Badge())
                         .getName(),
                     solveMember.getProfileImageUrl(),
