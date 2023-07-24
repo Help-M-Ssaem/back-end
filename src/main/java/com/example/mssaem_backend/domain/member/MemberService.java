@@ -12,7 +12,7 @@ import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import com.example.mssaem_backend.global.config.security.jwt.JwtTokenProvider;
-import com.example.mssaem_backend.global.config.security.oauth.KakaoLoginService;
+import com.example.mssaem_backend.global.config.security.oauth.SocialLoginService;
 import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class MemberService {
 
-    private final KakaoLoginService kakaoLoginService;
+    private final SocialLoginService socialLoginService;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final WorryBoardRepository worryBoardRepository;
@@ -66,8 +66,8 @@ public class MemberService {
         String idToken = socialLoginToken.getIdToken();
         String email = "";
         switch (socialLoginType) {
-            case KAKAO -> email = kakaoLoginService.getEmail(kakaoLoginService.getAccessToken(idToken));
-            //case GOOGLE -> email = googleLoginService.getEmail(idToken);
+            case KAKAO -> email = socialLoginService.getEmail(socialLoginService.getAccessToken(idToken));
+            case GOOGLE -> email = socialLoginService.getGoogleEmail(socialLoginService.getGoogleAccessToken(idToken));
             //case NAVER -> email =
         }
 
