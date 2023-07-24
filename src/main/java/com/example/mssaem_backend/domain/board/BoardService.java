@@ -1,13 +1,11 @@
 package com.example.mssaem_backend.domain.board;
 
-import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardimage.BoardImage;
 import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
@@ -70,10 +68,9 @@ public class BoardService {
         PageRequest pageRequest = PageRequest.of(0, 5);
         List<Board> boards =
             likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
-                    LocalDateTime.now().minusDays(3)
-                    , pageRequest
-                )
-                .stream()
+                    LocalDateTime.now().minusDays(3),
+                    pageRequest
+                ).stream()
                 .collect(Collectors.toList());
         if (!boards.isEmpty()) {
             boards.remove(0);
@@ -93,8 +90,7 @@ public class BoardService {
                     board.getId(),
                     board.getTitle(),
                     board.getContent(),
-                    boardImageRepository.findTopByBoardOrderById(board).orElse(new BoardImage())
-                        .getImageUrl(),
+                    boardImageRepository.findImageUrlByBoardOrderById(board).orElse(null),
                     board.getMbti(),
                     board.getLikeCount(),
                     boardCommentRepository.countByBoardAndStateTrue(board),
@@ -103,8 +99,7 @@ public class BoardService {
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getDetailMbti(),
-                        badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
-                            .orElse(new Badge()).getName(),
+                        badgeRepository.findNameMemberAndStateTrue(board.getMember()).orElse(null),
                         board.getMember().getProfileImageUrl()
                     )
                 )

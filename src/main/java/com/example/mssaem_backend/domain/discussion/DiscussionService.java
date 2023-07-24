@@ -1,6 +1,5 @@
 package com.example.mssaem_backend.domain.discussion;
 
-import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
@@ -97,10 +96,7 @@ public class DiscussionService {
                         discussion.getMember().getId(),
                         discussion.getMember().getNickName(),
                         discussion.getMember().getDetailMbti(),
-                        badgeRepository.findBadgeByMemberAndStateTrue(
-                                discussion.getMember())
-                            .orElse(new Badge())
-                            .getName(),
+                        badgeRepository.findNameMemberAndStateTrue(discussion.getMember()).orElse(null),
                         discussion.getMember().getProfileImageUrl()
                     ),
                     selectedOptionIdx != -1
