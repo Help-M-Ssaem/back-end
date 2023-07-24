@@ -1,23 +1,26 @@
 package com.example.mssaem_backend.domain.board;
 
-import com.example.mssaem_backend.domain.badge.Badge;
+import static com.example.mssaem_backend.global.common.Time.calculateTime;
+
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
+import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
+import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardimage.BoardImage;
 import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
 import com.example.mssaem_backend.domain.like.LikeRepository;
+import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
-import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
@@ -29,6 +32,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -96,7 +100,7 @@ public class BoardService {
                     board.getMbti(),
                     board.getLikeCount(),
                     boardCommentRepository.countByBoardAndStateTrue(board),
-                    Time.calculateTime(board.getCreatedAt(), dateType),
+                    calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
@@ -129,7 +133,7 @@ public class BoardService {
     public String modifyBoard(Member member, PatchBoardReq patchBoardReq, Long boardId,
         List<MultipartFile> multipartFiles) {
         Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
         if (member.getId().equals(board.getMember().getId())) {
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
@@ -262,5 +266,70 @@ public class BoardService {
             .commentCount(boardCommentRepository.countByBoardAndStateTrue(board))
             .isAllowed(isAllowed)
             .build();
+    }
+
+    // 전체 게시판 검색하기
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeyword(
+        SearchBoardReq searchBoardReq, int page, int size) {
+        String keyword = searchBoardReq.getKeyword();
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        Page<Board> boards = switch (searchBoardReq.getType()) {
+            case 0 -> // 제목+내용
+                boardRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
+                    keyword, keyword, pageRequest);
+            case 1 -> // 제목
+                boardRepository.findByTitleContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
+                    keyword, pageRequest);
+            case 2 -> // 내용
+                boardRepository.findByContentContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
+                    keyword, pageRequest);
+            default -> // 글쓴이
+                boardRepository.findByMemberNickNameContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
+                    keyword, pageRequest);
+        };
+
+        return new PageResponseDto<>(
+            boards.getNumber(),
+            boards.getTotalPages(),
+            setBoardSimpleInfo(
+                boards
+                    .stream()
+                    .collect(Collectors.toList()),
+                3)
+        );
+    }
+
+    // Mbti 카테고리 별 검색하기
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeywordAndMbti(
+        SearchBoardByMbtiReq searchBoardByMbtiReq, int page, int size) {
+        String keyword = searchBoardByMbtiReq.getKeyword();
+        MbtiEnum mbti = searchBoardByMbtiReq.getMbti();
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        Page<Board> boards = switch (searchBoardByMbtiReq.getType()) {
+            case 0 -> // 제목+내용
+                boardRepository.findByMbtiAndStateTrueAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrderByCreatedAtDesc(
+                    keyword, keyword, mbti, pageRequest);
+            case 1 -> // 제목
+                boardRepository.findByTitleContainingIgnoreCaseAndMbtiAndStateTrueOrderByCreatedAtDesc(
+                    keyword, mbti, pageRequest);
+            case 2 -> // 내용
+                boardRepository.findByContentContainingIgnoreCaseAndMbtiAndStateTrueOrderByCreatedAtDesc(
+                    keyword, mbti, pageRequest);
+            default -> // 글쓴이
+                boardRepository.findByMemberNickNameContainingIgnoreCaseAndMbtiAndStateTrueOrderByCreatedAtDesc(
+                    keyword, mbti, pageRequest);
+        };
+
+        return new PageResponseDto<>(
+            boards.getNumber(),
+            boards.getTotalPages(),
+            setBoardSimpleInfo(
+                boards
+                    .stream()
+                    .collect(Collectors.toList()),
+                3)
+        );
     }
 }
