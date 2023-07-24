@@ -1,7 +1,7 @@
 package com.example.mssaem_backend.domain.bookmark.dto;
 
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
-import lombok.Builder;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,11 +11,8 @@ public class BookMarkResponseDto {
     @NoArgsConstructor
     public static class BookMarkInfo {
 
-        private Long memberId;
-        private MbtiEnum mbti;
-        @Builder
-        public BookMarkInfo (Long memberId , MbtiEnum mbti){
-            this.memberId = memberId;
+        private List<MbtiEnum> mbti;
+        public BookMarkInfo (List<MbtiEnum> mbti){
             this.mbti = mbti;
         }
     }

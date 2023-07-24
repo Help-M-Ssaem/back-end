@@ -45,10 +45,10 @@ public class BookMark extends BaseTimeEntity {
 
     public void updateBookMark() {
         //현재 상태가 true 라면 false로 변경
-        if (this.state == true) {
-            this.state = false;
-        } else {
-            this.state = true;
-        }
+        this.state = !this.state;
+    }
+
+    public Boolean nowBookmarkState(){
+        return this.state;
     }
 }

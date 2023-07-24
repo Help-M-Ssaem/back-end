@@ -4,6 +4,7 @@ import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
 import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
+import com.example.mssaem_backend.domain.badge.BadgeService;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,6 +52,7 @@ public class BoardService {
     private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
     private final BoardCommentService boardCommentService;
+    private final BadgeService badgeService;
 
     // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
@@ -138,7 +141,7 @@ public class BoardService {
     public String modifyBoard(Member member, PatchBoardReq patchBoardReq, Long boardId,
         List<MultipartFile> multipartFiles) {
         Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
         if (member.getId().equals(board.getMember().getId())) {
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
@@ -158,7 +161,7 @@ public class BoardService {
     @Transactional
     public String deleteBoard(Member member, Long boardId) {
         Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         if (board.isState()) {
             //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
             if (member.getId().equals(board.getMember().getId())) {
@@ -171,7 +174,7 @@ public class BoardService {
                 throw new BaseException(BoardErrorCode.INVALID_MEMBER);
             }
         } else {
-            throw new BaseException(BoardErrorCode.BOARD_NOT_FOUND);
+            throw new BaseException(BoardErrorCode.EMPTY_BOARD);
         }
     }
 
@@ -250,7 +253,7 @@ public class BoardService {
     //게시글 상세 조회
     public GetBoardRes findBoardById(Member viewer, Long id) {
         Board board = boardRepository.findById(id)
-            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         Member member = board.getMember();
         //게시글 수정, 삭제 권한 확인
         Boolean isAllowed = (viewer != null && viewer.getId().equals(member.getId()));
@@ -261,8 +264,7 @@ public class BoardService {
                     board.getMember().getId(),
                     board.getMember().getNickName(),
                     board.getMember().getMbti(),
-                    badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
-                        .orElse(new Badge()).getName(),
+                    badgeService.findRepresentativeBadgeByMember(board.getMember()),
                     board.getMember().getProfileImageUrl()
                 )
             )
@@ -271,8 +273,6 @@ public class BoardService {
             .createdAt(calculateTime(board.getCreatedAt(), 2))
             .commentCount(boardCommentRepository.countByBoardAndStateTrue(board))
             .isAllowed(isAllowed)
-            .boardCommentSimpleInfo(boardCommentService.setBoardCommentSimpleInfo(
-                boardCommentService.boardCommentList(board.getId())))
             .build();
     }
 }

@@ -5,6 +5,7 @@ import static com.example.mssaem_backend.global.common.Time.calculateTime;
 import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
+import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,9 @@ public class BoardCommentService {
         List<BoardComment> boardComments) {
         List<BoardCommentSimpleInfo> boardCommentSimpleInfoList = new ArrayList<>();
 
+
+        /*
+        Boolean isAllowed = (viewer != null && viewer.getId().equals(member.getId()));
         for (BoardComment boardComment : boardComments) {
             boardCommentSimpleInfoList.add(
                 new BoardCommentSimpleInfo(
@@ -42,11 +46,13 @@ public class BoardCommentService {
                     )
                 )
             );
-        }
+        }*/
         return boardCommentSimpleInfoList;
     }
 
-    public List<BoardComment> boardCommentList(Long boardId) {
-        return boardCommentRepository.findAllByBoardId(boardId);
-    }
+/*    public List<BoardCommentSimpleInfo> findBoardCommentListByBoardId(Member viewer, Long boardId) {
+        //return boardCommentRepository.findAllByBoardId(boardId);
+    }*/
+
+
 }

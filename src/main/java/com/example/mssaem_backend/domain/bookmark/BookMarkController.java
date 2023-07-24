@@ -20,7 +20,7 @@ public class BookMarkController {
 
     //카테고리 즐겨찾기 누르기
     @PostMapping("/member/bookmark")
-    public ResponseEntity<String> updateBookMark(@CurrentMember Member member,
+    public ResponseEntity<Boolean> updateBookMark(@CurrentMember Member member,
         @RequestParam MbtiEnum mbtiEnum) {
         return ResponseEntity.ok(bookMarkService.updateBookMark(member, mbtiEnum));
     }
