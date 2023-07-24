@@ -66,8 +66,8 @@ public class MemberService {
         String idToken = socialLoginToken.getIdToken();
         String email = "";
         switch (socialLoginType) {
-            case KAKAO -> email = kakaoLoginService.getEmail(idToken);
-            //case GOOGLE -> email =
+            case KAKAO -> email = kakaoLoginService.getEmail(kakaoLoginService.getAccessToken(idToken));
+            //case GOOGLE -> email = googleLoginService.getEmail(idToken);
             //case NAVER -> email =
         }
 
