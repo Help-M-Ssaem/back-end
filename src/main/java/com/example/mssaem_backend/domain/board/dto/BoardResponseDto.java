@@ -7,6 +7,7 @@ import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimp
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,6 +42,39 @@ public class BoardResponseDto {
             this.memberSimpleInfo = memberSimpleInfo;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ThreeHotInfo {
+
+        private Long boardId;
+        private String boardTitle;
+        private Long discussionId;
+        private String discussionTitle;
+        private Long worryBoardId;
+        private String worryBoardTitle;
+
+        @Builder
+        public ThreeHotInfo(Long boardId, String boardTitle, Long discussionId,
+            String discussionTitle, Long worryBoardId, String worryBoardTitle) {
+            this.boardId = boardId;
+            this.boardTitle =
+                boardTitle != null && boardTitle.length() >= 35
+                    ? boardTitle.substring(0, 35)
+                    : boardTitle;
+            this.discussionId = discussionId;
+            this.discussionTitle =
+                discussionTitle != null && discussionTitle.length() >= 35
+                    ? discussionTitle.substring(0, 35)
+                    : discussionTitle;
+            this.worryBoardId = worryBoardId;
+            this.worryBoardTitle =
+                worryBoardTitle != null && worryBoardTitle.length() >= 35
+                    ? worryBoardTitle.substring(0, 35)
+                    : worryBoardTitle;
+        }
+    }
+
 
     @Getter
     @NoArgsConstructor

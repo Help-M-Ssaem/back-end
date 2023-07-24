@@ -8,15 +8,20 @@ import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentService;
 import com.example.mssaem_backend.domain.boardimage.BoardImage;
 import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
+import com.example.mssaem_backend.domain.discussion.Discussion;
+import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
 import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.worryboard.WorryBoard;
+import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
@@ -29,7 +34,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,6 +47,8 @@ public class BoardService {
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
     private final BoardImageRepository boardImageRepository;
+    private final DiscussionRepository discussionRepository;
+    private final WorryBoardRepository worryBoardRepository;
     private final BoardCommentService boardCommentService;
 
     // HOT 게시물 더보기
@@ -61,10 +67,11 @@ public class BoardService {
                 boards
                     .stream()
                     .collect(Collectors.toList()),
-                1)
+                3)
         );
     }
 
+    // 홈 화면 - 최상위 제외한 HOT 게시물 4개만 조회
     public List<BoardSimpleInfo> findHotBoardListForHome() {
         PageRequest pageRequest = PageRequest.of(0, 5);
         List<Board> boards =
@@ -166,6 +173,33 @@ public class BoardService {
         } else {
             throw new BaseException(BoardErrorCode.BOARD_NOT_FOUND);
         }
+    }
+
+    // 홈 화면에 보여줄 HOT 게시물, HOT 토론, 가장 최신 고민글 조회
+    public ThreeHotInfo findThreeHotForHome() {
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        List<Board> boards =
+            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
+                    LocalDateTime.now().minusDays(3)
+                    , pageRequest
+                )
+                .stream().toList();
+        List<Discussion> discussions =
+            discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
+                LocalDateTime.now().minusDays(3)
+                , pageRequest
+            ).stream().toList();
+        WorryBoard worryBoard = worryBoardRepository.findTopByStateFalseOrderByCreatedAtDesc();
+
+        return ThreeHotInfo.builder()
+            .boardId(!boards.isEmpty() ? boards.get(0).getId() : null)
+            .boardTitle(!boards.isEmpty() ? boards.get(0).getTitle() : null)
+            .discussionId(!discussions.isEmpty() ? discussions.get(0).getId() : null)
+            .discussionTitle(!discussions.isEmpty() ? discussions.get(0).getTitle() : null)
+            .worryBoardId(worryBoard != null ? worryBoard.getId() : null)
+            .worryBoardTitle(worryBoard != null ? worryBoard.getTitle() : null)
+            .build();
+
     }
 
 

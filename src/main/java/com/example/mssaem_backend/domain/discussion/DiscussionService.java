@@ -32,7 +32,7 @@ public class DiscussionService {
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
 
-    // HOT 토론글 전체 조회
+    // HOT 토론글 더보기 조회
     public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionList(Member member,
         int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -48,11 +48,11 @@ public class DiscussionService {
                 discussions
                     .stream()
                     .collect(Collectors.toList()),
-                1)
+                3)
         );
     }
 
-    // 최상위 제외한 HOT 토론글 2개만 조회
+    // 홈 화면 - 최상위 제외한 HOT 토론글 2개만 조회
     public List<DiscussionSimpleInfo> findHotDiscussionListForHome(Member member) {
         PageRequest pageRequest = PageRequest.of(0, 3);
         List<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(

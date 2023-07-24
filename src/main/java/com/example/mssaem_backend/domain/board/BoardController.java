@@ -5,6 +5,7 @@ import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
@@ -27,16 +28,31 @@ public class BoardController {
 
     private final BoardService boardService;
 
+    /**
+     * HOT 게시물 더보기
+     */
     @GetMapping("/boards/hot")
     public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findHotBoardList(
         @RequestParam int page, @RequestParam int size) {
         return ResponseEntity.ok(boardService.findHotBoardList(page, size));
     }
 
+    /**
+     * 홈 화면 조회 - HOT 게시물 4개
+     */
     @GetMapping("/boards/home")
     public ResponseEntity<List<BoardSimpleInfo>> findHotBoardListForHome() {
         return ResponseEntity.ok(boardService.findHotBoardListForHome());
     }
+
+    /**
+     * 홈 화면 조회 - 3HOT
+     */
+    @GetMapping("/three-hot")
+    public ResponseEntity<ThreeHotInfo> findThreeHotForHome() {
+        return ResponseEntity.ok(boardService.findThreeHotForHome());
+    }
+
 
     /**
      * 게시글 생성
