@@ -102,7 +102,7 @@ public class BoardService {
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
-                        board.getMember().getMbti(),
+                        board.getMember().getDetailMbti(),
                         badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
                             .orElse(new Badge()).getName(),
                         board.getMember().getProfileImageUrl()

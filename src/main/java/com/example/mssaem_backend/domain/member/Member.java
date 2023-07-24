@@ -55,4 +55,16 @@ public class Member extends BaseTimeEntity {
         this.refreshToken = refreshToken;
     }
 
+    public String getDetailMbti() {
+        char[] charArray = getMbti().toString().toCharArray();
+        String caseSensitivity = getCaseSensitivity();
+
+        for (int i = 0; i < caseSensitivity.length(); i++) {
+            if (caseSensitivity.charAt(i) == '0') {
+                charArray[i] = Character.toLowerCase(charArray[i]);
+            }
+        }
+        return String.valueOf(charArray);
+    }
+
 }
