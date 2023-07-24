@@ -3,6 +3,8 @@ package com.example.mssaem_backend.domain.board;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
+import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -55,7 +57,7 @@ public class BoardController {
     /**
      * 게시글 생성
      */
-    @PostMapping("/member/board")
+    @PostMapping("/member/boards")
     public ResponseEntity<String> createBoard(@CurrentMember Member member,
         @RequestPart(value = "postBoardReq") PostBoardReq postBoardReq,
         @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
@@ -65,19 +67,61 @@ public class BoardController {
     /**
      * 게시글 수정
      */
-    @PatchMapping("/member/board/{id}")
+    @PatchMapping("/member/boards/{id}")
     public ResponseEntity<String> modifyBoard(@CurrentMember Member member,
-        @RequestPart(value = "patchBoardReq") PatchBoardReq patchBoardReq, @PathVariable Long id,
+        @RequestPart(value = "patchBoardReq") PatchBoardReq patchBoardReq,
+        @PathVariable(value = "boardId") Long boardId,
         @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
         return ResponseEntity.ok(
-            boardService.modifyBoard(member, patchBoardReq, id, multipartFiles));
+            boardService.modifyBoard(member, patchBoardReq, boardId, multipartFiles));
     }
 
     /**
      * 게시글 삭제
      */
-    @DeleteMapping("/member/board/{id}")
-    public ResponseEntity<String> deleteBoard(@CurrentMember Member member, @PathVariable Long id) {
-        return ResponseEntity.ok(boardService.deleteBoard(member, id));
+    @DeleteMapping("/member/boards/{id}")
+    public ResponseEntity<String> deleteBoard(@CurrentMember Member member,
+        @PathVariable(value = "boardId") Long boardId) {
+        return ResponseEntity.ok(boardService.deleteBoard(member, boardId));
     }
+
+    /**
+     * 게시글 전체 조회 , 게시글 상세 조회시 boardId 입력 받아 현재 게시글 제외하고 전체 조회
+     */
+    @GetMapping("/boards")
+    public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoards(
+        @RequestParam(value = "page") int page, @RequestParam(value = "size") int size,
+        @RequestParam(value = "boardId", required = false) Long boardId) {
+        return ResponseEntity.ok(boardService.findBoards(page, size, boardId));
+    }
+
+    /**
+     * Mbti 카테고리 별 게시글 전체 조회
+     */
+    @GetMapping("/boards/mbti")
+    public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardsByMbti(
+        @RequestParam(value = "mbti", required = false) MbtiEnum mbti,
+        @RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
+        return ResponseEntity.ok(boardService.findBoardsByMbti(mbti, page, size));
+    }
+
+    /**
+     * 특정 멤버별 게시글 전체 조회
+     */
+    @GetMapping("/boards/member")
+    public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardsById(
+        @RequestParam(value = "memberId") Long memberId, @RequestParam(value = "page") int page,
+        @RequestParam(value = "size") int size) {
+        return ResponseEntity.ok(boardService.findBoardsByMemberId(memberId, page, size));
+    }
+
+    /**
+     * 게시글 상세조회
+     */
+    @GetMapping("/boards/{boardId}")
+    public ResponseEntity<GetBoardRes> findBoardById(@CurrentMember Member viewer,
+        @PathVariable(value = "boardId") Long boardId) {
+        return ResponseEntity.ok(boardService.findBoardById(viewer, boardId));
+    }
+
 }
