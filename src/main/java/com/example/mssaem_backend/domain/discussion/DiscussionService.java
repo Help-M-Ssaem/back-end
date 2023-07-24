@@ -96,7 +96,7 @@ public class DiscussionService {
                     new MemberSimpleInfo(
                         discussion.getMember().getId(),
                         discussion.getMember().getNickName(),
-                        discussion.getMember().getMbti(),
+                        discussion.getMember().getDetailMbti(),
                         badgeRepository.findBadgeByMemberAndStateTrue(
                                 discussion.getMember())
                             .orElse(new Badge())

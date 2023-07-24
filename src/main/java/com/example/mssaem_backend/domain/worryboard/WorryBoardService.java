@@ -79,7 +79,7 @@ public class WorryBoardService {
             .imgList(worryBoardImageService.getImgUrls(worryBoard))
             .createdAt(calculateTime(worryBoard.getCreatedAt(), 2))
             .memberSimpleInfo(
-                new MemberSimpleInfo(member.getId(), member.getNickName(), member.getMbti(),
+                new MemberSimpleInfo(member.getId(), member.getNickName(), member.getDetailMbti(),
                     badgeService.findRepresentativeBadgeByMember(member),
                     member.getProfileImageUrl()))
             .isEditAllowed(isEditAllowed)
@@ -163,7 +163,7 @@ public class WorryBoardService {
             .memberSimpleInfo(
                 new MemberSimpleInfo(
                     solveMember.getId(), solveMember.getNickName(),
-                    solveMember.getMbti(),
+                    solveMember.getDetailMbti(),
                     badgeService.findRepresentativeBadgeByMember(solveMember),
                     solveMember.getProfileImageUrl())
             )

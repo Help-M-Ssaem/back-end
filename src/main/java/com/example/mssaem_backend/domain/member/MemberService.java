@@ -113,7 +113,7 @@ public class MemberService {
                 new TeacherInfo(
                     solveMember.getId(),
                     solveMember.getNickName(),
-                    solveMember.getMbti(),
+                    solveMember.getDetailMbti(),
                     badgeRepository.findBadgeByMemberAndStateTrue(solveMember)
                         .orElse(new Badge())
                         .getName(),
