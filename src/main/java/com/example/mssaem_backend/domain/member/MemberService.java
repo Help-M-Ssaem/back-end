@@ -1,6 +1,5 @@
 package com.example.mssaem_backend.domain.member;
 
-import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
@@ -114,9 +113,7 @@ public class MemberService {
                     solveMember.getId(),
                     solveMember.getNickName(),
                     solveMember.getDetailMbti(),
-                    badgeRepository.findBadgeByMemberAndStateTrue(solveMember)
-                        .orElse(new Badge())
-                        .getName(),
+                    badgeRepository.findNameMemberAndStateTrue(solveMember).orElse(null),
                     solveMember.getProfileImageUrl(),
                     solveMember.getIntroduction()
                 )
