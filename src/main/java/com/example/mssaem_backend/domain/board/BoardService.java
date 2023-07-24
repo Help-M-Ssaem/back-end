@@ -79,10 +79,9 @@ public class BoardService {
         PageRequest pageRequest = PageRequest.of(0, 5);
         List<Board> boards =
             likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
-                    LocalDateTime.now().minusDays(3)
-                    , pageRequest
-                )
-                .stream()
+                    LocalDateTime.now().minusDays(3),
+                    pageRequest
+                ).stream()
                 .collect(Collectors.toList());
         if (!boards.isEmpty()) {
             boards.remove(0);
@@ -102,8 +101,7 @@ public class BoardService {
                     board.getId(),
                     board.getTitle(),
                     board.getContent(),
-                    boardImageRepository.findTopByBoardOrderById(board).orElse(new BoardImage())
-                        .getImageUrl(),
+                    boardImageRepository.findImageUrlByBoardOrderById(board).orElse(null),
                     board.getMbti(),
                     board.getLikeCount(),
                     boardCommentRepository.countByBoardAndStateTrue(board),
@@ -111,9 +109,8 @@ public class BoardService {
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
-                        board.getMember().getMbti(),
-                        badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
-                            .orElse(new Badge()).getName(),
+                        board.getMember().getDetailMbti(),
+                        badgeRepository.findNameMemberAndStateTrue(board.getMember()).orElse(null),
                         board.getMember().getProfileImageUrl()
                     )
                 )
