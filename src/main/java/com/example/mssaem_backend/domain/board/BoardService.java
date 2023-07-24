@@ -260,8 +260,8 @@ public class BoardService {
                 new MemberSimpleInfo(
                     board.getMember().getId(),
                     board.getMember().getNickName(),
-                    board.getMember().getMbti(),
-                    badgeService.findRepresentativeBadgeByMember(board.getMember()),
+                    board.getMember().getDetailMbti(),
+                    badgeRepository.findNameMemberAndStateTrue(board.getMember()).orElse(null),
                     board.getMember().getProfileImageUrl()
                 )
             )
