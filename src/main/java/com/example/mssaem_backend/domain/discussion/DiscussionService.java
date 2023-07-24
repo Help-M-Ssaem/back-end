@@ -1,10 +1,12 @@
 package com.example.mssaem_backend.domain.discussion;
 
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
+import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.PostDiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
+import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionRequestDto.GetOptionReq;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionInfo;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelectedRepository;
@@ -12,6 +14,9 @@ import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
+import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.s3.S3Service;
+import com.example.mssaem_backend.global.s3.dto.S3Result;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +37,7 @@ public class DiscussionService {
     private final DiscussionOptionSelectedRepository discussionOptionSelectedRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
+    private final S3Service s3Service;
 
     // HOT 토론글 더보기 조회
     public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionList(Member member,
@@ -96,7 +104,8 @@ public class DiscussionService {
                         discussion.getMember().getId(),
                         discussion.getMember().getNickName(),
                         discussion.getMember().getDetailMbti(),
-                        badgeRepository.findNameMemberAndStateTrue(discussion.getMember()).orElse(null),
+                        badgeRepository.findNameMemberAndStateTrue(discussion.getMember())
+                            .orElse(null),
                         discussion.getMember().getProfileImageUrl()
                     ),
                     selectedOptionIdx != -1
@@ -168,5 +177,44 @@ public class DiscussionService {
             );
         }
         return discussionOptionInfos;
+    }
+
+    //토른글 생성하기
+    @Transactional
+    public String createDiscussion(Member member, List<MultipartFile> multipartFiles,
+        PostDiscussionReq postDiscussionReq) {
+        //Discussion 생성
+        Discussion discussion = Discussion.builder()
+            .title(postDiscussionReq.getTitle())
+            .content(postDiscussionReq.getContent())
+            .member(member)
+            .build();
+        discussionRepository.save(discussion);
+
+        //DiscussionOption 생성
+        //option 리스트 가져오기
+        List<GetOptionReq> getOptionReqs = postDiscussionReq.getGetOptionReqs();
+
+        //s3 저장 후 url리스트 가져오기
+        List<S3Result> s3ResultList = s3Service.uploadFile(multipartFiles);
+
+        //option 리스트를 돌며 DiscussionOption 생성
+        for (GetOptionReq getOptionReq : getOptionReqs) {
+            //만약 option에 이미지가 없으면 null
+            String imgUrl;
+            if (getOptionReq.isHasImage()) {
+                imgUrl = s3ResultList.get(0).getImgUrl();
+                s3ResultList.remove(0);
+            } else {
+                imgUrl = null;
+            }
+            DiscussionOption discussionOption = DiscussionOption.builder()
+                .imgUrl(imgUrl)
+                .content(getOptionReq.getContent())
+                .discussion(discussion)
+                .build();
+            discussionOptionRepository.save(discussionOption);
+        }
+        return "토론글 생성완료";
     }
 }
