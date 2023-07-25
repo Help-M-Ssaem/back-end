@@ -2,17 +2,15 @@ package com.example.mssaem_backend.domain.board;
 
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
-import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
-import com.example.mssaem_backend.domain.badge.BadgeService;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
+import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
+import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardcomment.BoardCommentService;
-import com.example.mssaem_backend.domain.boardimage.BoardImage;
 import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
@@ -23,7 +21,6 @@ import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
-import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
@@ -51,8 +48,6 @@ public class BoardService {
     private final BoardImageRepository boardImageRepository;
     private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
-    private final BoardCommentService boardCommentService;
-    private final BadgeService badgeService;
 
     // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
@@ -105,7 +100,7 @@ public class BoardService {
                     board.getMbti(),
                     board.getLikeCount(),
                     boardCommentRepository.countByBoardAndStateTrue(board),
-                    Time.calculateTime(board.getCreatedAt(), dateType),
+                    calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
@@ -271,5 +266,43 @@ public class BoardService {
             .commentCount(boardCommentRepository.countByBoardAndStateTrue(board))
             .isAllowed(isAllowed)
             .build();
+    }
+
+    // 전체 게시판 검색하기
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeyword(
+        SearchBoardReq searchBoardReq, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        Page<Board> boards = boardRepository.searchByType(searchBoardReq.getType(),
+            searchBoardReq.getKeyword(), pageRequest);
+
+        return new PageResponseDto<>(
+            boards.getNumber(),
+            boards.getTotalPages(),
+            setBoardSimpleInfo(
+                boards
+                    .stream()
+                    .collect(Collectors.toList()),
+                3)
+        );
+    }
+
+    // Mbti 카테고리 별 검색하기
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeywordAndMbti(
+        SearchBoardByMbtiReq searchBoardByMbtiReq, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchBoardByMbtiReq.getType(),
+            searchBoardByMbtiReq.getKeyword(), searchBoardByMbtiReq.getMbti(), pageRequest);
+
+        return new PageResponseDto<>(
+            boards.getNumber(),
+            boards.getTotalPages(),
+            setBoardSimpleInfo(
+                boards
+                    .stream()
+                    .collect(Collectors.toList()),
+                3)
+        );
     }
 }

@@ -2,10 +2,12 @@ package com.example.mssaem_backend.domain.board;
 
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
+import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
+import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
-import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
+import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,10 +73,10 @@ public class BoardController {
     @PatchMapping("/member/boards/{id}")
     public ResponseEntity<String> modifyBoard(@CurrentMember Member member,
         @RequestPart(value = "patchBoardReq") PatchBoardReq patchBoardReq,
-        @PathVariable(value = "boardId") Long boardId,
+        @PathVariable(value = "id") Long id,
         @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
         return ResponseEntity.ok(
-            boardService.modifyBoard(member, patchBoardReq, boardId, multipartFiles));
+            boardService.modifyBoard(member, patchBoardReq, id, multipartFiles));
     }
 
     /**
@@ -81,8 +84,8 @@ public class BoardController {
      */
     @DeleteMapping("/member/boards/{id}")
     public ResponseEntity<String> deleteBoard(@CurrentMember Member member,
-        @PathVariable(value = "boardId") Long boardId) {
-        return ResponseEntity.ok(boardService.deleteBoard(member, boardId));
+        @PathVariable(value = "id") Long id) {
+        return ResponseEntity.ok(boardService.deleteBoard(member, id));
     }
 
     /**
@@ -122,6 +125,29 @@ public class BoardController {
     public ResponseEntity<GetBoardRes> findBoardById(@CurrentMember Member viewer,
         @PathVariable(value = "boardId") Long boardId) {
         return ResponseEntity.ok(boardService.findBoardById(viewer, boardId));
+    }
+
+    /**
+     * 전체 게시판 검색하기
+     */
+    @GetMapping("/boards/search-all")
+    public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardListByKeyword(
+        @RequestBody SearchBoardReq searchBoardReq,
+        @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(boardService.findBoardListByKeyword(searchBoardReq, page, size));
+    }
+
+    /**
+     * Mbti 카테고리 별 검색하기
+     */
+    @GetMapping("/boards/search")
+    public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardListByKeywordAndMbti(
+        @RequestBody SearchBoardByMbtiReq searchBoardByMbtiReq,
+        @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(
+            boardService.findBoardListByKeywordAndMbti(searchBoardByMbtiReq, page, size));
     }
 
 }
