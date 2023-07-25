@@ -30,13 +30,15 @@ public class BoardCommentService {
         List<BoardCommentSimpleInfo> boardCommentSimpleInfoList = new ArrayList<>();
 
         for (BoardComment boardComment : boardComments) {
-            Boolean isAllowed = (viewer != null && viewer.getId().equals(boardComment.getMember().getId()));
+            Boolean isAllowed = (viewer != null && viewer.getId()
+                .equals(boardComment.getMember().getId()));
             boardCommentSimpleInfoList.add(
                 BoardCommentSimpleInfo.builder()
                     .boardComment(boardComment)
                     .createdAt(calculateTime(boardComment.getCreatedAt(), 3))
                     .isAllowed(isAllowed)
-                    .isLiked(boardCommentLikeRepository.findByMemberAndStateIsTrue(boardComment.getMember()) != null)
+                    .isLiked(boardCommentLikeRepository.findByMemberAndStateIsTrue(
+                        boardComment.getMember()) != null)
                     .memberSimpleInfo(
                         new MemberSimpleInfo(
                             boardComment.getMember().getId(),
@@ -56,7 +58,8 @@ public class BoardCommentService {
         Member viewer, Long boardId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<BoardComment> result = boardCommentRepository.findAllByBoardIdAndStateIsTrue(boardId,pageable);
+        Page<BoardComment> result = boardCommentRepository.findAllByBoardIdAndStateIsTrue(boardId,
+            pageable);
 
         return new PageResponseDto<>(
             result.getNumber(),
@@ -65,6 +68,22 @@ public class BoardCommentService {
                 result
                     .stream()
                     .collect(Collectors.toList()), viewer)
+        );
+    }
+
+    public PageResponseDto<List<BoardCommentSimpleInfo>> findBoardCommentListByMemberId(
+        Long memberId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BoardComment> result = boardCommentRepository.findAllByMemberIdAndStateIsTrue(memberId,
+            pageable);
+
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setBoardCommentSimpleInfo(
+                result
+                    .stream()
+                    .collect(Collectors.toList()), null)
         );
     }
 

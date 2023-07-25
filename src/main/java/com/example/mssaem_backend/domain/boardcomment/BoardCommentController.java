@@ -27,4 +27,13 @@ public class BoardCommentController {
             boardCommentService.findBoardCommentListByBoardId(member, boardId, page, size));
     }
 
+    //특정 멤버별 댓글 전체 조회
+    @GetMapping("/boards/comments")
+    public ResponseEntity<PageResponseDto<List<BoardCommentSimpleInfo>>> findBoardCommentListByMemberId(
+        @RequestParam(value = "memberId") Long memberId, @RequestParam(value = "page") int page,
+        @RequestParam(value = "size") int size) {
+        return ResponseEntity.ok(
+            boardCommentService.findBoardCommentListByMemberId(memberId, page, size));
+    }
+
 }
