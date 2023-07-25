@@ -6,7 +6,6 @@ import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
-import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
@@ -19,6 +18,7 @@ import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -270,11 +270,11 @@ public class BoardService {
 
     // 전체 게시판 검색하기
     public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeyword(
-        SearchBoardReq searchBoardReq, int page, int size) {
+        SearchReq searchReq, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        Page<Board> boards = boardRepository.searchByType(searchBoardReq.getType(),
-            searchBoardReq.getKeyword(), pageRequest);
+        Page<Board> boards = boardRepository.searchByType(searchReq.getType(),
+            searchReq.getKeyword(), pageRequest);
 
         return new PageResponseDto<>(
             boards.getNumber(),
