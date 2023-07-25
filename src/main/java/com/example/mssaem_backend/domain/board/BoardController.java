@@ -70,10 +70,10 @@ public class BoardController {
     @PatchMapping("/member/boards/{id}")
     public ResponseEntity<String> modifyBoard(@CurrentMember Member member,
         @RequestPart(value = "patchBoardReq") PatchBoardReq patchBoardReq,
-        @PathVariable(value = "boardId") Long boardId,
+        @PathVariable(value = "id") Long id,
         @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
         return ResponseEntity.ok(
-            boardService.modifyBoard(member, patchBoardReq, boardId, multipartFiles));
+            boardService.modifyBoard(member, patchBoardReq, id, multipartFiles));
     }
 
     /**
@@ -81,8 +81,8 @@ public class BoardController {
      */
     @DeleteMapping("/member/boards/{id}")
     public ResponseEntity<String> deleteBoard(@CurrentMember Member member,
-        @PathVariable(value = "boardId") Long boardId) {
-        return ResponseEntity.ok(boardService.deleteBoard(member, boardId));
+        @PathVariable(value = "id") Long id) {
+        return ResponseEntity.ok(boardService.deleteBoard(member, id));
     }
 
     /**
