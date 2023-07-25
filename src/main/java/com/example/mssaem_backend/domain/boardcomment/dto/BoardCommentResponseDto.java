@@ -27,6 +27,7 @@ public class BoardCommentResponseDto {
         @Builder
         public BoardCommentSimpleInfo(MemberSimpleInfo memberSimpleInfo, BoardComment boardComment,
             String createdAt , Boolean isAllowed , Boolean isLiked) {
+            this.commentId = boardComment.getId();
             this.Content = boardComment.getContent();
             this.likeCount = boardComment.getLikeCount();
             this.depth = boardComment.getDepth();
