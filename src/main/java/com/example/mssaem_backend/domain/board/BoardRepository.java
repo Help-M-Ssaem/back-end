@@ -2,7 +2,6 @@ package com.example.mssaem_backend.domain.board;
 
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,33 +18,28 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Page<Board> findAllByMemberIdAndStateIsTrue(Long memberId, Pageable pageable);
 
     // 전체 게시판 검색하기
-    @Query("SELECT b FROM Board b WHERE (LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%')) OR LOWER(b.content) LIKE LOWER(CONCAT('%', :content, '%'))) AND b.state = true ORDER BY b.createdAt DESC")
-    Page<Board> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
-        @Param("title") String title, @Param("content") String content, PageRequest pageRequest);
+    @Query("SELECT b FROM Board b WHERE"
+        + "(    (:type = 0 AND (LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
+        + " OR (:type = 1 AND LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:type = 2 AND LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:type = 3 AND LOWER(b.member.nickName) LIKE LOWER(CONCAT('%', :keyword, '%'))) )"
+        + " AND b.state = true ORDER BY b.createdAt DESC ")
+    Page<Board> searchByType(
+        @Param("type") int type,
+        @Param("keyword") String keyword,
+        Pageable pageable);
 
-    Page<Board> findByTitleContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(String title,
-        PageRequest pageRequest);
-
-    Page<Board> findByContentContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(String content,
-        PageRequest pageRequest);
-
-    Page<Board> findByMemberNickNameContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
-        String nickName, PageRequest pageRequest);
 
     // Mbti 카테고리 별 검색하기
-    @Query("SELECT b FROM Board b WHERE (LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%')) OR LOWER(b.content) LIKE LOWER(CONCAT('%', :content, '%'))) AND b.state = true AND b.mbti = :mbti ORDER BY b.createdAt DESC")
-    Page<Board> findByMbtiAndStateTrueAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrderByCreatedAtDesc(
-        @Param("title") String title, @Param("content") String content,
-        @Param("mbti") MbtiEnum mbti, PageRequest pageRequest);
-
-    Page<Board> findByTitleContainingIgnoreCaseAndMbtiAndStateTrueOrderByCreatedAtDesc(String title,
-        MbtiEnum mbti,
-        PageRequest pageRequest);
-
-    Page<Board> findByContentContainingIgnoreCaseAndMbtiAndStateTrueOrderByCreatedAtDesc(
-        String content, MbtiEnum mbti,
-        PageRequest pageRequest);
-
-    Page<Board> findByMemberNickNameContainingIgnoreCaseAndMbtiAndStateTrueOrderByCreatedAtDesc(
-        String nickName, MbtiEnum mbti, PageRequest pageRequest);
+    @Query("SELECT b FROM Board b WHERE"
+        + "(    (:type = 0 AND (LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
+        + " OR (:type = 1 AND LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:type = 2 AND LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:type = 3 AND LOWER(b.member.nickName) LIKE LOWER(CONCAT('%', :keyword, '%'))) )"
+        + " AND b.state = true AND b.mbti = :mbti ORDER BY b.createdAt DESC ")
+    Page<Board> searchByTypeAndMbti(
+        @Param("type") int type,
+        @Param("keyword") String keyword,
+        @Param("mbti") MbtiEnum mbti,
+        Pageable pageable);
 }

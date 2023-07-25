@@ -271,23 +271,10 @@ public class BoardService {
     // 전체 게시판 검색하기
     public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeyword(
         SearchBoardReq searchBoardReq, int page, int size) {
-        String keyword = searchBoardReq.getKeyword();
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        Page<Board> boards = switch (searchBoardReq.getType()) {
-            case 0 -> // 제목+내용
-                boardRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
-                    keyword, keyword, pageRequest);
-            case 1 -> // 제목
-                boardRepository.findByTitleContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
-                    keyword, pageRequest);
-            case 2 -> // 내용
-                boardRepository.findByContentContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
-                    keyword, pageRequest);
-            default -> // 글쓴이
-                boardRepository.findByMemberNickNameContainingIgnoreCaseAndStateTrueOrderByCreatedAtDesc(
-                    keyword, pageRequest);
-        };
+        Page<Board> boards = boardRepository.searchByType(searchBoardReq.getType(),
+            searchBoardReq.getKeyword(), pageRequest);
 
         return new PageResponseDto<>(
             boards.getNumber(),
@@ -303,24 +290,10 @@ public class BoardService {
     // Mbti 카테고리 별 검색하기
     public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeywordAndMbti(
         SearchBoardByMbtiReq searchBoardByMbtiReq, int page, int size) {
-        String keyword = searchBoardByMbtiReq.getKeyword();
-        MbtiEnum mbti = searchBoardByMbtiReq.getMbti();
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        Page<Board> boards = switch (searchBoardByMbtiReq.getType()) {
-            case 0 -> // 제목+내용
-                boardRepository.findByMbtiAndStateTrueAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrderByCreatedAtDesc(
-                    keyword, keyword, mbti, pageRequest);
-            case 1 -> // 제목
-                boardRepository.findByTitleContainingIgnoreCaseAndMbtiAndStateTrueOrderByCreatedAtDesc(
-                    keyword, mbti, pageRequest);
-            case 2 -> // 내용
-                boardRepository.findByContentContainingIgnoreCaseAndMbtiAndStateTrueOrderByCreatedAtDesc(
-                    keyword, mbti, pageRequest);
-            default -> // 글쓴이
-                boardRepository.findByMemberNickNameContainingIgnoreCaseAndMbtiAndStateTrueOrderByCreatedAtDesc(
-                    keyword, mbti, pageRequest);
-        };
+        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchBoardByMbtiReq.getType(),
+            searchBoardByMbtiReq.getKeyword(), searchBoardByMbtiReq.getMbti(), pageRequest);
 
         return new PageResponseDto<>(
             boards.getNumber(),
