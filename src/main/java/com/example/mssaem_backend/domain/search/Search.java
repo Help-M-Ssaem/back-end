@@ -1,8 +1,7 @@
-package com.example.mssaem_backend.domain.badge;
+package com.example.mssaem_backend.domain.search;
 
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -19,18 +18,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Badge extends BaseTimeEntity {
+public class Search extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "badge_id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @NotNull
-    private String name;
+  @NotNull
+  private String keyword;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
-
-    private boolean state; // true : 대표
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Member member;
 }

@@ -1,15 +1,14 @@
-package com.example.mssaem_backend.domain.badge;
+package com.example.mssaem_backend.domain.discussioncommentlike;
 
+import com.example.mssaem_backend.domain.discussioncomment.DiscussionComment;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,18 +18,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Badge extends BaseTimeEntity {
+public class DiscussionCommentLike extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "badge_id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  private Boolean state = true;
 
-    @NotNull
-    private String name;
+  @ManyToOne(fetch = FetchType.LAZY)
+  private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
-
-    private boolean state; // true : 대표
+  @ManyToOne(fetch = FetchType.LAZY)
+  private DiscussionComment discussionComment;
 }

@@ -3,7 +3,9 @@ package com.example.mssaem_backend.domain.boardimage;
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.global.s3.S3Service;
 import com.example.mssaem_backend.global.s3.dto.S3Result;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,5 +52,17 @@ public class BoardImageService {
         }
         //DB에 저장된 이미지 삭제
         deleteImage(board);
+    }
+
+    //해당 게시글 이미지 url 리스트 가져오기
+    public List<String> getImgUrls(Board board) {
+        List<BoardImage> boardImageList = boardImageRepository.findAllByBoardId(board.getId());
+
+        if (boardImageList.isEmpty()) {
+            return Collections.singletonList("default");
+        }
+        return boardImageList.stream()
+            .map(BoardImage::getImageUrl)
+            .collect(Collectors.toList());
     }
 }

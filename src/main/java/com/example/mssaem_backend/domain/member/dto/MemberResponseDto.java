@@ -1,6 +1,5 @@
 package com.example.mssaem_backend.domain.member.dto;
 
-import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +21,7 @@ public class MemberResponseDto {
 
         private Long id;
         private String nickName;
-        private MbtiEnum mbtiEnum;
+        private String mbti;
         private String badge;
         private String profileImgUrl;
     }
@@ -40,7 +39,7 @@ public class MemberResponseDto {
 
         private Long id;
         private String nickName;
-        private MbtiEnum mbtiEnum;
+        private String mbti;
         private String badge;
         private String profileImgUrl;
         private String introduction;
