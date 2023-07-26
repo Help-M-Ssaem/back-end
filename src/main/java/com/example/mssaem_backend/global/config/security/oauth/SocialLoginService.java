@@ -21,14 +21,14 @@ public class SocialLoginService {
     private String grantType;
     @Value("${social.kakao.client-id}")
     private String kakaoClientId;
-    @Value("${social.kakao.redirect-url}")
+    @Value("${social.kakao.redirect-uri}")
     private String kakaoRedirectUrl;
 
     @Value("${social.google.client-id}")
     private String googleClientId;
     @Value("${social.google.client-secret}")
     private String googleClientSecret;
-    @Value("${social.google.redirect-url}")
+    @Value("${social.google.redirect-uri}")
     private String googleRedirectUrl;
 
     public String getGoogleAccessToken(String idToken) throws IOException {
