@@ -8,7 +8,7 @@ public class CheckWriter {
 
     //현재 viewer와 작성자가 같지 않으면 예외 처리
     public static void match(Member viewer, Member writer) {
-        if((viewer != null) && (viewer.getId().equals(writer.getId()))) {
+        if( (viewer == null) || !(viewer.getId().equals(writer.getId()))) {
             throw new BaseException(MemberErrorCode.INVALID_MEMBER);
         }
     }
