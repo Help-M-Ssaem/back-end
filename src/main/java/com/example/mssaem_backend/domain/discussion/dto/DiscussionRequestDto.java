@@ -11,9 +11,10 @@ public class DiscussionRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class PostDiscussionReq {
+    public static class DiscussionReq {
         String title;
         String content;
         List<GetOptionReq> getOptionReqs;
     }
+    
 }

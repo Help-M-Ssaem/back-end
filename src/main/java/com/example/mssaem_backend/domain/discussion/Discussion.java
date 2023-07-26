@@ -53,4 +53,9 @@ public class Discussion extends BaseTimeEntity {
         this.content = content;
         this.member = member;
     }
+
+    public void modifyDiscussion(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }

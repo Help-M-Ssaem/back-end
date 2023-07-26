@@ -1,12 +1,14 @@
 package com.example.mssaem_backend.domain.discussion;
 
+import static com.example.mssaem_backend.global.common.CheckWriter.match;
+
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
-import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.PostDiscussionReq;
+import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
-import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionRequestDto.GetOptionReq;
+import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionInfo;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelectedRepository;
@@ -15,8 +17,8 @@ import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimp
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionErrorCode;
 import com.example.mssaem_backend.global.s3.S3Service;
-import com.example.mssaem_backend.global.s3.dto.S3Result;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class DiscussionService {
 
     private final DiscussionRepository discussionRepository;
+    private final DiscussionOptionService discussionOptionService;
     private final DiscussionOptionRepository discussionOptionRepository;
     private final DiscussionOptionSelectedRepository discussionOptionSelectedRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
@@ -182,7 +185,7 @@ public class DiscussionService {
     //토른글 생성하기
     @Transactional
     public String createDiscussion(Member member, List<MultipartFile> multipartFiles,
-        PostDiscussionReq postDiscussionReq) {
+        DiscussionReq postDiscussionReq) {
         //Discussion 생성
         Discussion discussion = Discussion.builder()
             .title(postDiscussionReq.getTitle())
@@ -192,29 +195,27 @@ public class DiscussionService {
         discussionRepository.save(discussion);
 
         //DiscussionOption 생성
-        //option 리스트 가져오기
-        List<GetOptionReq> getOptionReqs = postDiscussionReq.getGetOptionReqs();
-
-        //s3 저장 후 url리스트 가져오기
-        List<S3Result> s3ResultList = s3Service.uploadFile(multipartFiles);
-
-        //option 리스트를 돌며 DiscussionOption 생성
-        for (GetOptionReq getOptionReq : getOptionReqs) {
-            //만약 option에 이미지가 없으면 null
-            String imgUrl;
-            if (getOptionReq.isHasImage()) {
-                imgUrl = s3ResultList.get(0).getImgUrl();
-                s3ResultList.remove(0);
-            } else {
-                imgUrl = null;
-            }
-            DiscussionOption discussionOption = DiscussionOption.builder()
-                .imgUrl(imgUrl)
-                .content(getOptionReq.getContent())
-                .discussion(discussion)
-                .build();
-            discussionOptionRepository.save(discussionOption);
-        }
+        discussionOptionService.createOption(discussion, postDiscussionReq, multipartFiles);
         return "토론글 생성완료";
+    }
+
+    @Transactional
+    public String modifyDiscussion(Member member, Long id, DiscussionReq patchDiscussionReq,
+        List<MultipartFile> multipartFiles) {
+        //수정 권한 확인
+        Discussion discussion = discussionRepository.findById(id)
+            .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+        match(member, discussion.getMember());
+
+        //discussion 수정하기
+        discussion.modifyDiscussion(
+            patchDiscussionReq.getTitle(),
+            patchDiscussionReq.getContent()
+        );
+
+        discussionOptionService.deleteOption(discussion);
+        discussionOptionService.createOption(discussion, patchDiscussionReq, multipartFiles);
+
+        return "토론글 수정완료";
     }
 }
