@@ -5,7 +5,6 @@ import static com.example.mssaem_backend.global.common.Time.calculateTime;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
-import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
@@ -289,11 +288,11 @@ public class BoardService {
 
     // Mbti 카테고리 별 검색하기
     public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeywordAndMbti(
-        SearchBoardByMbtiReq searchBoardByMbtiReq, int page, int size) {
+        SearchReq searchReq,MbtiEnum mbti, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchBoardByMbtiReq.getType(),
-            searchBoardByMbtiReq.getKeyword(), searchBoardByMbtiReq.getMbti(), pageRequest);
+        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchReq.getType(),
+            searchReq.getKeyword(), mbti, pageRequest);
 
         return new PageResponseDto<>(
             boards.getNumber(),

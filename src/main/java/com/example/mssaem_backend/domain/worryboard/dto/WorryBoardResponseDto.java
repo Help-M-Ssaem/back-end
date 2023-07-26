@@ -29,7 +29,8 @@ public class WorryBoardResponseDto {
 
         @Builder
         public GetWorryRes(WorryBoard worryBoard, List<String> imgList,
-            MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed, Boolean isChatAllowed) {
+            MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed,
+            Boolean isChatAllowed) {
             this.worryBoardId = worryBoard.getId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.targetMbti = worryBoard.getTargetMbti();
@@ -54,9 +55,10 @@ public class WorryBoardResponseDto {
         private MbtiEnum targetMbti;
         private String createdDate;
         private String imgUrl;
+        private MemberSimpleInfo memberSimpleInfo;
 
         @Builder
-        public GetWorriesRes(WorryBoard worryBoard, String imgUrl, String createdAt) {
+        public GetWorriesRes(WorryBoard worryBoard, String imgUrl, String createdAt, MemberSimpleInfo memberSimpleInfo) {
             this.id = worryBoard.getId();
             this.title = worryBoard.getTitle();
             this.content = worryBoard.getContent();
@@ -64,6 +66,7 @@ public class WorryBoardResponseDto {
             this.targetMbti = worryBoard.getTargetMbti();
             this.createdDate = createdAt;
             this.imgUrl = imgUrl;
+            this.memberSimpleInfo = memberSimpleInfo;
         }
     }
 
