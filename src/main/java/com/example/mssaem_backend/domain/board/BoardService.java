@@ -137,7 +137,7 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
-        if(isMatch(member, board.getMember())) {
+        if (isMatch(member, board.getMember())) {
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
                 patchBoardReq.getMbti());
             //현재 저장된 이미지 삭제
@@ -248,6 +248,8 @@ public class BoardService {
         Member member = board.getMember();
         //게시글 수정, 삭제 권한 확인
         Boolean isAllowed = (isMatch(viewer, member));
+        //게시글 좋아요 눌렀는지 확인
+        Boolean isLiked = likeRepository.existsLikeByMemberAndStateIsTrueAndBoard(viewer, board);
 
         return GetBoardRes.builder()
             .memberSimpleInfo(
@@ -264,6 +266,7 @@ public class BoardService {
             .createdAt(calculateTime(board.getCreatedAt(), 2))
             .commentCount(boardCommentRepository.countByBoardAndStateTrue(board))
             .isAllowed(isAllowed)
+            .isLiked(isLiked)
             .build();
     }
 
