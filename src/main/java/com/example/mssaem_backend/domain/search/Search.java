@@ -34,4 +34,8 @@ public class Search extends BaseTimeEntity {
     this.keyword = keyword;
     this.member = member;
   }
+
+  public void setKeyword(String keyword) {
+    this.keyword = keyword;
+  }
 }

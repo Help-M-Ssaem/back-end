@@ -33,6 +33,7 @@ dependencies {
     //Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+
     //내장 Redis
     implementation 'it.ozimov:embedded-redis:0.7.1'
 

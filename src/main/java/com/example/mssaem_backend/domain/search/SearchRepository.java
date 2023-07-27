@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SearchRepository extends JpaRepository<Search, Long> {
 
-  List<Search> findAllByMember(Member member);
+  List<Search> findAllByMemberOrderByUpdatedAtDesc(Member member);
+
+  Search findByKeywordAndMember(String Keyword, Member member);
 }

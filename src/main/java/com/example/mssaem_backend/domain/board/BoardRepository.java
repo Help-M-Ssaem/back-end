@@ -42,4 +42,14 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
         @Param("keyword") String keyword,
         @Param("mbti") MbtiEnum mbti,
         Pageable pageable);
+
+
+    //내용, 제목, 닉네임 별 검색어 한 번에 조회
+    @Query(value = "select b from Board b join fetch b.member"
+        + " where (lower(b.title) like lower(concat('%', :keyword, '%'))) "
+        + "or (lower(b.content) like lower(concat('%', :keyword, '%'))) "
+        + "or (lower(b.member.nickName) like lower(concat('%', :keyword, '%'))) "
+        + "and b.state = true order by b.createdAt desc",
+        countQuery = "select count(b) from Board b" )
+    Page<Board> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }
