@@ -14,6 +14,7 @@ import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionRe
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelectedRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
@@ -139,7 +140,7 @@ public class DiscussionService {
         return selectedOptionIdx;
     }
 
-    // 로그인한 유저가 옵션을 선택한 경우 고민글 옵션 정보 Dto에 저장
+    // 로그인한 유저가 옵션을 선택한 경우 고민글 옵션 정보 Dto에 매핑
     private List<DiscussionOptionSelectedInfo> setDiscussionOptionSelectedInfo(Long participants,
         List<DiscussionOption> discussionOptions, int selectedOptionIdx) {
 
@@ -181,6 +182,25 @@ public class DiscussionService {
         }
         return discussionOptionInfos;
     }
+
+    public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussionListByKeyword(Member member,
+        SearchReq searchReq, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Discussion> discussions = discussionRepository.searchByType(searchReq.getType(),
+            searchReq.getKeyword(), pageRequest);
+
+        return new PageResponseDto<>(
+            discussions.getNumber(),
+            discussions.getTotalPages(),
+            setDiscussionSimpleInfo(
+                member,
+                discussions
+                    .stream()
+                    .collect(Collectors.toList()),
+                3)
+        );
+    }
+}
 
     //토른글 생성하기
     @Transactional
