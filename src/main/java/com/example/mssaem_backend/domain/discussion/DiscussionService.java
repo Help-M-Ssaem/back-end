@@ -218,4 +218,17 @@ public class DiscussionService {
 
         return "토론글 수정완료";
     }
+
+    @Transactional
+    public String deleteDiscussion(Member member, Long id) {
+        //삭제 권한 확인
+        Discussion discussion = discussionRepository.findById(id)
+            .orElseThrow(()-> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+        match(member, discussion.getMember());
+
+        discussionOptionService.deleteOption(discussion);
+        discussion.deleteDiscussion();
+
+        return "토론글 삭제완료";
+    }
 }

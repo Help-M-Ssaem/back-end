@@ -23,6 +23,7 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Discussion extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -57,5 +58,9 @@ public class Discussion extends BaseTimeEntity {
     public void modifyDiscussion(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public void deleteDiscussion() {
+        this.state = false;
     }
 }

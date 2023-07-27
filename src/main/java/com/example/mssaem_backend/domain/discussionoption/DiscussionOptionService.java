@@ -18,8 +18,8 @@ public class DiscussionOptionService {
     private final DiscussionOptionRepository discussionOptionRepository;
 
     //s3에 이미지 저장 후 DiscussionOption 생성
-    public void createOption(Discussion discussion, DiscussionReq discussionReq
-        , List<MultipartFile> multipartFiles) {
+    public void createOption(Discussion discussion, DiscussionReq discussionReq,
+        List<MultipartFile> multipartFiles) {
         //option 리스트 가져오기
         List<GetOptionReq> getOptionReqs = discussionReq.getGetOptionReqs();
 
@@ -30,20 +30,16 @@ public class DiscussionOptionService {
         }
         //option 리스트를 돌며 DiscussionOption 생성
         for (GetOptionReq getOptionReq : getOptionReqs) {
-            //만약 option에 이미지가 없으면 null
             String imgUrl;
-            if (getOptionReq.isHasImage()) {
+            if (getOptionReq.isHasImage() && (s3ResultList != null)) {
                 imgUrl = s3ResultList.get(0).getImgUrl();
                 s3ResultList.remove(0);
             } else {
                 imgUrl = null;
             }
 
-            DiscussionOption discussionOption = DiscussionOption.builder()
-                .imgUrl(imgUrl)
-                .content(getOptionReq.getContent())
-                .discussion(discussion)
-                .build();
+            DiscussionOption discussionOption = DiscussionOption.builder().imgUrl(imgUrl)
+                .content(getOptionReq.getContent()).discussion(discussion).build();
             discussionOptionRepository.save(discussionOption);
         }
     }
@@ -55,9 +51,7 @@ public class DiscussionOptionService {
         //s3 이미지 삭제
         for (DiscussionOption discussionOption : discussionOptions) {
             if (discussionOption.getImgUrl() != null) {
-                s3Service.deleteFile(
-                    s3Service.parseFileName(discussionOption.getImgUrl())
-                );
+                s3Service.deleteFile(s3Service.parseFileName(discussionOption.getImgUrl()));
             }
         }
         //해당 discussion에 존재하는 option 삭제
