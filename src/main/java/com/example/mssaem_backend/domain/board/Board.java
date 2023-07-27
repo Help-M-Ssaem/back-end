@@ -45,6 +45,10 @@ public class Board extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    private String thumbnail;
+    @ColumnDefault("0")
+    private Long commentCount;
+
     @Builder
     public Board(String title, String content, MbtiEnum mbti, Member member) {
         this.title = title;
