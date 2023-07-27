@@ -11,5 +11,4 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
 
     Page<BoardComment> findAllByBoardIdAndStateIsTrue(Long id, Pageable pageable);
 
-    Page<BoardComment> findAllByMemberIdAndStateIsTrue(Long memberId, Pageable pageable);
 }
