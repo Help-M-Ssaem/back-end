@@ -30,6 +30,7 @@ public class BoardCommentService {
         List<BoardCommentSimpleInfo> boardCommentSimpleInfoList = new ArrayList<>();
 
         for (BoardComment boardComment : boardComments) {
+            //해당 게시글을 보는 viewer 와 해당 댓글의 작성자와 같은지 확인(수정 또는 삭제를 위함)
             Boolean isAllowed = (viewer != null && viewer.getId()
                 .equals(boardComment.getMember().getId()));
             boardCommentSimpleInfoList.add(
@@ -37,8 +38,8 @@ public class BoardCommentService {
                     .boardComment(boardComment)
                     .createdAt(calculateTime(boardComment.getCreatedAt(), 3))
                     .isAllowed(isAllowed)
-                    .isLiked(boardCommentLikeRepository.findByMemberAndStateIsTrue(
-                        boardComment.getMember()) != null)
+                    .isLiked(boardCommentLikeRepository.existsBoardCommentLikeByMemberAndStateIsTrueAndBoardCommentId(
+                        boardComment.getMember(), boardComment.getId())) //댓글 좋아요 눌렀는지 안눌렀는지 확인
                     .memberSimpleInfo(
                         new MemberSimpleInfo(
                             boardComment.getMember().getId(),

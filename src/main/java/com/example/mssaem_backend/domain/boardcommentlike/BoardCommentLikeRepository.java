@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BoardCommentLikeRepository extends JpaRepository<BoardCommentLike, Long> {
 
-    BoardCommentLike findByMemberAndStateIsTrue(Member member);
+    Boolean existsBoardCommentLikeByMemberAndStateIsTrueAndBoardCommentId(Member member , Long boardCommentId);
 
 }
