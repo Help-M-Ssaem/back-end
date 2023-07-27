@@ -57,7 +57,6 @@ public class Discussion extends BaseTimeEntity {
 
     @ColumnDefault("0")
     private Long commentCount;
-}
 
     public void modifyDiscussion(String title, String content) {
         this.title = title;
