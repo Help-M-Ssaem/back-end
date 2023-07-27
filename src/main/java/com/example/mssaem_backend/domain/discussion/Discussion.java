@@ -45,4 +45,7 @@ public class Discussion extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @ColumnDefault("0")
+    private Long commentCount;
 }
