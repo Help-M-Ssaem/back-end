@@ -1,12 +1,13 @@
 package com.example.mssaem_backend.domain.board;
 
+import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
+import static com.example.mssaem_backend.global.common.CheckWriter.match;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
-import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
@@ -19,6 +20,7 @@ import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -135,7 +137,7 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
-        if (member.getId().equals(board.getMember().getId())) {
+        if(isMatch(member, board.getMember())) {
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
                 patchBoardReq.getMbti());
             //현재 저장된 이미지 삭제
@@ -156,15 +158,12 @@ public class BoardService {
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         if (board.isState()) {
             //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
-            if (member.getId().equals(board.getMember().getId())) {
-                //게시글 Soft Delete
-                board.deleteBoard();
-                //현재 저장된 이미지 삭제
-                boardImageService.deleteBoardImage(board);
-                return "게시글 삭제 완료";
-            } else {
-                throw new BaseException(BoardErrorCode.INVALID_MEMBER);
-            }
+            match(member, board.getMember());
+            //게시글 Soft Delete
+            board.deleteBoard();
+            //현재 저장된 이미지 삭제
+            boardImageService.deleteBoardImage(board);
+            return "게시글 삭제 완료";
         } else {
             throw new BaseException(BoardErrorCode.EMPTY_BOARD);
         }
@@ -248,7 +247,7 @@ public class BoardService {
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         Member member = board.getMember();
         //게시글 수정, 삭제 권한 확인
-        Boolean isAllowed = (viewer != null && viewer.getId().equals(member.getId()));
+        Boolean isAllowed = (isMatch(viewer, member));
 
         return GetBoardRes.builder()
             .memberSimpleInfo(
@@ -270,11 +269,11 @@ public class BoardService {
 
     // 전체 게시판 검색하기
     public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeyword(
-        SearchBoardReq searchBoardReq, int page, int size) {
+        SearchReq searchReq, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        Page<Board> boards = boardRepository.searchByType(searchBoardReq.getType(),
-            searchBoardReq.getKeyword(), pageRequest);
+        Page<Board> boards = boardRepository.searchByType(searchReq.getType(),
+            searchReq.getKeyword(), pageRequest);
 
         return new PageResponseDto<>(
             boards.getNumber(),

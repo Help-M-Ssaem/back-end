@@ -51,6 +51,8 @@ public class Member extends BaseTimeEntity {
     @ColumnDefault("0")
     private Integer report; //신고수
 
+    private String badgeName;
+
     public void changeRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }

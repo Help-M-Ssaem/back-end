@@ -2,12 +2,14 @@ package com.example.mssaem_backend.domain.discussion;
 
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,5 +35,18 @@ public class DiscussionController {
     public ResponseEntity<List<DiscussionSimpleInfo>> findHotDiscussionListForHome(
         @CurrentMember Member member) {
         return ResponseEntity.ok(discussionService.findHotDiscussionListForHome(member));
+    }
+
+    /**
+     * 토론 검색하기
+     */
+    @GetMapping("/discussions/search")
+    public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findDiscussionListByKeyword(
+        @CurrentMember Member member,
+        @RequestBody SearchReq searchReq,
+        @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(
+            discussionService.findDiscussionListByKeyword(member, searchReq, page, size));
     }
 }

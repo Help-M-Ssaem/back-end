@@ -3,12 +3,12 @@ package com.example.mssaem_backend.domain.board;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
-import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
@@ -132,10 +132,10 @@ public class BoardController {
      */
     @GetMapping("/boards/search-all")
     public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardListByKeyword(
-        @RequestBody SearchBoardReq searchBoardReq,
+        @RequestBody SearchReq searchReq,
         @RequestParam int page,
         @RequestParam int size) {
-        return ResponseEntity.ok(boardService.findBoardListByKeyword(searchBoardReq, page, size));
+        return ResponseEntity.ok(boardService.findBoardListByKeyword(searchReq, page, size));
     }
 
     /**
