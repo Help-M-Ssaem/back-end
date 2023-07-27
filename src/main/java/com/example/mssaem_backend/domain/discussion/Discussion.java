@@ -55,6 +55,10 @@ public class Discussion extends BaseTimeEntity {
         this.member = member;
     }
 
+    @ColumnDefault("0")
+    private Long commentCount;
+}
+
     public void modifyDiscussion(String title, String content) {
         this.title = title;
         this.content = content;
