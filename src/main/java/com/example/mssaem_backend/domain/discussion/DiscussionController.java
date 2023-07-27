@@ -49,14 +49,11 @@ public class DiscussionController {
      */
     @GetMapping("/discussions/search")
     public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findDiscussionListByKeyword(
-        @CurrentMember Member member,
-        @RequestBody SearchReq searchReq,
-        @RequestParam int page,
+        @CurrentMember Member member, @RequestBody SearchReq searchReq, @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
             discussionService.findDiscussionListByKeyword(member, searchReq, page, size));
     }
-}
 
     /**
      * 토론글 생성
@@ -76,7 +73,7 @@ public class DiscussionController {
     public ResponseEntity<String> modifyDiscussion(@CurrentMember Member member,
         @PathVariable Long id,
         @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles,
-        @RequestPart(value = "patchDiscussionReq") DiscussionReq patchDiscussionReq) {
+        @RequestPart(value = "DiscussionReq") DiscussionReq patchDiscussionReq) {
         return ResponseEntity.ok(
             discussionService.modifyDiscussion(member, id, patchDiscussionReq, multipartFiles));
     }
@@ -87,6 +84,7 @@ public class DiscussionController {
     @DeleteMapping("/member/discussion/{id}")
     public ResponseEntity<String> deleteDiscussion(@CurrentMember Member member,
         @PathVariable Long id) {
-        return ResponseEntity.ok(discussionService.deleteDiscussion(member, id));
+        return ResponseEntity.ok(
+            discussionService.deleteDiscussion(member, id));
     }
 }

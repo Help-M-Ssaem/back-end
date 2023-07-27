@@ -19,7 +19,6 @@ import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionErrorCode;
-import com.example.mssaem_backend.global.s3.S3Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,7 @@ public class DiscussionService {
     private final DiscussionOptionSelectedRepository discussionOptionSelectedRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
-    private final S3Service s3Service;
+
 
     // HOT 토론글 더보기 조회
     public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionList(Member member,
@@ -200,7 +199,7 @@ public class DiscussionService {
                 3)
         );
     }
-}
+
 
     //토른글 생성하기
     @Transactional
@@ -219,6 +218,7 @@ public class DiscussionService {
         return "토론글 생성완료";
     }
 
+    //토론글 수정하기
     @Transactional
     public String modifyDiscussion(Member member, Long id, DiscussionReq patchDiscussionReq,
         List<MultipartFile> multipartFiles) {
@@ -239,6 +239,7 @@ public class DiscussionService {
         return "토론글 수정완료";
     }
 
+    //토론글 삭제하기
     @Transactional
     public String deleteDiscussion(Member member, Long id) {
         //삭제 권한 확인
