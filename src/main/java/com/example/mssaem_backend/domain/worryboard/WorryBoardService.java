@@ -1,5 +1,7 @@
 package com.example.mssaem_backend.domain.worryboard;
 
+import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
+import static com.example.mssaem_backend.global.common.CheckWriter.match;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
 import com.example.mssaem_backend.domain.badge.BadgeService;
@@ -45,13 +47,6 @@ public class WorryBoardService {
             .build()).toList();
     }
 
-    //현재 멤버와 작성자가 같은지 확인하는 함수
-    private void isMatchMemberWithAuthor(Member currentMember, WorryBoard worryBoard) {
-        if (!currentMember.getId().equals(worryBoard.getMember().getId())) {
-            throw new BaseException(MemberErrorCode.INVALID_MEMBER);
-        }
-    }
-
     //고민게시판 - 고민 목록 조회
     public PageResponseDto<List<GetWorriesRes>> findWorriesBySolved(boolean isSolved, int page,
         int size) {
@@ -69,8 +64,7 @@ public class WorryBoardService {
         Member member = worryBoard.getMember();
 
         //수정,삭제 권한 확인
-        Boolean isEditAllowed = (viewer != null && viewer.getId()
-            .equals(worryBoard.getMember().getId()));
+        Boolean isEditAllowed = isMatch(viewer, worryBoard.getMember());
 
         //채팅 시작 권한 확인
         Boolean isChatAllowed = (viewer != null && viewer.getMbti()
@@ -154,7 +148,7 @@ public class WorryBoardService {
         PatchWorrySolvedReq patchWorryReq) {
         WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
-        isMatchMemberWithAuthor(currentMember, worryBoard);
+        match(currentMember, worryBoard.getMember());
 
         Member solveMember = memberRepository.findById(patchWorryReq.getWorrySolverId())
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
@@ -201,7 +195,7 @@ public class WorryBoardService {
         if (!currentMember.getId().equals(worryBoard.getMember().getId())) {
             throw new BaseException(MemberErrorCode.INVALID_MEMBER);
         }
-        isMatchMemberWithAuthor(currentMember, worryBoard);
+        match(currentMember, worryBoard.getMember());
 
         //worryBoard 수정하기
         worryBoard.modifyWorryBoard(
@@ -224,7 +218,7 @@ public class WorryBoardService {
         //현재 멤버와 작성자 일치하는 지 확인
         WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
-        isMatchMemberWithAuthor(currentMember, worryBoard);
+        match(currentMember, worryBoard.getMember());
 
         worryBoard.deleteWorryBoard();
         worryBoardImageService.deleteWorryImage(worryBoard);
