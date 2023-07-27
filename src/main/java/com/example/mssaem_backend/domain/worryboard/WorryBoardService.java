@@ -42,13 +42,6 @@ public class WorryBoardService {
         return result.stream().map(worryBoard -> GetWorriesRes.builder().worryBoard(worryBoard)
             .imgUrl(worryBoardImageService.getImgUrl(worryBoard))
             .createdAt(calculateTime(worryBoard.getCreatedAt(), 3))
-            .memberSimpleInfo(new MemberSimpleInfo(
-                worryBoard.getMember().getId(),
-                worryBoard.getMember().getNickName(),
-                worryBoard.getMember().getDetailMbti(),
-                badgeService.findRepresentativeBadgeByMember(worryBoard.getMember()),
-                worryBoard.getMember().getProfileImageUrl()
-            ))
             .build()).toList();
     }
 
