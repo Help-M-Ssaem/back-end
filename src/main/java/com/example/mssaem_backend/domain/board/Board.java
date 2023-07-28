@@ -78,4 +78,8 @@ public class Board extends BaseTimeEntity {
     public void deleteBoard() {
         this.state = false;
     }
+
+    public void changeThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
 }

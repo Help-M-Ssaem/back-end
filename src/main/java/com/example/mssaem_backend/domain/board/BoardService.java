@@ -11,7 +11,6 @@ import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleI
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
@@ -25,8 +24,6 @@ import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
-import com.example.mssaem_backend.global.s3.S3Service;
-import com.example.mssaem_backend.global.s3.dto.S3Result;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,10 +45,8 @@ public class BoardService {
     private final LikeRepository likeRepository;
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
-    private final BoardImageRepository boardImageRepository;
     private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
-    private final S3Service s3Service;
 
     // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
@@ -118,31 +113,23 @@ public class BoardService {
         return boardSimpleInfos;
     }
 
+    @Transactional
     public String createBoard(Member member, PostBoardReq postBoardReq,
         List<MultipartFile> multipartFiles) {
-        if (multipartFiles != null) { //이미지가 있는 경우
-            //먼저 S3에 이미지 저장
-            List<S3Result> result = s3Service.uploadFile(multipartFiles);
 
-            Board board = Board.builder()
-                .title(postBoardReq.getTitle())
-                .content(postBoardReq.getContent())
-                .mbti(postBoardReq.getMbti())
-                .member(member)
-                .thumbnail(result.get(0).getImgUrl()) //받아온 이미지 중 첫번째 사진 썸네일
-                .build();
-            boardRepository.save(board);
-            boardImageService.uploadBoardImage(board, result);
-        } else { //이미지가 없는 경우
-            Board board = Board.builder()
-                .title(postBoardReq.getTitle())
-                .content(postBoardReq.getContent())
-                .mbti(postBoardReq.getMbti())
-                .member(member)
-                .thumbnail(null) // 이미지 없으면 썸네일 null
-                .build();
-            boardRepository.save(board);
+        Board board = Board.builder()
+            .title(postBoardReq.getTitle())
+            .content(postBoardReq.getContent())
+            .mbti(postBoardReq.getMbti())
+            .member(member)
+            .thumbnail(null)
+            .build();
+
+        if (multipartFiles != null) {
+            String thumbnail = boardImageService.uploadBoardImage(board, multipartFiles);
+            board.changeThumbnail(thumbnail);
         }
+        boardRepository.save(board);
         return "게시글 생성 완료";
     }
 
@@ -160,8 +147,7 @@ public class BoardService {
             //새로운 이미지 업로드
             if (multipartFiles != null) {
                 //이미지 S3에 먼저 저장
-                List<S3Result> result = s3Service.uploadFile(multipartFiles);
-                boardImageService.uploadBoardImage(board, result);
+                boardImageService.uploadBoardImage(board, multipartFiles);
             }
             return "게시글 수정 완료";
         } else {
