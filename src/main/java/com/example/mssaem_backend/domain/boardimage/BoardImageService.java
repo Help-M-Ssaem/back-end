@@ -40,6 +40,7 @@ public class BoardImageService {
         boardImageRepository.saveAll(boardImages);
 
         return s3ResultList.isEmpty() ? null : s3ResultList.get(0).getImgUrl();
+
     }
 
     public void deleteBoardImage(Board board) {
