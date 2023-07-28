@@ -26,9 +26,9 @@ public class BoardResponseDto {
         private MemberSimpleInfo memberSimpleInfo;
 
         public BoardSimpleInfo(Long id, String title, String content, String imgUrl,
-            MbtiEnum boardMbti,
-            Long likeCount, Long commentCount, String createdAt,
-            MemberSimpleInfo memberSimpleInfo) {
+                               MbtiEnum boardMbti,
+                               Long likeCount, Long commentCount, String createdAt,
+                               MemberSimpleInfo memberSimpleInfo) {
             this.id = id;
             this.title = title;
             this.content = content;
@@ -54,22 +54,22 @@ public class BoardResponseDto {
 
         @Builder
         public ThreeHotInfo(Long boardId, String boardTitle, Long discussionId,
-            String discussionTitle, Long worryBoardId, String worryBoardTitle) {
+                            String discussionTitle, Long worryBoardId, String worryBoardTitle) {
             this.boardId = boardId;
             this.boardTitle =
-                boardTitle != null && boardTitle.length() >= 35
-                    ? boardTitle.substring(0, 35)
-                    : boardTitle;
+                    boardTitle != null && boardTitle.length() >= 35
+                            ? boardTitle.substring(0, 35)
+                            : boardTitle;
             this.discussionId = discussionId;
             this.discussionTitle =
-                discussionTitle != null && discussionTitle.length() >= 35
-                    ? discussionTitle.substring(0, 35)
-                    : discussionTitle;
+                    discussionTitle != null && discussionTitle.length() >= 35
+                            ? discussionTitle.substring(0, 35)
+                            : discussionTitle;
             this.worryBoardId = worryBoardId;
             this.worryBoardTitle =
-                worryBoardTitle != null && worryBoardTitle.length() >= 35
-                    ? worryBoardTitle.substring(0, 35)
-                    : worryBoardTitle;
+                    worryBoardTitle != null && worryBoardTitle.length() >= 35
+                            ? worryBoardTitle.substring(0, 35)
+                            : worryBoardTitle;
         }
     }
 
@@ -91,7 +91,7 @@ public class BoardResponseDto {
 
         @Builder
         public GetBoardRes(MemberSimpleInfo memberSimpleInfo, Board board, List<String> imgUrlList,
-            String createdAt, Long commentCount, Boolean isAllowed) {
+                           String createdAt, Long commentCount, Boolean isAllowed) {
             this.memberSimpleInfo = memberSimpleInfo;
             this.boardId = board.getId();
             this.title = board.getTitle();
@@ -102,5 +102,15 @@ public class BoardResponseDto {
             this.commentCount = commentCount;
             this.isAllowed = isAllowed;
         }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardHistory {
+        private int boardCount;         // 전체 게시글 수
+        private int boardCommentCount;  // 전체 게시글 댓글 수
+        private int likeCount1;         // 받은 좋아요의 수
+        private int likeCount2;         // 누른 좋아요의 수
     }
 }

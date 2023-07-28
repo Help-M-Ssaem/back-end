@@ -4,6 +4,7 @@ import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfi
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
@@ -14,6 +15,9 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,4 +78,17 @@ public class MemberController {
         memberService.modifyProfile(member, modifyProfile, multipartFile);
         return new ResponseEntity<>(200, HttpStatus.OK);
     }
+
+    /**
+     * [PATCH] 프로필 수정
+     */
+    @PatchMapping("/member/profile/{id}")
+    public ResponseEntity<Integer> getProfile(
+            @CurrentMember Member member, @RequestBody ModifyProfile modifyProfile,
+            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
+        memberService.modifyProfile(member, modifyProfile, multipartFile);
+        return new ResponseEntity<>(200, HttpStatus.OK);
+    }
+
+
 }
