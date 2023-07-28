@@ -19,7 +19,7 @@ public class BoardCommentController {
     private final BoardCommentService boardCommentService;
 
     //특정 게시글 상세 조회시 댓글 전체 조회
-    @GetMapping("/boards/comments/{boardId}")
+    @GetMapping("/boards/{boardId}/comments")
     public ResponseEntity<PageResponseDto<List<BoardCommentSimpleInfo>>> findBoardCommentListByBoardId(
         @CurrentMember Member member, @PathVariable(value = "boardId") Long boardId,
         @RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
