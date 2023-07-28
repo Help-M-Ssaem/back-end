@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -32,10 +31,8 @@ public class BoardImageService {
         boardImageRepository.deleteAllByBoard(board);
     }
 
-    public void uploadBoardImage(Board board, List<MultipartFile> multipartFiles) {
-        //multipartFiles 로 부터 파일 받아오기
-        List<S3Result> boardImageList = s3Service.uploadFile(multipartFiles);
-        //이미지 저장
+    public void uploadBoardImage(Board board, List<S3Result> boardImageList) {
+        //S3에 먼저 저장된 리스트를 받아와 DB에 이미지 저장
         if (!boardImageList.isEmpty()) {
             for (S3Result s3Result : boardImageList) {
                 uploadImage(s3Result.getImgUrl(), board);

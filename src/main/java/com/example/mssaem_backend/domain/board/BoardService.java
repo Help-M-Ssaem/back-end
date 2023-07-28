@@ -25,6 +25,8 @@ import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
+import com.example.mssaem_backend.global.s3.S3Service;
+import com.example.mssaem_backend.global.s3.dto.S3Result;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -49,6 +51,7 @@ public class BoardService {
     private final BoardImageRepository boardImageRepository;
     private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
+    private final S3Service s3Service;
 
     // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
@@ -97,16 +100,16 @@ public class BoardService {
                     board.getId(),
                     board.getTitle(),
                     board.getContent(),
-                    boardImageRepository.findImageUrlByBoardOrderById(board).orElse(null),
+                    board.getThumbnail(), //imgUrl
                     board.getMbti(),
                     board.getLikeCount(),
-                    boardCommentRepository.countByBoardAndStateTrue(board),
+                    board.getCommentCount(),
                     calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getDetailMbti(),
-                        badgeRepository.findNameMemberAndStateTrue(board.getMember()).orElse(null),
+                        board.getMember().getBadgeName(),
                         board.getMember().getProfileImageUrl()
                     )
                 )
@@ -117,15 +120,19 @@ public class BoardService {
 
     public String createBoard(Member member, PostBoardReq postBoardReq,
         List<MultipartFile> multipartFiles) {
+        //먼저 S3에 이미지 저장
+        List<S3Result> result = s3Service.uploadFile(multipartFiles);
+
         Board board = Board.builder()
             .title(postBoardReq.getTitle())
             .content(postBoardReq.getContent())
             .mbti(postBoardReq.getMbti())
             .member(member)
+            .thumbnail(result.get(0).getImgUrl()) //받아온 이미지 중 첫번째 사진 썸네일
             .build();
         boardRepository.save(board);
         if (multipartFiles != null) {
-            boardImageService.uploadBoardImage(board, multipartFiles);
+            boardImageService.uploadBoardImage(board, result);
         }
         return "게시글 생성 완료";
     }
@@ -143,7 +150,9 @@ public class BoardService {
             boardImageService.deleteBoardImage(board);
             //새로운 이미지 업로드
             if (multipartFiles != null) {
-                boardImageService.uploadBoardImage(board, multipartFiles);
+                //이미지 S3에 먼저 저장
+                List<S3Result> result = s3Service.uploadFile(multipartFiles);
+                boardImageService.uploadBoardImage(board, result);
             }
             return "게시글 수정 완료";
         } else {
