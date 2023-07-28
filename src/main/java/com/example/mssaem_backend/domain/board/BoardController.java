@@ -2,7 +2,6 @@ package com.example.mssaem_backend.domain.board;
 
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
-import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
@@ -143,11 +142,12 @@ public class BoardController {
      */
     @GetMapping("/boards/search")
     public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardListByKeywordAndMbti(
-        @RequestBody SearchBoardByMbtiReq searchBoardByMbtiReq,
+        @RequestBody SearchReq searchReq,
+        @RequestParam MbtiEnum mbti,
         @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            boardService.findBoardListByKeywordAndMbti(searchBoardByMbtiReq, page, size));
+            boardService.findBoardListByKeywordAndMbti(searchReq, mbti, page, size));
     }
 
 }
