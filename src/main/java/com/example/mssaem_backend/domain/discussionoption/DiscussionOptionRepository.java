@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface DiscussionOptionRepository extends JpaRepository<DiscussionOption, Long> {
 
     List<DiscussionOption> findDiscussionOptionByDiscussion(Discussion discussion);
+
+    void deleteAllByDiscussion(Discussion discussion);
 }

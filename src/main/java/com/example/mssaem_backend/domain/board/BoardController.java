@@ -2,7 +2,6 @@ package com.example.mssaem_backend.domain.board;
 
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
-import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
@@ -128,26 +127,16 @@ public class BoardController {
     }
 
     /**
-     * 전체 게시판 검색하기
-     */
-    @GetMapping("/boards/search-all")
-    public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardListByKeyword(
-        @RequestBody SearchReq searchReq,
-        @RequestParam int page,
-        @RequestParam int size) {
-        return ResponseEntity.ok(boardService.findBoardListByKeyword(searchReq, page, size));
-    }
-
-    /**
-     * Mbti 카테고리 별 검색하기
+     * 게시글 검색하기
      */
     @GetMapping("/boards/search")
     public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardListByKeywordAndMbti(
-        @RequestBody SearchBoardByMbtiReq searchBoardByMbtiReq,
+        @RequestBody SearchReq searchReq,
+        @RequestParam String strMbti,
         @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            boardService.findBoardListByKeywordAndMbti(searchBoardByMbtiReq, page, size));
+            boardService.findBoardListByKeywordAndMbti(searchReq, strMbti, page, size));
     }
 
 }

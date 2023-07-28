@@ -7,7 +7,6 @@ import static com.example.mssaem_backend.global.common.Time.calculateTime;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
-import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.SearchBoardByMbtiReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
@@ -137,7 +136,7 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
-        if(isMatch(member, board.getMember())) {
+        if (isMatch(member, board.getMember())) {
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
                 patchBoardReq.getMbti());
             //현재 저장된 이미지 삭제
@@ -267,32 +266,15 @@ public class BoardService {
             .build();
     }
 
-    // 전체 게시판 검색하기
-    public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeyword(
-        SearchReq searchReq, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-
-        Page<Board> boards = boardRepository.searchByType(searchReq.getType(),
-            searchReq.getKeyword(), pageRequest);
-
-        return new PageResponseDto<>(
-            boards.getNumber(),
-            boards.getTotalPages(),
-            setBoardSimpleInfo(
-                boards
-                    .stream()
-                    .collect(Collectors.toList()),
-                3)
-        );
-    }
-
     // Mbti 카테고리 별 검색하기
     public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeywordAndMbti(
-        SearchBoardByMbtiReq searchBoardByMbtiReq, int page, int size) {
+        SearchReq searchReq, String strMbti, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchBoardByMbtiReq.getType(),
-            searchBoardByMbtiReq.getKeyword(), searchBoardByMbtiReq.getMbti(), pageRequest);
+        MbtiEnum mbti = strMbti.equals("ALL") ? null : MbtiEnum.valueOf(strMbti);
+
+        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchReq.getType(),
+            searchReq.getKeyword(), mbti, pageRequest);
 
         return new PageResponseDto<>(
             boards.getNumber(),

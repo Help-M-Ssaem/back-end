@@ -35,4 +35,19 @@ public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
     Page<Member> findSolveMemberWithMoreThanOneIdAndIsSolvedTrueAndStateTrue(
         @Param("oneMonthAgo") LocalDateTime oneMonthAgo, PageRequest pageRequest);
 
+    // 고민글 검색하기
+    @Query("SELECT wb FROM WorryBoard wb WHERE"
+        + "(    (:type = 0 AND (LOWER(wb.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(wb.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
+        + " OR (:type = 1 AND LOWER(wb.title) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:type = 2 AND LOWER(wb.content) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:type = 3 AND LOWER(wb.member.nickName) LIKE LOWER(CONCAT('%', :keyword, '%'))) )"
+        + " AND wb.isSolved = :isSolved AND (:fromMbti IS NULL OR wb.member.mbti = :fromMbti) AND (:toMbti IS NULL OR wb.targetMbti = :toMbti)ORDER BY wb.createdAt DESC ")
+    Page<WorryBoard> searchWorriesBySolvedAndTypeAndMbti(
+        @Param("type") int type,
+        @Param("keyword") String keyword,
+        @Param("isSolved") Boolean isSolved,
+        @Param("fromMbti") MbtiEnum fromMbti,
+        @Param("toMbti") MbtiEnum toMbti,
+        Pageable pageable);
+
 }
