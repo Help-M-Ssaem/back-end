@@ -1,8 +1,8 @@
 package com.example.mssaem_backend.domain.boardcomment;
 
+import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
-import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
 import com.example.mssaem_backend.domain.boardcommentlike.BoardCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 public class BoardCommentService {
 
     private final BoardCommentRepository boardCommentRepository;
-    private final BadgeRepository badgeRepository;
     private final BoardCommentLikeRepository boardCommentLikeRepository;
 
     public List<BoardCommentSimpleInfo> setBoardCommentSimpleInfo(List<BoardComment> boardComments,
@@ -30,23 +29,21 @@ public class BoardCommentService {
         List<BoardCommentSimpleInfo> boardCommentSimpleInfoList = new ArrayList<>();
 
         for (BoardComment boardComment : boardComments) {
-            //해당 게시글을 보는 viewer 와 해당 댓글의 작성자와 같은지 확인(수정 또는 삭제를 위함)
-            Boolean isAllowed = (viewer != null && viewer.getId()
-                .equals(boardComment.getMember().getId()));
             boardCommentSimpleInfoList.add(
                 BoardCommentSimpleInfo.builder()
                     .boardComment(boardComment)
                     .createdAt(calculateTime(boardComment.getCreatedAt(), 3))
-                    .isAllowed(isAllowed)
-                    .isLiked(boardCommentLikeRepository.existsBoardCommentLikeByMemberAndStateIsTrueAndBoardCommentId(
-                        boardComment.getMember(), boardComment.getId())) //댓글 좋아요 눌렀는지 안눌렀는지 확인
+                    .isAllowed(isMatch(viewer,
+                        boardComment.getMember())) //해당 게시글을 보는 viewer 와 해당 댓글의 작성자와 같은지 확인
+                    .isLiked(
+                        boardCommentLikeRepository.existsBoardCommentLikeByMemberAndStateIsTrueAndBoardCommentId(
+                            boardComment.getMember(), boardComment.getId())) //댓글 좋아요 눌렀는지 안눌렀는지 확인
                     .memberSimpleInfo(
                         new MemberSimpleInfo(
                             boardComment.getMember().getId(),
                             boardComment.getMember().getNickName(),
                             boardComment.getMember().getDetailMbti(),
-                            badgeRepository.findNameMemberAndStateTrue(boardComment.getMember())
-                                .orElse(null),
+                            boardComment.getMember().getBadgeName(),
                             boardComment.getMember().getProfileImageUrl())
                     )
                     .build()
@@ -71,6 +68,4 @@ public class BoardCommentService {
                     .collect(Collectors.toList()), viewer)
         );
     }
-
-
 }
