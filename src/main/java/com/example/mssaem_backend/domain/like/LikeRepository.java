@@ -3,6 +3,7 @@ package com.example.mssaem_backend.domain.like;
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.member.Member;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
