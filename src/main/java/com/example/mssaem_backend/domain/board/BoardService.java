@@ -120,19 +120,28 @@ public class BoardService {
 
     public String createBoard(Member member, PostBoardReq postBoardReq,
         List<MultipartFile> multipartFiles) {
-        //먼저 S3에 이미지 저장
-        List<S3Result> result = s3Service.uploadFile(multipartFiles);
+        if (multipartFiles != null) { //이미지가 있는 경우
+            //먼저 S3에 이미지 저장
+            List<S3Result> result = s3Service.uploadFile(multipartFiles);
 
-        Board board = Board.builder()
-            .title(postBoardReq.getTitle())
-            .content(postBoardReq.getContent())
-            .mbti(postBoardReq.getMbti())
-            .member(member)
-            .thumbnail(result.get(0).getImgUrl()) //받아온 이미지 중 첫번째 사진 썸네일
-            .build();
-        boardRepository.save(board);
-        if (multipartFiles != null) {
+            Board board = Board.builder()
+                .title(postBoardReq.getTitle())
+                .content(postBoardReq.getContent())
+                .mbti(postBoardReq.getMbti())
+                .member(member)
+                .thumbnail(result.get(0).getImgUrl()) //받아온 이미지 중 첫번째 사진 썸네일
+                .build();
+            boardRepository.save(board);
             boardImageService.uploadBoardImage(board, result);
+        } else { //이미지가 없는 경우
+            Board board = Board.builder()
+                .title(postBoardReq.getTitle())
+                .content(postBoardReq.getContent())
+                .mbti(postBoardReq.getMbti())
+                .member(member)
+                .thumbnail(null) // 이미지 없으면 썸네일 null
+                .build();
+            boardRepository.save(board);
         }
         return "게시글 생성 완료";
     }
