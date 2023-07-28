@@ -1,15 +1,21 @@
 package com.example.mssaem_backend.domain.member;
 
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
+import com.example.mssaem_backend.domain.badge.BadgeService;
 import com.example.mssaem_backend.domain.board.Board;
+import com.example.mssaem_backend.domain.board.BoardService;
+import com.example.mssaem_backend.domain.discussion.DiscussionService;
+import com.example.mssaem_backend.domain.evaluation.EvaluationService;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfile;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberProfileInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
+import com.example.mssaem_backend.domain.worryboard.WorryBoardService;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import com.example.mssaem_backend.global.config.security.jwt.JwtTokenProvider;
@@ -43,6 +49,11 @@ public class MemberService {
     private final WorryBoardRepository worryBoardRepository;
     private final BadgeRepository badgeRepository;
     private final S3Service s3Service;
+    private final BadgeService badgeService;
+    private final EvaluationService evaluationService;
+    private final BoardService boardService;
+    private final DiscussionService discussionService;
+    private final WorryBoardService worryBoardService;
 
     public void save(Member member) {
         memberRepository.save(member);
@@ -145,5 +156,18 @@ public class MemberService {
         member.modifyMember(modifyProfile.getNickName(), modifyProfile.getIntroduction(),
                 profileImageUrl, modifyProfile.getMbti(), modifyProfile.getCaseSensitivity(),
                 badgeRepository.findNameByIdAndMember(modifyProfile.getBadgeId(), member));
+    }
+
+    public MemberProfileInfo getProfile(Long memberId) {
+        Member member = memberRepository.findByIdWithStatus(memberId)
+                .orElseThrow(()-> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+        return MemberProfileInfo.builder()
+                .teacherInfo(new TeacherInfo(member))
+                .badgeInfos(badgeService.findAllBadge(member))
+                .evaluationCount(evaluationService.countEvaluation(member))
+                .boardHistory(boardService.getBoardHistory(member))
+                .discussionHistory(discussionService.getDiscussionHistory(member))
+                .worryBoardHistory(worryBoardService.getWorryBoardHistory(member))
+                .build();
     }
 }

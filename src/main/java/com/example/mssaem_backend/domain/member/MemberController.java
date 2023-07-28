@@ -4,7 +4,8 @@ import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfi
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
-import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberProfileInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
@@ -80,14 +81,12 @@ public class MemberController {
     }
 
     /**
-     * [PATCH] 프로필 수정
+     * [GET] 프로필 조회
      */
-    @PatchMapping("/member/profile/{id}")
-    public ResponseEntity<Integer> getProfile(
-            @CurrentMember Member member, @RequestBody ModifyProfile modifyProfile,
-            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
-        memberService.modifyProfile(member, modifyProfile, multipartFile);
-        return new ResponseEntity<>(200, HttpStatus.OK);
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<MemberProfileInfo> getProfile(
+            @PathVariable("id") Long memberId) {
+        return new ResponseEntity<>(memberService.getProfile(memberId), HttpStatus.OK);
     }
 
 

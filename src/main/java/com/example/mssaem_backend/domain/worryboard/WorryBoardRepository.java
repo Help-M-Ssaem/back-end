@@ -50,4 +50,8 @@ public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
         @Param("toMbti") MbtiEnum toMbti,
         Pageable pageable);
 
+    Integer countAllByStateIsTrueAndMember(@Param("member") Member member);
+
+    Integer countALlBySolveMember(@Param("solveMember") Member solveMember);
+
 }

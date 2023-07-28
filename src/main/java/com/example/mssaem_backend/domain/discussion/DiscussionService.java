@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.domain.discussion;
 
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
+import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
@@ -189,4 +190,14 @@ public class DiscussionService {
                 3)
         );
     }
+
+    public DiscussionHistory getDiscussionHistory(Member member) {
+        return new DiscussionHistory(
+                discussionRepository.countAllByStateIsTrueAndMember(member),
+                discussionCommentRepository.countAllByStateIsTrueAndMember(member),
+                //수정 필요
+                0, 0
+        );
+    }
+
 }

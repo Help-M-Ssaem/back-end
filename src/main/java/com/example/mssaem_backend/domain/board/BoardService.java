@@ -7,6 +7,7 @@ import static com.example.mssaem_backend.global.common.Time.calculateTime;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardHistory;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
@@ -287,5 +288,13 @@ public class BoardService {
         );
     }
 
+    public BoardHistory getBoardHistory(Member member) {
+        return new BoardHistory(
+                boardRepository.countAllByStateIsTrueAndMember(member),
+                boardCommentRepository.countAllByStateIsTrueAndMember(member),
+                //수정 필요
+                0, 0
+                );
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.example.mssaem_backend.domain.badge;
+package com.example.mssaem_backend.domain.badge.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
