@@ -68,5 +68,15 @@ public class Member extends BaseTimeEntity {
         }
         return String.valueOf(charArray);
     }
+    public void modifyMember(String nickName, String introduction, String profileImageUrl,
+                             MbtiEnum mbti, String caseSensitivity, String badgeName) {
+        this.nickName = !nickName.equals("") ? nickName : this.nickName;
+        this.introduction = !introduction.equals(this.introduction) ? introduction : this.introduction;
+        this.profileImageUrl = !profileImageUrl.equals("") ? profileImageUrl : this.profileImageUrl;
+        this.mbti = !mbti.equals(this.mbti) ? mbti : this.mbti;
+        this.caseSensitivity = !caseSensitivity.equals("") ? caseSensitivity : this.caseSensitivity;
+        this.badgeName = !badgeName.equals("") ? badgeName : this.badgeName;
+    }
+
 
 }

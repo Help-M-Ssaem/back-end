@@ -1,23 +1,24 @@
 package com.example.mssaem_backend.domain.member;
 
+import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfile;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
+import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
 import jakarta.validation.Valid;
+
 import java.io.IOException;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
@@ -61,5 +62,16 @@ public class MemberController {
     @GetMapping("/teacher")
     public ResponseEntity<List<TeacherInfo>> findHotTeacherForHome() {
         return ResponseEntity.ok(memberService.findHotTeacherForHome());
+    }
+
+    /**
+     * [PATCH] 프로필 수정
+     */
+    @PatchMapping("/member/profile")
+    public ResponseEntity<Integer> modifyProfile(
+            @CurrentMember Member member, @RequestBody ModifyProfile modifyProfile,
+            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
+        memberService.modifyProfile(member, modifyProfile, multipartFile);
+        return new ResponseEntity<>(200, HttpStatus.OK);
     }
 }
