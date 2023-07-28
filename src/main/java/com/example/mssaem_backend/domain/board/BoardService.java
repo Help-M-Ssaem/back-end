@@ -11,7 +11,6 @@ import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleI
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
@@ -46,7 +45,6 @@ public class BoardService {
     private final LikeRepository likeRepository;
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
-    private final BoardImageRepository boardImageRepository;
     private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
 
@@ -97,16 +95,16 @@ public class BoardService {
                     board.getId(),
                     board.getTitle(),
                     board.getContent(),
-                    boardImageRepository.findImageUrlByBoardOrderById(board).orElse(null),
+                    board.getThumbnail(), //imgUrl
                     board.getMbti(),
                     board.getLikeCount(),
-                    boardCommentRepository.countByBoardAndStateTrue(board),
+                    board.getCommentCount(),
                     calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getDetailMbti(),
-                        badgeRepository.findNameMemberAndStateTrue(board.getMember()).orElse(null),
+                        board.getMember().getBadgeName(),
                         board.getMember().getProfileImageUrl()
                     )
                 )
@@ -115,18 +113,23 @@ public class BoardService {
         return boardSimpleInfos;
     }
 
+    @Transactional
     public String createBoard(Member member, PostBoardReq postBoardReq,
         List<MultipartFile> multipartFiles) {
+
         Board board = Board.builder()
             .title(postBoardReq.getTitle())
             .content(postBoardReq.getContent())
             .mbti(postBoardReq.getMbti())
             .member(member)
+            .thumbnail(null)
             .build();
-        boardRepository.save(board);
+
         if (multipartFiles != null) {
-            boardImageService.uploadBoardImage(board, multipartFiles);
+            String thumbnail = boardImageService.uploadBoardImage(board, multipartFiles);
+            board.changeThumbnail(thumbnail);
         }
+        boardRepository.save(board);
         return "게시글 생성 완료";
     }
 
@@ -143,6 +146,7 @@ public class BoardService {
             boardImageService.deleteBoardImage(board);
             //새로운 이미지 업로드
             if (multipartFiles != null) {
+                //이미지 S3에 먼저 저장
                 boardImageService.uploadBoardImage(board, multipartFiles);
             }
             return "게시글 수정 완료";
