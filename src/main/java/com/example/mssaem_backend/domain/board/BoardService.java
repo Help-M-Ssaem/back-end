@@ -247,6 +247,8 @@ public class BoardService {
         Member member = board.getMember();
         //게시글 수정, 삭제 권한 확인
         Boolean isAllowed = (isMatch(viewer, member));
+        //게시글 좋아요 눌렀는지 확인
+        Boolean isLiked = likeRepository.existsLikeByMemberAndStateIsTrueAndBoard(viewer, board);
 
         return GetBoardRes.builder()
             .memberSimpleInfo(
@@ -263,6 +265,7 @@ public class BoardService {
             .createdAt(calculateTime(board.getCreatedAt(), 2))
             .commentCount(boardCommentRepository.countByBoardAndStateTrue(board))
             .isAllowed(isAllowed)
+            .isLiked(isLiked)
             .build();
     }
 
