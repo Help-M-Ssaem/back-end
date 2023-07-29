@@ -2,7 +2,6 @@ package com.example.mssaem_backend.domain.boardimage;
 
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.global.s3.S3Service;
-import com.example.mssaem_backend.global.s3.dto.S3Result;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,23 +25,6 @@ public class BoardImageService {
         boardImageRepository.deleteAllByBoard(board);
     }
 
-    public String uploadBoardImage(Board board, List<MultipartFile> multipartFiles) {
-        //S3에 먼저 저장된 리스트를 받아와 DB에 이미지 저장
-        List<S3Result> s3ResultList = s3Service.uploadFile(multipartFiles);
-
-        List<BoardImage> boardImages = new ArrayList<>();
-
-        if (!s3ResultList.isEmpty()) {
-            for (S3Result s3Result : s3ResultList) {
-                boardImages.add(new BoardImage(board, s3Result.getImgUrl()));
-            }
-        }
-        boardImageRepository.saveAll(boardImages);
-
-        return s3ResultList.isEmpty() ? null : s3ResultList.get(0).getImgUrl();
-
-    }
-
     public void deleteBoardImage(Board board) {
         //현재 DB에 저장된 이미지 불러오기
         List<BoardImage> dbBoardImageList = loadImage(board.getId());
@@ -64,5 +46,24 @@ public class BoardImageService {
         return boardImageList.stream()
             .map(BoardImage::getImageUrl)
             .collect(Collectors.toList());
+    }
+
+    //이미지 S3에 저장 후 해당 파일에 대한 url 바로 반환
+    public String uploadFile(MultipartFile multipartFile) {
+        return s3Service.uploadImage(multipartFile);
+    }
+
+    //전달받은 imgUrl 리스트 DB에 저장
+    public String uploadBoardImageUrl(Board board, List<String> imgUrls) {
+        List<BoardImage> boardImages = new ArrayList<>();
+
+        if (!imgUrls.isEmpty()) {
+            for (String result : imgUrls) {
+                boardImages.add(new BoardImage(board, result));
+            }
+        }
+        boardImageRepository.saveAll(boardImages);
+
+        return imgUrls.isEmpty() ? null : imgUrls.get(0);
     }
 }
