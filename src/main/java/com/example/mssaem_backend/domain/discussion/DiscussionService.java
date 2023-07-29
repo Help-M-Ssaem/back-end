@@ -11,6 +11,7 @@ import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionReposi
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionInfo;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
+import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelected;
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelectedRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
@@ -244,12 +245,77 @@ public class DiscussionService {
     public String deleteDiscussion(Member member, Long id) {
         //삭제 권한 확인
         Discussion discussion = discussionRepository.findById(id)
-            .orElseThrow(()-> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+            .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
         match(member, discussion.getMember());
 
         discussionOptionService.deleteOption(discussion);
         discussion.deleteDiscussion();
 
         return "토론글 삭제완료";
+    }
+
+    //토론글 참여하기
+    @Transactional
+    public List<DiscussionOptionSelectedInfo> participateDiscussion(Member member, Long discussionId, Long discussionOptionId) {
+        Discussion discussion = discussionRepository.findById(discussionId)
+            .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+        DiscussionOption discussionOption = discussionOptionRepository.findById(discussionOptionId)
+            .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION_OPTION));
+
+        //첫 참여인지 변경인지 확인
+        DiscussionOptionSelected discussionOptionSelected =
+            discussionOptionSelectedRepository.findByDiscussionAndMemberAndStateTrue(discussion,
+                member);
+
+        //첫 참여라면
+        if (discussionOptionSelected == null) {
+            DiscussionOptionSelected newDiscussionOptionSelected = DiscussionOptionSelected.builder()
+                .discussionOption(discussionOption)
+                .member(member)
+                .build();
+
+
+            //discussion과 count수 증가
+            discussion.plusCount();
+            discussionOptionSelectedRepository.save(newDiscussionOptionSelected);
+
+        } else {
+            //이전에 선택했던 옵션과 optionSelected
+            DiscussionOption beforeDiscussionOption = discussionOptionSelectedRepository.findDiscussionOptionByDiscussionAndMemberAndStateTrue(
+                discussion, member);
+            DiscussionOptionSelected beforeDiscussionOptionSelected = discussionOptionSelectedRepository.findDiscussionOptionSelectedByMemberAndDiscussionOptionAndStateTrue(
+                member, beforeDiscussionOption);
+
+            // 이전 변경으로 인해 discussionOptionSelected가 false상태로 있는지 확인
+            DiscussionOptionSelected newDiscussionOptionSelected1 =
+                discussionOptionSelectedRepository.findDiscussionOptionSelectedByMemberAndDiscussionOptionAndStateTrue(
+                    member, discussionOption);
+
+            if (newDiscussionOptionSelected1 != null) {
+                newDiscussionOptionSelected1.changeSelected();
+            } else {
+                // discussionOptionSelected가 없다면
+                DiscussionOptionSelected newDiscussionOptionSelected2 = DiscussionOptionSelected.builder()
+                    .discussionOption(discussionOption)
+                    .member(member)
+                    .build();
+
+                discussionOptionSelectedRepository.save(newDiscussionOptionSelected2);
+            }
+
+            //이전에 선택한 option과 optionSelected count 감소
+            beforeDiscussionOption.minusCount();
+            beforeDiscussionOptionSelected.changeUnselected();
+        }
+
+        //option count수 증가
+        discussionOption.plusCount();
+
+        //해당 토론의 참여율 계산해서 반환
+        List<Discussion> discussions = new ArrayList<>();
+        discussions.add(discussion);
+        List<DiscussionOption> discussionOptions = discussionOptionRepository.findDiscussionOptionByDiscussion(discussion);
+        int selectedOptionIdx = getSelectedOptionIdx(member, discussionOptions);
+        return setDiscussionOptionSelectedInfo(discussion.getParticipantCount(), discussionOptions, selectedOptionIdx);
     }
 }

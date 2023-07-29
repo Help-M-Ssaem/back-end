@@ -2,6 +2,8 @@ package com.example.mssaem_backend.domain.discussion;
 
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
+import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
+import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -9,6 +11,7 @@ import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -86,5 +89,17 @@ public class DiscussionController {
         @PathVariable Long id) {
         return ResponseEntity.ok(
             discussionService.deleteDiscussion(member, id));
+    }
+
+    /**
+     * 토론글 참여하기
+     */
+    @PostMapping("/member/discussions/{discussionId}/discussion-options/{discussionOptionId}")
+    public ResponseEntity<List<DiscussionOptionSelectedInfo>> selectDiscussion(@CurrentMember Member member,
+        @PathVariable Long discussionId,
+        @PathVariable Long discussionOptionId
+    ) {
+        return ResponseEntity.ok(
+            discussionService.participateDiscussion(member, discussionId, discussionOptionId));
     }
 }
