@@ -1,18 +1,26 @@
 package com.example.mssaem_backend.domain.board;
 
-import com.example.mssaem_backend.domain.badge.Badge;
+import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
+import static com.example.mssaem_backend.global.common.CheckWriter.match;
+import static com.example.mssaem_backend.global.common.Time.calculateTime;
+
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardimage.BoardImage;
-import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
+import com.example.mssaem_backend.domain.discussion.Discussion;
+import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
 import com.example.mssaem_backend.domain.like.LikeRepository;
+import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
-import com.example.mssaem_backend.global.common.Time;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
+import com.example.mssaem_backend.domain.worryboard.WorryBoard;
+import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
@@ -24,6 +32,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +45,8 @@ public class BoardService {
     private final LikeRepository likeRepository;
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
-    private final BoardImageRepository boardImageRepository;
+    private final DiscussionRepository discussionRepository;
+    private final WorryBoardRepository worryBoardRepository;
 
     // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
@@ -54,18 +64,18 @@ public class BoardService {
                 boards
                     .stream()
                     .collect(Collectors.toList()),
-                1)
+                3)
         );
     }
 
+    // 홈 화면 - 최상위 제외한 HOT 게시물 4개만 조회
     public List<BoardSimpleInfo> findHotBoardListForHome() {
         PageRequest pageRequest = PageRequest.of(0, 5);
         List<Board> boards =
             likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
-                    LocalDateTime.now().minusDays(3)
-                    , pageRequest
-                )
-                .stream()
+                    LocalDateTime.now().minusDays(3),
+                    pageRequest
+                ).stream()
                 .collect(Collectors.toList());
         if (!boards.isEmpty()) {
             boards.remove(0);
@@ -85,18 +95,16 @@ public class BoardService {
                     board.getId(),
                     board.getTitle(),
                     board.getContent(),
-                    boardImageRepository.findTopByBoardOrderById(board).orElse(new BoardImage())
-                        .getImageUrl(),
+                    board.getThumbnail(), //imgUrl
                     board.getMbti(),
                     board.getLikeCount(),
-                    boardCommentRepository.countByBoardAndStateTrue(board),
-                    Time.calculateTime(board.getCreatedAt(), dateType),
+                    board.getCommentCount(),
+                    calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
-                        board.getMember().getMbti(),
-                        badgeRepository.findBadgeByMemberAndStateTrue(board.getMember())
-                            .orElse(new Badge()).getName(),
+                        board.getMember().getDetailMbti(),
+                        board.getMember().getBadgeName(),
                         board.getMember().getProfileImageUrl()
                     )
                 )
@@ -105,18 +113,23 @@ public class BoardService {
         return boardSimpleInfos;
     }
 
+    @Transactional
     public String createBoard(Member member, PostBoardReq postBoardReq,
         List<MultipartFile> multipartFiles) {
+
         Board board = Board.builder()
             .title(postBoardReq.getTitle())
             .content(postBoardReq.getContent())
             .mbti(postBoardReq.getMbti())
             .member(member)
+            .thumbnail(null)
             .build();
-        boardRepository.save(board);
+
         if (multipartFiles != null) {
-            boardImageService.uploadBoardImage(board, multipartFiles);
+            String thumbnail = boardImageService.uploadBoardImage(board, multipartFiles);
+            board.changeThumbnail(thumbnail);
         }
+        boardRepository.save(board);
         return "게시글 생성 완료";
     }
 
@@ -124,15 +137,16 @@ public class BoardService {
     public String modifyBoard(Member member, PatchBoardReq patchBoardReq, Long boardId,
         List<MultipartFile> multipartFiles) {
         Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
-        if (member.getId().equals(board.getMember().getId())) {
+        if (isMatch(member, board.getMember())) {
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
                 patchBoardReq.getMbti());
             //현재 저장된 이미지 삭제
             boardImageService.deleteBoardImage(board);
             //새로운 이미지 업로드
             if (multipartFiles != null) {
+                //이미지 S3에 먼저 저장
                 boardImageService.uploadBoardImage(board, multipartFiles);
             }
             return "게시글 수정 완료";
@@ -144,20 +158,139 @@ public class BoardService {
     @Transactional
     public String deleteBoard(Member member, Long boardId) {
         Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new BaseException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         if (board.isState()) {
             //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
-            if (member.getId().equals(board.getMember().getId())) {
-                //게시글 Soft Delete
-                board.deleteBoard();
-                //현재 저장된 이미지 삭제
-                boardImageService.deleteBoardImage(board);
-                return "게시글 삭제 완료";
-            } else {
-                throw new BaseException(BoardErrorCode.INVALID_MEMBER);
-            }
+            match(member, board.getMember());
+            //게시글 Soft Delete
+            board.deleteBoard();
+            //현재 저장된 이미지 삭제
+            boardImageService.deleteBoardImage(board);
+            return "게시글 삭제 완료";
         } else {
-            throw new BaseException(BoardErrorCode.BOARD_NOT_FOUND);
+            throw new BaseException(BoardErrorCode.EMPTY_BOARD);
         }
+    }
+
+    // 홈 화면에 보여줄 HOT 게시물, HOT 토론, 가장 최신 고민글 조회
+    public ThreeHotInfo findThreeHotForHome() {
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        List<Board> boards =
+            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
+                    LocalDateTime.now().minusDays(3)
+                    , pageRequest
+                )
+                .stream().toList();
+        List<Discussion> discussions =
+            discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
+                LocalDateTime.now().minusDays(3)
+                , pageRequest
+            ).stream().toList();
+        WorryBoard worryBoard = worryBoardRepository.findTopByStateFalseOrderByCreatedAtDesc();
+
+        return ThreeHotInfo.builder()
+            .boardId(!boards.isEmpty() ? boards.get(0).getId() : null)
+            .boardTitle(!boards.isEmpty() ? boards.get(0).getTitle() : null)
+            .discussionId(!discussions.isEmpty() ? discussions.get(0).getId() : null)
+            .discussionTitle(!discussions.isEmpty() ? discussions.get(0).getTitle() : null)
+            .worryBoardId(worryBoard != null ? worryBoard.getId() : null)
+            .worryBoardTitle(worryBoard != null ? worryBoard.getTitle() : null)
+            .build();
+
+    }
+
+
+    //게시글 전체 조회 , 게시글 상세 조회시 boardId 입력 받아 현재 게시글 제외하고 전체 조회
+    public PageResponseDto<List<BoardSimpleInfo>> findBoards(int page, int size, Long boardId) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Board> result = boardRepository.findAllByStateIsTrueAndId(boardId, pageable);
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setBoardSimpleInfo(
+                result
+                    .stream()
+                    .collect(Collectors.toList()), 3)
+        );
+    }
+
+    //Mbti 카테고리 별 게시글 전체 조회
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardsByMbti(MbtiEnum mbti, int page,
+        int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Board> result = boardRepository.findAllByStateIsTrueAndMbti(mbti, pageable);
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setBoardSimpleInfo(
+                result
+                    .stream()
+                    .collect(Collectors.toList()), 3)
+        );
+    }
+
+    //특정 멤버별 게시글 전체 조회
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardsByMemberId(Long id, int page,
+        int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Board> result = boardRepository.findAllByMemberIdAndStateIsTrue(id, pageable);
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setBoardSimpleInfo(
+                result
+                    .stream()
+                    .collect(Collectors.toList()), 3)
+        );
+    }
+
+    //게시글 상세 조회
+    public GetBoardRes findBoardById(Member viewer, Long id) {
+        Board board = boardRepository.findById(id)
+            .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
+        Member member = board.getMember();
+        //게시글 수정, 삭제 권한 확인
+        Boolean isAllowed = (isMatch(viewer, member));
+        //게시글 좋아요 눌렀는지 확인
+        Boolean isLiked = likeRepository.existsLikeByMemberAndStateIsTrueAndBoard(viewer, board);
+
+        return GetBoardRes.builder()
+            .memberSimpleInfo(
+                new MemberSimpleInfo(
+                    board.getMember().getId(),
+                    board.getMember().getNickName(),
+                    board.getMember().getDetailMbti(),
+                    badgeRepository.findNameMemberAndStateTrue(board.getMember()).orElse(null),
+                    board.getMember().getProfileImageUrl()
+                )
+            )
+            .board(board)
+            .imgUrlList(boardImageService.getImgUrls(board))
+            .createdAt(calculateTime(board.getCreatedAt(), 2))
+            .commentCount(boardCommentRepository.countByBoardAndStateTrue(board))
+            .isAllowed(isAllowed)
+            .isLiked(isLiked)
+            .build();
+    }
+
+    // Mbti 카테고리 별 검색하기
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeywordAndMbti(
+        SearchReq searchReq, String strMbti, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        MbtiEnum mbti = strMbti.equals("ALL") ? null : MbtiEnum.valueOf(strMbti);
+
+        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchReq.getType(),
+            searchReq.getKeyword(), mbti, pageRequest);
+
+        return new PageResponseDto<>(
+            boards.getNumber(),
+            boards.getTotalPages(),
+            setBoardSimpleInfo(
+                boards
+                    .stream()
+                    .collect(Collectors.toList()),
+                3)
+        );
     }
 }

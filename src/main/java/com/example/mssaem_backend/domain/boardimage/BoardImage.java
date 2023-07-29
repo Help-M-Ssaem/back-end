@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import org.hibernate.annotations.DynamicInsert;
 @DynamicInsert
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class BoardImage extends BaseTimeEntity {
 
@@ -31,11 +32,8 @@ public class BoardImage extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
 
-    public BoardImage(String imageUrl){
-        this.imageUrl = imageUrl;
-    }
-
-    public void setBoard(Board board) {
+    public BoardImage(Board board, String imageUrl) {
         this.board = board;
+        this.imageUrl = imageUrl;
     }
 }

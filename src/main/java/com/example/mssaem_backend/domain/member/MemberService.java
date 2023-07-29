@@ -1,6 +1,5 @@
 package com.example.mssaem_backend.domain.member;
 
-import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
@@ -12,7 +11,7 @@ import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import com.example.mssaem_backend.global.config.security.jwt.JwtTokenProvider;
-import com.example.mssaem_backend.global.config.security.oauth.KakaoLoginService;
+import com.example.mssaem_backend.global.config.security.oauth.SocialLoginService;
 import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -29,7 +28,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class MemberService {
 
-    private final KakaoLoginService kakaoLoginService;
+    private final SocialLoginService socialLoginService;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final WorryBoardRepository worryBoardRepository;
@@ -66,8 +65,8 @@ public class MemberService {
         String idToken = socialLoginToken.getIdToken();
         String email = "";
         switch (socialLoginType) {
-            case KAKAO -> email = kakaoLoginService.getEmail(idToken);
-            //case GOOGLE -> email =
+            case KAKAO -> email = socialLoginService.getKaKaoEmail(socialLoginService.getKaKaoAccessToken(idToken));
+            case GOOGLE -> email = socialLoginService.getGoogleEmail(socialLoginService.getGoogleAccessToken(idToken));
             //case NAVER -> email =
         }
 
@@ -102,7 +101,8 @@ public class MemberService {
     // 홈 화면에 보여줄 인기 M쌤 조회
     public List<TeacherInfo> findHotTeacherForHome() {
         PageRequest pageRequest = PageRequest.of(0, 4);
-        Page<Member> solveMembers = worryBoardRepository.findSolveMemberWithMoreThanOneIdAndStateTrue(
+        Page<Member> solveMembers = worryBoardRepository.findSolveMemberWithMoreThanOneIdAndIsSolvedTrueAndStateTrue(
+
             LocalDateTime.now().minusMonths(1),
             pageRequest);
         List<TeacherInfo> teacherInfos = new ArrayList<>();
@@ -112,10 +112,8 @@ public class MemberService {
                 new TeacherInfo(
                     solveMember.getId(),
                     solveMember.getNickName(),
-                    solveMember.getMbti(),
-                    badgeRepository.findBadgeByMemberAndStateTrue(solveMember)
-                        .orElse(new Badge())
-                        .getName(),
+                    solveMember.getDetailMbti(),
+                    badgeRepository.findNameMemberAndStateTrue(solveMember).orElse(null),
                     solveMember.getProfileImageUrl(),
                     solveMember.getIntroduction()
                 )

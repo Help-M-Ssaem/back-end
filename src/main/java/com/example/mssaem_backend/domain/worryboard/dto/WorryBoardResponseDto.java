@@ -24,11 +24,13 @@ public class WorryBoardResponseDto {
         private String content;
         private String createdAt;
         private List<String> imgList;
-        private Boolean isAllowed;
+        private Boolean isEditAllowed;
+        private Boolean isChatAllowed;
 
         @Builder
         public GetWorryRes(WorryBoard worryBoard, List<String> imgList,
-            MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isAllowed) {
+            MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed,
+            Boolean isChatAllowed) {
             this.worryBoardId = worryBoard.getId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.targetMbti = worryBoard.getTargetMbti();
@@ -36,7 +38,8 @@ public class WorryBoardResponseDto {
             this.content = worryBoard.getContent();
             this.createdAt = createdAt;
             this.imgList = imgList;
-            this.isAllowed = isAllowed;
+            this.isEditAllowed = isEditAllowed;
+            this.isChatAllowed = isChatAllowed;
         }
     }
 
@@ -65,5 +68,18 @@ public class WorryBoardResponseDto {
         }
     }
 
+    @Getter
+    @NoArgsConstructor
+    public static class PatchWorrySolvedRes {
+
+        private MemberSimpleInfo memberSimpleInfo;
+        private Long worryBoardId;
+
+        @Builder
+        public PatchWorrySolvedRes(MemberSimpleInfo memberSimpleInfo, Long worryBoardId) {
+            this.memberSimpleInfo = memberSimpleInfo;
+            this.worryBoardId = worryBoardId;
+        }
+    }
 }
 

@@ -3,7 +3,10 @@ package com.example.mssaem_backend.domain.boardimage;
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.global.s3.S3Service;
 import com.example.mssaem_backend.global.s3.dto.S3Result;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,13 +18,6 @@ public class BoardImageService {
     private final BoardImageRepository boardImageRepository;
     private final S3Service s3Service;
 
-    public String uploadImage(String boardImageUrl, Board board) {
-        BoardImage boardImage = new BoardImage(boardImageUrl);
-        boardImage.setBoard(board);
-        boardImageRepository.save(boardImage);
-        return "이미지 업로드 완료";
-    }
-
     public List<BoardImage> loadImage(Long boardId) {
         return boardImageRepository.findAllByBoardId(boardId);
     }
@@ -30,15 +26,21 @@ public class BoardImageService {
         boardImageRepository.deleteAllByBoard(board);
     }
 
-    public void uploadBoardImage(Board board, List<MultipartFile> multipartFiles) {
-        //multipartFiles 로 부터 파일 받아오기
-        List<S3Result> boardImageList = s3Service.uploadFile(multipartFiles);
-        //이미지 저장
-        if (!boardImageList.isEmpty()) {
-            for (S3Result s3Result : boardImageList) {
-                uploadImage(s3Result.getImgUrl(), board);
+    public String uploadBoardImage(Board board, List<MultipartFile> multipartFiles) {
+        //S3에 먼저 저장된 리스트를 받아와 DB에 이미지 저장
+        List<S3Result> s3ResultList = s3Service.uploadFile(multipartFiles);
+
+        List<BoardImage> boardImages = new ArrayList<>();
+
+        if (!s3ResultList.isEmpty()) {
+            for (S3Result s3Result : s3ResultList) {
+                boardImages.add(new BoardImage(board, s3Result.getImgUrl()));
             }
         }
+        boardImageRepository.saveAll(boardImages);
+
+        return s3ResultList.isEmpty() ? null : s3ResultList.get(0).getImgUrl();
+
     }
 
     public void deleteBoardImage(Board board) {
@@ -50,5 +52,17 @@ public class BoardImageService {
         }
         //DB에 저장된 이미지 삭제
         deleteImage(board);
+    }
+
+    //해당 게시글 이미지 url 리스트 가져오기
+    public List<String> getImgUrls(Board board) {
+        List<BoardImage> boardImageList = boardImageRepository.findAllByBoardId(board.getId());
+
+        if (boardImageList.isEmpty()) {
+            return Collections.singletonList("default");
+        }
+        return boardImageList.stream()
+            .map(BoardImage::getImageUrl)
+            .collect(Collectors.toList());
     }
 }
