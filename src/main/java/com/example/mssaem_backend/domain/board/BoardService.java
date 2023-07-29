@@ -47,8 +47,6 @@ public class BoardService {
     private final BadgeRepository badgeRepository;
     private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
-    private final BoardCommentService boardCommentService;
-    private final BadgeService badgeService;
 
     // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
