@@ -1,19 +1,16 @@
 package com.example.mssaem_backend.domain.board;
 
+import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
+import static com.example.mssaem_backend.global.common.CheckWriter.match;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
-import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
-import com.example.mssaem_backend.domain.badge.BadgeService;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardcomment.BoardCommentService;
-import com.example.mssaem_backend.domain.boardimage.BoardImage;
-import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
@@ -21,9 +18,9 @@ import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
-import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
@@ -48,7 +45,6 @@ public class BoardService {
     private final LikeRepository likeRepository;
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
-    private final BoardImageRepository boardImageRepository;
     private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
     private final BoardCommentService boardCommentService;
@@ -101,16 +97,16 @@ public class BoardService {
                     board.getId(),
                     board.getTitle(),
                     board.getContent(),
-                    boardImageRepository.findImageUrlByBoardOrderById(board).orElse(null),
+                    board.getThumbnail(), //imgUrl
                     board.getMbti(),
                     board.getLikeCount(),
-                    boardCommentRepository.countByBoardAndStateTrue(board),
-                    Time.calculateTime(board.getCreatedAt(), dateType),
+                    board.getCommentCount(),
+                    calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getDetailMbti(),
-                        badgeRepository.findNameMemberAndStateTrue(board.getMember()).orElse(null),
+                        board.getMember().getBadgeName(),
                         board.getMember().getProfileImageUrl()
                     )
                 )
@@ -119,18 +115,23 @@ public class BoardService {
         return boardSimpleInfos;
     }
 
+    @Transactional
     public String createBoard(Member member, PostBoardReq postBoardReq,
         List<MultipartFile> multipartFiles) {
+
         Board board = Board.builder()
             .title(postBoardReq.getTitle())
             .content(postBoardReq.getContent())
             .mbti(postBoardReq.getMbti())
             .member(member)
+            .thumbnail(null)
             .build();
-        boardRepository.save(board);
+
         if (multipartFiles != null) {
-            boardImageService.uploadBoardImage(board, multipartFiles);
+            String thumbnail = boardImageService.uploadBoardImage(board, multipartFiles);
+            board.changeThumbnail(thumbnail);
         }
+        boardRepository.save(board);
         return "게시글 생성 완료";
     }
 
@@ -140,13 +141,14 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
-        if (member.getId().equals(board.getMember().getId())) {
+        if (isMatch(member, board.getMember())) {
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
                 patchBoardReq.getMbti());
             //현재 저장된 이미지 삭제
             boardImageService.deleteBoardImage(board);
             //새로운 이미지 업로드
             if (multipartFiles != null) {
+                //이미지 S3에 먼저 저장
                 boardImageService.uploadBoardImage(board, multipartFiles);
             }
             return "게시글 수정 완료";
@@ -161,15 +163,12 @@ public class BoardService {
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         if (board.isState()) {
             //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
-            if (member.getId().equals(board.getMember().getId())) {
-                //게시글 Soft Delete
-                board.deleteBoard();
-                //현재 저장된 이미지 삭제
-                boardImageService.deleteBoardImage(board);
-                return "게시글 삭제 완료";
-            } else {
-                throw new BaseException(BoardErrorCode.INVALID_MEMBER);
-            }
+            match(member, board.getMember());
+            //게시글 Soft Delete
+            board.deleteBoard();
+            //현재 저장된 이미지 삭제
+            boardImageService.deleteBoardImage(board);
+            return "게시글 삭제 완료";
         } else {
             throw new BaseException(BoardErrorCode.EMPTY_BOARD);
         }
@@ -253,7 +252,9 @@ public class BoardService {
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         Member member = board.getMember();
         //게시글 수정, 삭제 권한 확인
-        Boolean isAllowed = (viewer != null && viewer.getId().equals(member.getId()));
+        Boolean isAllowed = (isMatch(viewer, member));
+        //게시글 좋아요 눌렀는지 확인
+        Boolean isLiked = likeRepository.existsLikeByMemberAndStateIsTrueAndBoard(viewer, board);
 
         return GetBoardRes.builder()
             .memberSimpleInfo(
@@ -270,6 +271,28 @@ public class BoardService {
             .createdAt(calculateTime(board.getCreatedAt(), 2))
             .commentCount(boardCommentRepository.countByBoardAndStateTrue(board))
             .isAllowed(isAllowed)
+            .isLiked(isLiked)
             .build();
+    }
+
+    // Mbti 카테고리 별 검색하기
+    public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeywordAndMbti(
+        SearchReq searchReq, String strMbti, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        MbtiEnum mbti = strMbti.equals("ALL") ? null : MbtiEnum.valueOf(strMbti);
+
+        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchReq.getType(),
+            searchReq.getKeyword(), mbti, pageRequest);
+
+        return new PageResponseDto<>(
+            boards.getNumber(),
+            boards.getTotalPages(),
+            setBoardSimpleInfo(
+                boards
+                    .stream()
+                    .collect(Collectors.toList()),
+                3)
+        );
     }
 }

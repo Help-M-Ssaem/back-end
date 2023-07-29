@@ -29,7 +29,8 @@ public class WorryBoardResponseDto {
 
         @Builder
         public GetWorryRes(WorryBoard worryBoard, List<String> imgList,
-            MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed, Boolean isChatAllowed) {
+            MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed,
+            Boolean isChatAllowed) {
             this.worryBoardId = worryBoard.getId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.targetMbti = worryBoard.getTargetMbti();

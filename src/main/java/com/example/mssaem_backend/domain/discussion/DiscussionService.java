@@ -1,17 +1,24 @@
 package com.example.mssaem_backend.domain.discussion;
 
+import static com.example.mssaem_backend.global.common.CheckWriter.match;
+
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
+import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
+import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionInfo;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelectedRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
+import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionErrorCode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +27,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
 public class DiscussionService {
 
     private final DiscussionRepository discussionRepository;
+    private final DiscussionOptionService discussionOptionService;
     private final DiscussionOptionRepository discussionOptionRepository;
     private final DiscussionOptionSelectedRepository discussionOptionSelectedRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
+
 
     // HOT 토론글 더보기 조회
     public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionList(Member member,
@@ -96,7 +107,8 @@ public class DiscussionService {
                         discussion.getMember().getId(),
                         discussion.getMember().getNickName(),
                         discussion.getMember().getDetailMbti(),
-                        badgeRepository.findNameMemberAndStateTrue(discussion.getMember()).orElse(null),
+                        badgeRepository.findNameMemberAndStateTrue(discussion.getMember())
+                            .orElse(null),
                         discussion.getMember().getProfileImageUrl()
                     ),
                     selectedOptionIdx != -1
@@ -127,7 +139,7 @@ public class DiscussionService {
         return selectedOptionIdx;
     }
 
-    // 로그인한 유저가 옵션을 선택한 경우 고민글 옵션 정보 Dto에 저장
+    // 로그인한 유저가 옵션을 선택한 경우 고민글 옵션 정보 Dto에 매핑
     private List<DiscussionOptionSelectedInfo> setDiscussionOptionSelectedInfo(Long participants,
         List<DiscussionOption> discussionOptions, int selectedOptionIdx) {
 
@@ -168,5 +180,76 @@ public class DiscussionService {
             );
         }
         return discussionOptionInfos;
+    }
+
+    public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussionListByKeyword(Member member,
+        SearchReq searchReq, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Discussion> discussions = discussionRepository.searchByType(searchReq.getType(),
+            searchReq.getKeyword(), pageRequest);
+
+        return new PageResponseDto<>(
+            discussions.getNumber(),
+            discussions.getTotalPages(),
+            setDiscussionSimpleInfo(
+                member,
+                discussions
+                    .stream()
+                    .collect(Collectors.toList()),
+                3)
+        );
+    }
+
+
+    //토른글 생성하기
+    @Transactional
+    public String createDiscussion(Member member, List<MultipartFile> multipartFiles,
+        DiscussionReq postDiscussionReq) {
+        //Discussion 생성
+        Discussion discussion = Discussion.builder()
+            .title(postDiscussionReq.getTitle())
+            .content(postDiscussionReq.getContent())
+            .member(member)
+            .build();
+        discussionRepository.save(discussion);
+
+        //DiscussionOption 생성
+        discussionOptionService.createOption(discussion, postDiscussionReq, multipartFiles);
+        return "토론글 생성완료";
+    }
+
+    //토론글 수정하기
+    @Transactional
+    public String modifyDiscussion(Member member, Long id, DiscussionReq patchDiscussionReq,
+        List<MultipartFile> multipartFiles) {
+        //수정 권한 확인
+        Discussion discussion = discussionRepository.findById(id)
+            .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+        match(member, discussion.getMember());
+
+        //discussion 수정하기
+        discussion.modifyDiscussion(
+            patchDiscussionReq.getTitle(),
+            patchDiscussionReq.getContent()
+        );
+
+        discussionOptionService.deleteOption(discussion);
+        discussionOptionService.createOption(discussion, patchDiscussionReq, multipartFiles);
+
+        return "토론글 수정완료";
+    }
+
+    //토론글 삭제하기
+    @Transactional
+    public String deleteDiscussion(Member member, Long id) {
+        //삭제 권한 확인
+        Discussion discussion = discussionRepository.findById(id)
+            .orElseThrow(()-> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+        match(member, discussion.getMember());
+
+        discussionOptionService.deleteOption(discussion);
+        discussion.deleteDiscussion();
+
+        return "토론글 삭제완료";
     }
 }

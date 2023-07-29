@@ -1,5 +1,7 @@
 package com.example.mssaem_backend.domain.worryboard;
 
+import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
+import static com.example.mssaem_backend.global.common.CheckWriter.match;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
 import com.example.mssaem_backend.domain.badge.BadgeService;
@@ -7,6 +9,7 @@ import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
@@ -40,14 +43,8 @@ public class WorryBoardService {
     private List<GetWorriesRes> makeGetWorriesResForm(Page<WorryBoard> result) {
         return result.stream().map(worryBoard -> GetWorriesRes.builder().worryBoard(worryBoard)
             .imgUrl(worryBoardImageService.getImgUrl(worryBoard))
-            .createdAt(calculateTime(worryBoard.getCreatedAt(), 3)).build()).toList();
-    }
-
-    //현재 멤버와 작성자가 같은지 확인하는 함수
-    private void isMatchMemberWithAuthor(Member currentMember, WorryBoard worryBoard) {
-        if (!currentMember.getId().equals(worryBoard.getMember().getId())) {
-            throw new BaseException(MemberErrorCode.INVALID_MEMBER);
-        }
+            .createdAt(calculateTime(worryBoard.getCreatedAt(), 3))
+            .build()).toList();
     }
 
     //고민게시판 - 고민 목록 조회
@@ -67,8 +64,7 @@ public class WorryBoardService {
         Member member = worryBoard.getMember();
 
         //수정,삭제 권한 확인
-        Boolean isEditAllowed = (viewer != null && viewer.getId()
-            .equals(worryBoard.getMember().getId()));
+        Boolean isEditAllowed = isMatch(viewer, worryBoard.getMember());
 
         //채팅 시작 권한 확인
         Boolean isChatAllowed = (viewer != null && viewer.getMbti()
@@ -152,7 +148,7 @@ public class WorryBoardService {
         PatchWorrySolvedReq patchWorryReq) {
         WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
-        isMatchMemberWithAuthor(currentMember, worryBoard);
+        match(currentMember, worryBoard.getMember());
 
         Member solveMember = memberRepository.findById(patchWorryReq.getWorrySolverId())
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
@@ -199,7 +195,7 @@ public class WorryBoardService {
         if (!currentMember.getId().equals(worryBoard.getMember().getId())) {
             throw new BaseException(MemberErrorCode.INVALID_MEMBER);
         }
-        isMatchMemberWithAuthor(currentMember, worryBoard);
+        match(currentMember, worryBoard.getMember());
 
         //worryBoard 수정하기
         worryBoard.modifyWorryBoard(
@@ -222,11 +218,43 @@ public class WorryBoardService {
         //현재 멤버와 작성자 일치하는 지 확인
         WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
-        isMatchMemberWithAuthor(currentMember, worryBoard);
+        match(currentMember, worryBoard.getMember());
 
         worryBoard.deleteWorryBoard();
         worryBoardImageService.deleteWorryImage(worryBoard);
 
         return "고민글 삭제 완료";
+    }
+
+    // 해결된 고민글 중에서 검색하기
+    public PageResponseDto<List<GetWorriesRes>> findSolvedWorriesByKeywordAndMbti(
+        SearchReq searchReq, String strFromMbti, String strToMbti, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        // ALL인 경우에 mbti에는 null값이 들어감
+        MbtiEnum fromMbti = strFromMbti.equals("ALL") ? null : MbtiEnum.valueOf(strFromMbti);
+        MbtiEnum toMbti = strToMbti.equals("ALL") ? null : MbtiEnum.valueOf(strToMbti);
+
+        Page<WorryBoard> worryBoards = worryBoardRepository.searchWorriesBySolvedAndTypeAndMbti(
+            searchReq.getType(), searchReq.getKeyword(), true, fromMbti, toMbti, pageRequest);
+
+        return new PageResponseDto<>(worryBoards.getNumber(), worryBoards.getTotalPages(),
+            makeGetWorriesResForm(worryBoards));
+    }
+
+    // 해결 안 된 고민글 중에서 검색하기
+    public PageResponseDto<List<GetWorriesRes>> findWaitingWorriesByKeywordAndMbti(
+        SearchReq searchReq, String strFromMbti, String strToMbti, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        // ALL인 경우에 mbti에는 null값이 들어감
+        MbtiEnum fromMbti = strFromMbti.equals("ALL") ? null : MbtiEnum.valueOf(strFromMbti);
+        MbtiEnum toMbti = strToMbti.equals("ALL") ? null : MbtiEnum.valueOf(strToMbti);
+
+        Page<WorryBoard> worryBoards = worryBoardRepository.searchWorriesBySolvedAndTypeAndMbti(
+            searchReq.getType(), searchReq.getKeyword(), false, fromMbti, toMbti, pageRequest);
+
+        return new PageResponseDto<>(worryBoards.getNumber(), worryBoards.getTotalPages(),
+            makeGetWorriesResForm(worryBoards));
     }
 }

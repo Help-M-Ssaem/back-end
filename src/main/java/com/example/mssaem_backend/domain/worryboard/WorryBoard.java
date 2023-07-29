@@ -60,6 +60,8 @@ public class WorryBoard extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long hits;
 
+    private String thumbnail;
+
     @Builder
     public WorryBoard(String title, String content, MbtiEnum targetMbti,
         Member member) {

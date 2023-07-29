@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.domain.worryboard;
 
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
@@ -124,4 +125,36 @@ public class WorryBoardController {
         return ResponseEntity.ok(
             worryBoardService.deleteWorryBoard(currentMember, id));
     }
+
+    /**
+     * 해결한 고민글 검색하기
+     */
+    @GetMapping("/worry-board/solved/search")
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findSolvedWorriesByKeywordAndMbti(
+        @RequestBody SearchReq searchReq,
+        @RequestParam String strFromMbti,
+        @RequestParam String strToMbti,
+        @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(
+            worryBoardService.findSolvedWorriesByKeywordAndMbti(searchReq, strFromMbti, strToMbti,
+                page, size));
+    }
+
+    /**
+     * 해결 안 된 고민글 전체 검색하기
+     */
+    @GetMapping("/worry-board/waiting/search")
+    public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWaitingWorriesByKeywordAndMbti(
+        @RequestBody SearchReq searchReq,
+        @RequestParam String strFromMbti,
+        @RequestParam String strToMbti,
+        @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(
+            worryBoardService.findWaitingWorriesByKeywordAndMbti(searchReq, strFromMbti, strToMbti,
+                page, size));
+    }
+
+
 }
