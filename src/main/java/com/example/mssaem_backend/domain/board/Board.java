@@ -82,4 +82,12 @@ public class Board extends BaseTimeEntity {
     public void changeThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount--;
+    }
 }
