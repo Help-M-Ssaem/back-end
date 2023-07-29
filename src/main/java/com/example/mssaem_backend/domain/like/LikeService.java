@@ -19,8 +19,7 @@ public class LikeService {
         //해당 Board Like가 member, boardId 에 대해 존재하는지 확인
         if (likeRepository.existsLikeByMemberAndBoardId(member, boardId)) {
             //존재한다면 해당 Like 상태 변경
-            Like like = likeRepository.findByMemberAndBoardId(member, boardId);
-            like.updateBoardLike();
+            likeRepository.findByMemberAndBoardId(member, boardId).updateBoardLike();
         } else {
             //존재하지 않는다면 새로운 Like 추가
             likeRepository.save(
