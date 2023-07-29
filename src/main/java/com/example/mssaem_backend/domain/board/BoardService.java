@@ -34,7 +34,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -115,7 +114,7 @@ public class BoardService {
 
     @Transactional
     public String createBoard(Member member, PostBoardReq postBoardReq,
-        List<MultipartFile> multipartFiles) {
+        List<String> imgUrls) {
 
         Board board = Board.builder()
             .title(postBoardReq.getTitle())
@@ -125,8 +124,8 @@ public class BoardService {
             .thumbnail(null)
             .build();
 
-        if (multipartFiles != null) {
-            String thumbnail = boardImageService.uploadBoardImage(board, multipartFiles);
+        if (imgUrls != null) {
+            String thumbnail = boardImageService.uploadBoardImageUrl(board, imgUrls);
             board.changeThumbnail(thumbnail);
         }
         boardRepository.save(board);
@@ -135,7 +134,7 @@ public class BoardService {
 
     @Transactional
     public String modifyBoard(Member member, PatchBoardReq patchBoardReq, Long boardId,
-        List<MultipartFile> multipartFiles) {
+        List<String> imgUrls) {
         Board board = boardRepository.findById(boardId)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
@@ -145,9 +144,9 @@ public class BoardService {
             //현재 저장된 이미지 삭제
             boardImageService.deleteBoardImage(board);
             //새로운 이미지 업로드
-            if (multipartFiles != null) {
-                //이미지 S3에 먼저 저장
-                boardImageService.uploadBoardImage(board, multipartFiles);
+            if (imgUrls != null) {
+                //이미지 DB에 저장
+                boardImageService.uploadBoardImageUrl(board, imgUrls);
             }
             return "게시글 수정 완료";
         } else {

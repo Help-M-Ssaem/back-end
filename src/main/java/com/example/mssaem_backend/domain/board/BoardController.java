@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
@@ -62,8 +61,8 @@ public class BoardController {
     @PostMapping("/member/boards")
     public ResponseEntity<String> createBoard(@CurrentMember Member member,
         @RequestPart(value = "postBoardReq") PostBoardReq postBoardReq,
-        @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
-        return ResponseEntity.ok(boardService.createBoard(member, postBoardReq, multipartFiles));
+        @RequestPart(value = "image", required = false) List<String> imgUrls) {
+        return ResponseEntity.ok(boardService.createBoard(member, postBoardReq, imgUrls));
     }
 
     /**
@@ -73,9 +72,9 @@ public class BoardController {
     public ResponseEntity<String> modifyBoard(@CurrentMember Member member,
         @RequestPart(value = "patchBoardReq") PatchBoardReq patchBoardReq,
         @PathVariable(value = "id") Long id,
-        @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
+        @RequestPart(value = "image", required = false) List<String> imgUrls) {
         return ResponseEntity.ok(
-            boardService.modifyBoard(member, patchBoardReq, id, multipartFiles));
+            boardService.modifyBoard(member, patchBoardReq, id, imgUrls));
     }
 
     /**
