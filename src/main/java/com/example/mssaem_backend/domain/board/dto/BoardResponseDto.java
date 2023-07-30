@@ -89,6 +89,7 @@ public class BoardResponseDto {
         private Long commentCount;
         private Boolean isAllowed; //게시글 수정 삭제 권한 확인
         private Boolean isLiked; //게시글 좋아요 눌렀는지 확인
+        private MbtiEnum boardMbti; //게시글 MBTI
 
         @Builder
         public GetBoardRes(MemberSimpleInfo memberSimpleInfo, Board board, List<String> imgUrlList,
@@ -103,6 +104,7 @@ public class BoardResponseDto {
             this.commentCount = commentCount;
             this.isAllowed = isAllowed;
             this.isLiked = isLiked;
+            this.boardMbti = board.getMbti();
         }
     }
 }
