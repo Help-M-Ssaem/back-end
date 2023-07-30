@@ -6,7 +6,11 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.mssaem_backend.global.s3.dto.S3Result;
-import java.util.StringTokenizer;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -14,12 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @PropertySource("classpath:application.yml")
@@ -44,7 +42,8 @@ public class S3Service {
         try {
             return fileName.substring(fileName.lastIndexOf("."));
         } catch (StringIndexOutOfBoundsException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일(" + fileName + ") 입니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "잘못된 형식의 파일(" + fileName + ") 입니다.");
         }
     }
 
@@ -58,13 +57,15 @@ public class S3Service {
             objectMetadata.setContentLength(file.getSize());
             objectMetadata.setContentType(file.getContentType());
 
-            try(InputStream inputStream = file.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+            try (InputStream inputStream = file.getInputStream()) {
+                s3Client.putObject(
+                    new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
-            } catch(IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "파일 업로드에 실패했습니다.");
             }
-            fileList.add(new S3Result(s3Client.getUrl(bucket,fileName).toString()));
+            fileList.add(new S3Result(s3Client.getUrl(bucket, fileName).toString()));
         });
         return fileList;
     }
@@ -73,8 +74,27 @@ public class S3Service {
         s3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 
-    public String parseFileName(String imgURl){
+    public String parseFileName(String imgURl) {
         String[] st = imgURl.split("/");
-        return st[st.length-1];
+        return st[st.length - 1];
+    }
+
+    //파일 하나만 받아 S3에 저장 후 url 반환
+    public String uploadImage(MultipartFile multipartFile) {
+        S3Result fileResult;
+
+        String fileName = createFileName(multipartFile.getOriginalFilename());
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
+
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            s3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+        }
+        fileResult = new S3Result(s3Client.getUrl(bucket, fileName).toString());
+        return fileResult.getImgUrl();
     }
 }
