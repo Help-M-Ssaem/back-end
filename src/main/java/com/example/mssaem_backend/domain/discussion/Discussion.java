@@ -66,4 +66,8 @@ public class Discussion extends BaseTimeEntity {
     public void deleteDiscussion() {
         this.state = false;
     }
+
+    public void increaseCount() {
+        this.participantCount +=1;
+    }
 }

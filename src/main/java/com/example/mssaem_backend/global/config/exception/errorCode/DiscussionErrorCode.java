@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum DiscussionErrorCode implements ErrorCode {
     EMPTY_DISCUSSION("DISCUSSION_001", "존재하지 않는 토론글입니다.", HttpStatus.CONFLICT),
+    EMPTY_DISCUSSION_OPTION("DISCUSSION_002", "존재하지 않는 옵션입니다.", HttpStatus.CONFLICT)
     ;
 
     private final String errorCode;

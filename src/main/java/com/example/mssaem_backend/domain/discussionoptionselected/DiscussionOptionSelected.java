@@ -10,9 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @DynamicInsert
@@ -33,4 +33,18 @@ public class DiscussionOptionSelected {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @Builder
+    DiscussionOptionSelected(DiscussionOption discussionOption, Member member) {
+        this.discussionOption = discussionOption;
+        this.member = member;
+    }
+
+    public void changeSelected() {
+        this.state = true;
+    }
+
+    public void changeUnselected() {
+        this.state = false;
+    }
 }
