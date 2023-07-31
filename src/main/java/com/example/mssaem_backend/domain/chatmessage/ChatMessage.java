@@ -39,7 +39,7 @@ public class ChatMessage extends BaseTimeEntity {
 
   private String message; // 메시지
 
-  private boolean state; //true : 확인, false : 확인 안함
+  private boolean state = false; //true : 확인, false : 확인 안함
 
   private String imgUrl;
 
@@ -56,6 +56,12 @@ public class ChatMessage extends BaseTimeEntity {
         .type(type)
         .build();
     return chatMessage;
+  }
+
+  public ChatMessage(MessageType type, String sender, ChatRoom chatRoom) {
+    this.type = type;
+    this.sender = sender;
+    this.chatRoom = chatRoom;
   }
 
   public void setSender(String sender) {
