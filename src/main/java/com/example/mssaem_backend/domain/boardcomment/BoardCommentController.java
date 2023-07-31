@@ -48,7 +48,7 @@ public class BoardCommentController {
      * 댓글 삭제
      */
     @DeleteMapping("/member/boards/{boardId}/comments/{commentId}")
-    public ResponseEntity<String> deleteBoardComment(@CurrentMember Member member,
+    public ResponseEntity<Boolean> deleteBoardComment(@CurrentMember Member member,
         @PathVariable(value = "boardId") Long boardId,
         @PathVariable(value = "commentId") Long commentId) {
         return ResponseEntity.ok(

@@ -99,7 +99,7 @@ public class BoardCommentService {
 
     //댓글 삭제
     @Transactional
-    public String deleteBoardComment(Member member, Long boardId, Long commentId) {
+    public Boolean deleteBoardComment(Member member, Long boardId, Long commentId) {
         BoardComment boardComment = boardCommentRepository.findByIdAndBoardIdAndStateIsTrue(
             commentId, boardId);
         //현재 로그인한 멤버와 댓글 작성자가 같은지 확인
@@ -109,6 +109,6 @@ public class BoardCommentService {
         } else {
             throw new BaseException(MemberErrorCode.INVALID_MEMBER);
         }
-        return "댓글이 삭제되었습니다.";
+        return boardComment.isState();
     }
 }
