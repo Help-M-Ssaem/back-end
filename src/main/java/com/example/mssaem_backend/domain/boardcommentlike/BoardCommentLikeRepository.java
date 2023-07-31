@@ -18,4 +18,9 @@ public interface BoardCommentLikeRepository extends JpaRepository<BoardCommentLi
     Page<BoardComment> findBoardCommentsByBoardIdWithMoreThanTenBoardCommentLikeAndStateTrue(
         PageRequest pageRequest, @Param("boardId") Long boardId);
 
+
+    BoardCommentLike findBoardCommentLikeByMemberAndBoardCommentId(Member member,
+        Long boardCommentId);
+
+    Boolean existsBoardCommentLikeByMemberAndBoardCommentId(Member member, Long bardCommentId);
 }
