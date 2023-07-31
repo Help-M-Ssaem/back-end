@@ -77,6 +77,7 @@ public class BoardCommentService {
         );
     }
 
+    //댓글 작성
     @Transactional
     public Boolean createBoardComment(Member member, Long boardId,
         PostBoardCommentReq postBoardCommentReq, Long commentId) {
@@ -96,16 +97,18 @@ public class BoardCommentService {
         return true;
     }
 
+    //댓글 삭제
     @Transactional
-    public Boolean deleteBoardComment(Member member, Long boardId, Long commentId) {
+    public String deleteBoardComment(Member member, Long boardId, Long commentId) {
         BoardComment boardComment = boardCommentRepository.findByIdAndBoardIdAndStateIsTrue(
             commentId, boardId);
         //현재 로그인한 멤버와 댓글 작성자가 같은지 확인
         if (isMatch(member, boardComment.getMember())) {
+            //같다면 삭제(삭제된 댓글입니다. 로 표시)
             boardComment.deleteBoardComment();
         } else {
             throw new BaseException(MemberErrorCode.INVALID_MEMBER);
         }
-        return true;
+        return "댓글이 삭제되었습니다.";
     }
 }

@@ -31,6 +31,9 @@ public class BoardCommentController {
             boardCommentService.findBoardCommentListByBoardId(member, boardId, page, size));
     }
 
+    /**
+     * 댓글 작성, 댓글 작성 시 @RequestParam 으로 commentId 값 받으면 대댓글 작성
+     */
     @PostMapping("/member/boards/{boardId}/comments")
     public ResponseEntity<Boolean> createBoardComment(@CurrentMember Member member,
         @PathVariable(value = "boardId") Long boardId,
@@ -41,13 +44,15 @@ public class BoardCommentController {
                 commentId));
     }
 
+    /**
+     * 댓글 삭제
+     */
     @DeleteMapping("/member/boards/{boardId}/comments/{commentId}")
-    public ResponseEntity<Boolean> deleteBoardComment(@CurrentMember Member member,
+    public ResponseEntity<String> deleteBoardComment(@CurrentMember Member member,
         @PathVariable(value = "boardId") Long boardId,
         @PathVariable(value = "commentId") Long commentId) {
         return ResponseEntity.ok(
             boardCommentService.deleteBoardComment(member, boardId, commentId));
-
     }
 
 
