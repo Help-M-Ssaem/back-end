@@ -16,5 +16,4 @@ public class ChatMessageDto {
   private Long roomId;
   private String message;
   private MessageType type;
-  private String accessToken;
 }

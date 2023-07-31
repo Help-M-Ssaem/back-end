@@ -30,6 +30,14 @@ public class BoardCommentController {
         return ResponseEntity.ok(
             boardCommentService.findBoardCommentListByBoardId(member, boardId, page, size));
     }
+  
+    //게시글 상세 조회시 베스트 댓글 3개 조회
+    @GetMapping("/boards/{boardId}/comments/best")
+    public ResponseEntity<List<BoardCommentSimpleInfo>> findBoardCommentBestListByBoardId(
+        @CurrentMember Member member, @PathVariable(value = "boardId") Long boardId) {
+        return ResponseEntity.ok(
+            boardCommentService.findBoardCommentBestListByBoardId(member, boardId));
+    }
 
     /**
      * 댓글 작성, 댓글 작성 시 @RequestParam 으로 commentId 값 받으면 대댓글 작성
@@ -54,6 +62,5 @@ public class BoardCommentController {
         return ResponseEntity.ok(
             boardCommentService.deleteBoardComment(member, boardId, commentId));
     }
-
 
 }
