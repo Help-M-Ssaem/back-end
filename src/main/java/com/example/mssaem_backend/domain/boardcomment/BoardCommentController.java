@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.boardcomment;
 
+import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentRequestDto.PostBoardCommentReq;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -7,9 +8,12 @@ import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -25,6 +29,25 @@ public class BoardCommentController {
         @RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
         return ResponseEntity.ok(
             boardCommentService.findBoardCommentListByBoardId(member, boardId, page, size));
+    }
+
+    @PostMapping("/member/boards/{boardId}/comments")
+    public ResponseEntity<Boolean> createBoardComment(@CurrentMember Member member,
+        @PathVariable(value = "boardId") Long boardId,
+        @RequestPart(value = "postBoardCommentReq") PostBoardCommentReq postBoardCommentReq,
+        @RequestParam(value = "commentId", required = false) Long commentId) {
+        return ResponseEntity.ok(
+            boardCommentService.createBoardComment(member, boardId, postBoardCommentReq,
+                commentId));
+    }
+
+    @DeleteMapping("/member/boards/{boardId}/comments/{commentId}")
+    public ResponseEntity<Boolean> deleteBoardComment(@CurrentMember Member member,
+        @PathVariable(value = "boardId") Long boardId,
+        @PathVariable(value = "commentId") Long commentId) {
+        return ResponseEntity.ok(
+            boardCommentService.deleteBoardComment(member, boardId, commentId));
+
     }
 
 
