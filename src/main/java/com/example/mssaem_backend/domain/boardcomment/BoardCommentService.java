@@ -68,4 +68,15 @@ public class BoardCommentService {
                     .collect(Collectors.toList()), viewer)
         );
     }
+
+    // 좋아요 수 10개 이상으로 베스트 댓글 3개 조회
+    public List<BoardCommentSimpleInfo> findBoardCommentBestListByBoardId(Member viewer,
+        Long boardId) {
+        PageRequest pageRequest = PageRequest.of(0, 3);
+
+        List<BoardComment> boardCommentList = boardCommentLikeRepository.findBoardCommentsByBoardIdWithMoreThanTenBoardCommentLikeAndStateTrue(
+            pageRequest, boardId).stream().collect(Collectors.toList());
+
+        return setBoardCommentSimpleInfo(boardCommentList, viewer);
+    }
 }

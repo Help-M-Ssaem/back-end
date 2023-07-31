@@ -27,5 +27,12 @@ public class BoardCommentController {
             boardCommentService.findBoardCommentListByBoardId(member, boardId, page, size));
     }
 
+    //게시글 상세 조회시 베스트 댓글 3개 조회
+    @GetMapping("/boards/{boardId}/comments/best")
+    public ResponseEntity<List<BoardCommentSimpleInfo>> findBoardCommentBestListByBoardId(
+        @CurrentMember Member member, @PathVariable(value = "boardId") Long boardId) {
+        return ResponseEntity.ok(
+            boardCommentService.findBoardCommentBestListByBoardId(member, boardId));
+    }
 
 }
