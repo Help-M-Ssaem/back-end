@@ -39,11 +39,11 @@ public class DiscussionOption extends BaseTimeEntity {
         this.discussion = discussion;
     }
 
-    public void plusCount() {
+    public void increaseCount() {
         this.selectCount += 1;
     }
 
-    public void minusCount() {
+    public void decreaseCount() {
         this.selectCount -= 1;
     }
 }

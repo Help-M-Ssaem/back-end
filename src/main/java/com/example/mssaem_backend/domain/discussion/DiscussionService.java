@@ -285,7 +285,7 @@ public class DiscussionService {
                 .build();
 
             //discussion의 count수 증가
-            discussion.plusCount();
+            discussion.increaseCount();
             discussionOptionSelectedRepository.save(discussionOptionSelected);
         }
 
@@ -302,6 +302,8 @@ public class DiscussionService {
             boolean isOptionSelectExsist = false;
             for(int i =0 ; i< discussionOptionSelects.size(); i++) {
                 Long id = discussionOptionSelects.get(i).getDiscussionOption().getId();
+                String content = discussionOptionSelects.get(i).getDiscussionOption().getContent();
+                System.out.println(content);
                 if(id.equals(discussionOptionId)) {
                     isOptionSelectExsist = true;
                 }
@@ -325,13 +327,12 @@ public class DiscussionService {
             }
 
             //이전에 선택한 option과 optionSelected count 감소
-            beforeDiscussionOption.minusCount();
-            System.out.println(discussionOptionSelects.get(beforeSelectedIdx).getDiscussionOption().getId());
+            beforeDiscussionOption.decreaseCount();
             discussionOptionSelects.get(beforeSelectedIdx).changeUnselected();
         }
 
         //option count수 증가
-        discussionOption.plusCount();
+        discussionOption.increaseCount();
 
         //해당 토론의 참여율 계산해서 반환
         return setDiscussionOptionSelectedInfo(discussion.getParticipantCount(), discussionOptions, selectIdx);
