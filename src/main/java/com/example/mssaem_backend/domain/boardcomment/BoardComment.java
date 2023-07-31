@@ -50,4 +50,11 @@ public class BoardComment extends BaseTimeEntity {
         this.content = "삭제된 댓글입니다.";
         this.state = false;
     }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+    public void decreaseLikeCount() {
+        this.likeCount--;
+    }
 }
