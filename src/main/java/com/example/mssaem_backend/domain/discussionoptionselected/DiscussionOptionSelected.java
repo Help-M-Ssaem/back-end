@@ -1,7 +1,6 @@
 package com.example.mssaem_backend.domain.discussionoptionselected;
 
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
-import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
 import com.example.mssaem_backend.domain.member.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,7 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @DynamicInsert

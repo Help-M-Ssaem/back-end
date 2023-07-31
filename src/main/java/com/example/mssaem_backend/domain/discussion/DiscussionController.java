@@ -2,7 +2,6 @@ package com.example.mssaem_backend.domain.discussion;
 
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
-import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
@@ -11,7 +10,6 @@ import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;

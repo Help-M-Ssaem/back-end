@@ -256,66 +256,84 @@ public class DiscussionService {
 
     //토론글 참여하기
     @Transactional
-    public List<DiscussionOptionSelectedInfo> participateDiscussion(Member member, Long discussionId, Long discussionOptionId) {
+    public List<DiscussionOptionSelectedInfo> participateDiscussion(Member member,
+        Long discussionId, Long discussionOptionId) {
         Discussion discussion = discussionRepository.findById(discussionId)
             .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
-        DiscussionOption discussionOption = discussionOptionRepository.findById(discussionOptionId)
-            .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION_OPTION));
+        List<DiscussionOption> discussionOptions = discussionOptionRepository.findDiscussionOptionByDiscussion(
+            discussion);
 
-        //첫 참여인지 변경인지 확인
-        DiscussionOptionSelected discussionOptionSelected =
-            discussionOptionSelectedRepository.findByDiscussionAndMemberAndStateTrue(discussion,
-                member);
+        //선택할 option 가져오기
+        int selectIdx = 0;
+        for(DiscussionOption discussionOption : discussionOptions) {
+            if(discussionOption.getId().equals(discussionOptionId))  {
+                break;
+            }
+            selectIdx++;
+        }
+
+        DiscussionOption discussionOption = discussionOptions.get(selectIdx);
+
+        //첫 참여라면 -1 아니면 이전 선택 option idx반환
+        int checkSelectedIdx = getSelectedOptionIdx(member, discussionOptions);
 
         //첫 참여라면
-        if (discussionOptionSelected == null) {
-            DiscussionOptionSelected newDiscussionOptionSelected = DiscussionOptionSelected.builder()
+        if (checkSelectedIdx == -1) {
+            DiscussionOptionSelected discussionOptionSelected = DiscussionOptionSelected.builder()
                 .discussionOption(discussionOption)
                 .member(member)
                 .build();
 
-
-            //discussion과 count수 증가
+            //discussion의 count수 증가
             discussion.plusCount();
-            discussionOptionSelectedRepository.save(newDiscussionOptionSelected);
+            discussionOptionSelectedRepository.save(discussionOptionSelected);
+        }
 
-        } else {
-            //이전에 선택했던 옵션과 optionSelected
-            DiscussionOption beforeDiscussionOption = discussionOptionSelectedRepository.findDiscussionOptionByDiscussionAndMemberAndStateTrue(
-                discussion, member);
-            DiscussionOptionSelected beforeDiscussionOptionSelected = discussionOptionSelectedRepository.findDiscussionOptionSelectedByMemberAndDiscussionOptionAndStateTrue(
-                member, beforeDiscussionOption);
+        //첫 참여가 아니라면 (선택한 옵션이 있다면)
+        else {
+            //이전에 선택했던 옵션과 optionSelected 불러오기
+            DiscussionOption beforeDiscussionOption = discussionOptions.get(checkSelectedIdx);
+            List<DiscussionOptionSelected> discussionOptionSelects = discussionOptionSelectedRepository.findAllByMemberAndDiscussionOrderByOptionIdAsc(
+                member, discussion);
 
-            // 이전 변경으로 인해 discussionOptionSelected가 false상태로 있는지 확인
-            DiscussionOptionSelected newDiscussionOptionSelected1 =
-                discussionOptionSelectedRepository.findDiscussionOptionSelectedByMemberAndDiscussionOptionAndStateTrue(
-                    member, discussionOption);
+            //현재 선택한 option에 대해 optionSeleted가 존재하는지 확인
+            //&& 직전 선택한 beforeOptionSelected idx값도 확인
+            int beforeSelectedIdx = 0;
+            boolean isOptionSelectExsist = false;
+            for(int i =0 ; i< discussionOptionSelects.size(); i++) {
+                Long id = discussionOptionSelects.get(i).getDiscussionOption().getId();
+                if(id.equals(discussionOptionId)) {
+                    isOptionSelectExsist = true;
+                }
+                if(id.equals(beforeDiscussionOption.getId())) {
+                    beforeSelectedIdx = i;
+                }
+            }
 
-            if (newDiscussionOptionSelected1 != null) {
-                newDiscussionOptionSelected1.changeSelected();
-            } else {
-                // discussionOptionSelected가 없다면
-                DiscussionOptionSelected newDiscussionOptionSelected2 = DiscussionOptionSelected.builder()
+            // 이전에 선택했었던 option으로 선택하는 경우
+            if (isOptionSelectExsist) {
+                discussionOptionSelects.get(selectIdx).changeSelected();
+            }
+            //이전에 선택하지 않았던 option으로 선택하는 경우
+            else {
+                DiscussionOptionSelected newDiscussionOptionSelected = DiscussionOptionSelected.builder()
                     .discussionOption(discussionOption)
                     .member(member)
                     .build();
 
-                discussionOptionSelectedRepository.save(newDiscussionOptionSelected2);
+                discussionOptionSelectedRepository.save(newDiscussionOptionSelected);
             }
 
             //이전에 선택한 option과 optionSelected count 감소
             beforeDiscussionOption.minusCount();
-            beforeDiscussionOptionSelected.changeUnselected();
+            System.out.println(discussionOptionSelects.get(beforeSelectedIdx).getDiscussionOption().getId());
+            discussionOptionSelects.get(beforeSelectedIdx).changeUnselected();
         }
 
         //option count수 증가
         discussionOption.plusCount();
 
         //해당 토론의 참여율 계산해서 반환
-        List<Discussion> discussions = new ArrayList<>();
-        discussions.add(discussion);
-        List<DiscussionOption> discussionOptions = discussionOptionRepository.findDiscussionOptionByDiscussion(discussion);
-        int selectedOptionIdx = getSelectedOptionIdx(member, discussionOptions);
-        return setDiscussionOptionSelectedInfo(discussion.getParticipantCount(), discussionOptions, selectedOptionIdx);
+        return setDiscussionOptionSelectedInfo(discussion.getParticipantCount(), discussionOptions, selectIdx);
     }
 }
