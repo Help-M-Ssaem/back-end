@@ -32,11 +32,8 @@ public class BoardImage extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
 
-    public BoardImage(String imageUrl){
-        this.imageUrl = imageUrl;
-    }
-
-    public void setBoard(Board board) {
+    public BoardImage(Board board, String imageUrl) {
         this.board = board;
+        this.imageUrl = imageUrl;
     }
 }

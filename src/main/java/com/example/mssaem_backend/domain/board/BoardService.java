@@ -11,7 +11,6 @@ import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleI
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardimage.BoardImageRepository;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
@@ -35,7 +34,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -46,7 +44,6 @@ public class BoardService {
     private final LikeRepository likeRepository;
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
-    private final BoardImageRepository boardImageRepository;
     private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
 
@@ -97,16 +94,16 @@ public class BoardService {
                     board.getId(),
                     board.getTitle(),
                     board.getContent(),
-                    boardImageRepository.findImageUrlByBoardOrderById(board).orElse(null),
+                    board.getThumbnail(), //imgUrl
                     board.getMbti(),
                     board.getLikeCount(),
-                    boardCommentRepository.countByBoardAndStateTrue(board),
+                    board.getCommentCount(),
                     calculateTime(board.getCreatedAt(), dateType),
                     new MemberSimpleInfo(
                         board.getMember().getId(),
                         board.getMember().getNickName(),
                         board.getMember().getDetailMbti(),
-                        badgeRepository.findNameMemberAndStateTrue(board.getMember()).orElse(null),
+                        board.getMember().getBadgeName(),
                         board.getMember().getProfileImageUrl()
                     )
                 )
@@ -115,24 +112,29 @@ public class BoardService {
         return boardSimpleInfos;
     }
 
+    @Transactional
     public String createBoard(Member member, PostBoardReq postBoardReq,
-        List<MultipartFile> multipartFiles) {
+        List<String> imgUrls) {
+
         Board board = Board.builder()
             .title(postBoardReq.getTitle())
             .content(postBoardReq.getContent())
             .mbti(postBoardReq.getMbti())
             .member(member)
+            .thumbnail(null)
             .build();
-        boardRepository.save(board);
-        if (multipartFiles != null) {
-            boardImageService.uploadBoardImage(board, multipartFiles);
+
+        if (imgUrls != null) {
+            String thumbnail = boardImageService.uploadBoardImageUrl(board, imgUrls);
+            board.changeThumbnail(thumbnail);
         }
+        boardRepository.save(board);
         return "게시글 생성 완료";
     }
 
     @Transactional
     public String modifyBoard(Member member, PatchBoardReq patchBoardReq, Long boardId,
-        List<MultipartFile> multipartFiles) {
+        List<String> imgUrls) {
         Board board = boardRepository.findById(boardId)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
@@ -142,8 +144,11 @@ public class BoardService {
             //현재 저장된 이미지 삭제
             boardImageService.deleteBoardImage(board);
             //새로운 이미지 업로드
-            if (multipartFiles != null) {
-                boardImageService.uploadBoardImage(board, multipartFiles);
+            if (imgUrls != null) {
+                //이미지 DB에 저장
+                board.changeThumbnail(boardImageService.uploadBoardImageUrl(board, imgUrls));
+            } else {
+                board.changeThumbnail(null); //게시글 수정 시 이미지 없으면 다시 썸네일 제거
             }
             return "게시글 수정 완료";
         } else {
@@ -247,6 +252,8 @@ public class BoardService {
         Member member = board.getMember();
         //게시글 수정, 삭제 권한 확인
         Boolean isAllowed = (isMatch(viewer, member));
+        //게시글 좋아요 눌렀는지 확인
+        Boolean isLiked = likeRepository.existsLikeByMemberAndStateIsTrueAndBoard(viewer, board);
 
         return GetBoardRes.builder()
             .memberSimpleInfo(
@@ -263,6 +270,7 @@ public class BoardService {
             .createdAt(calculateTime(board.getCreatedAt(), 2))
             .commentCount(boardCommentRepository.countByBoardAndStateTrue(board))
             .isAllowed(isAllowed)
+            .isLiked(isLiked)
             .build();
     }
 
