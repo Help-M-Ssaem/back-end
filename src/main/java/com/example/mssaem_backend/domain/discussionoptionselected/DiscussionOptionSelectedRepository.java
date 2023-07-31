@@ -11,17 +11,8 @@ import org.springframework.data.repository.query.Param;
 public interface DiscussionOptionSelectedRepository extends
     JpaRepository<DiscussionOptionSelected, Long> {
 
-    DiscussionOptionSelected findDiscussionOptionSelectedByMemberAndDiscussionOptionAndStateFalse(
-        Member member, DiscussionOption discussionOption);
-
     DiscussionOptionSelected findDiscussionOptionSelectedByMemberAndDiscussionOptionAndStateTrue(
         Member member, DiscussionOption beforeDiscussionOption);
-
-    @Query("SELECT dos.discussionOption FROM DiscussionOptionSelected dos "
-        + "WHERE dos.discussionOption.discussion = :discussion " + "AND dos.member = :member "
-        + "AND dos.state = true")
-    DiscussionOption findDiscussionOptionByDiscussionAndMemberAndStateTrue(
-        @Param("discussion") Discussion discussion, @Param("member") Member member);
 
     @Query("SELECT dos FROM DiscussionOptionSelected dos "
         + "JOIN dos.discussionOption option "
