@@ -146,7 +146,9 @@ public class BoardService {
             //새로운 이미지 업로드
             if (imgUrls != null) {
                 //이미지 DB에 저장
-                boardImageService.uploadBoardImageUrl(board, imgUrls);
+                board.changeThumbnail(boardImageService.uploadBoardImageUrl(board, imgUrls));
+            } else {
+                board.changeThumbnail(null); //게시글 수정 시 이미지 없으면 다시 썸네일 제거
             }
             return "게시글 수정 완료";
         } else {

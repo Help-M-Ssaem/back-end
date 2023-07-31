@@ -10,4 +10,6 @@ public interface ChatParticipateRepository extends JpaRepository<ChatParticipate
 
   @Query("select cp from ChatParticipate cp join fetch cp.chatRoom join fetch cp.member where cp.member = :member")
   List<ChatParticipate> findAllByMember(@Param("member") Member member);
+
+  ChatParticipate findBySessionId(String sessionId);
 }

@@ -38,4 +38,12 @@ public class DiscussionOption extends BaseTimeEntity {
         this.imgUrl = imgUrl;
         this.discussion = discussion;
     }
+
+    public void increaseCount() {
+        this.selectCount += 1;
+    }
+
+    public void decreaseCount() {
+        this.selectCount -= 1;
+    }
 }

@@ -3,11 +3,17 @@ package com.example.mssaem_backend.domain.boardcomment;
 import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
+import com.example.mssaem_backend.domain.board.Board;
+import com.example.mssaem_backend.domain.board.BoardRepository;
+import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentRequestDto.PostBoardCommentReq;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
 import com.example.mssaem_backend.domain.boardcommentlike.BoardCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
+import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
+import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -23,6 +30,7 @@ public class BoardCommentService {
 
     private final BoardCommentRepository boardCommentRepository;
     private final BoardCommentLikeRepository boardCommentLikeRepository;
+    private final BoardRepository boardRepository;
 
     public List<BoardCommentSimpleInfo> setBoardCommentSimpleInfo(List<BoardComment> boardComments,
         Member viewer) {
@@ -56,7 +64,7 @@ public class BoardCommentService {
         Member viewer, Long boardId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<BoardComment> result = boardCommentRepository.findAllByBoardIdAndStateIsTrue(boardId,
+        Page<BoardComment> result = boardCommentRepository.findAllByBoardId(boardId,
             pageable);
 
         return new PageResponseDto<>(
@@ -68,4 +76,51 @@ public class BoardCommentService {
                     .collect(Collectors.toList()), viewer)
         );
     }
+
+    //댓글 작성
+    @Transactional
+    public Boolean createBoardComment(Member member, Long boardId,
+        PostBoardCommentReq postBoardCommentReq, Long commentId) {
+        //해당 게시글이 없다면 예외처리
+        Board board = boardRepository.findById(boardId)
+            .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
+
+        //만약 코멘트가 존재한다면 그 댓글에 대댓글
+        if (boardCommentRepository.existsBoardCommentById(commentId)) {
+            boardCommentRepository.save(
+                new BoardComment(postBoardCommentReq.getContent(), member, board,
+                    commentId.intValue()));
+        } else { //존재하지 않다면 새로운 댓글
+            boardCommentRepository.save(
+                new BoardComment(postBoardCommentReq.getContent(), member, board, 0));
+        }
+        return true;
+    }
+
+    //댓글 삭제
+    @Transactional
+    public Boolean deleteBoardComment(Member member, Long boardId, Long commentId) {
+        BoardComment boardComment = boardCommentRepository.findByIdAndBoardIdAndStateIsTrue(
+            commentId, boardId);
+        //현재 로그인한 멤버와 댓글 작성자가 같은지 확인
+        if (isMatch(member, boardComment.getMember())) {
+            //같다면 삭제(삭제된 댓글입니다. 로 표시)
+            boardComment.deleteBoardComment();
+        } else {
+            throw new BaseException(MemberErrorCode.INVALID_MEMBER);
+        }
+        return boardComment.isState();
+    }
+  
+    // 좋아요 수 10개 이상으로 베스트 댓글 3개 조회
+    public List<BoardCommentSimpleInfo> findBoardCommentBestListByBoardId(Member viewer,
+        Long boardId) {
+        PageRequest pageRequest = PageRequest.of(0, 3);
+
+        List<BoardComment> boardCommentList = boardCommentLikeRepository.findBoardCommentsByBoardIdWithMoreThanTenBoardCommentLikeAndStateTrue(
+            pageRequest, boardId).stream().collect(Collectors.toList());
+
+        return setBoardCommentSimpleInfo(boardCommentList, viewer);
+    }
+      
 }
