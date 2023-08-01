@@ -46,7 +46,7 @@ public class Board extends BaseTimeEntity {
     private MbtiEnum mbti;
 
     @ColumnDefault("0")
-    private Long report;
+    private Integer report;
 
     @ColumnDefault("0")
     private Long hits;
@@ -89,5 +89,13 @@ public class Board extends BaseTimeEntity {
 
     public void decreaseLikeCount() {
         this.likeCount--;
+    }
+
+    public Integer increaseReport() {
+        return this.report++;
+    }
+
+    public void updateState() {
+        this.state = false;
     }
 }

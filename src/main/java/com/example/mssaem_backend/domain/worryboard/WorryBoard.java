@@ -43,7 +43,7 @@ public class WorryBoard extends BaseTimeEntity {
     private MbtiEnum targetMbti;
 
     @ColumnDefault("0")
-    private Long report;
+    private Integer report;
 
     private boolean state = true; //고민글 삭제시 : false
 
@@ -84,6 +84,14 @@ public class WorryBoard extends BaseTimeEntity {
     }
 
     public void deleteWorryBoard() {
+        this.state = false;
+    }
+
+    public Integer increaseReport() {
+        return this.report++;
+    }
+
+    public void updateState() {
         this.state = false;
     }
 }
