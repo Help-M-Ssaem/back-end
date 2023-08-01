@@ -69,7 +69,7 @@ public class ReportService {
                     .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
                 if (board.increaseReport() >= reportStandard) {
                     board.updateState();
-                    sendReportEmail(member.getEmail(), reportReq);
+                    sendReportEmail(board.getMember().getEmail(), reportReq);
                 }
             }
             case DISCUSSION -> {
@@ -78,7 +78,7 @@ public class ReportService {
                     .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
                 if (discussion.increaseReport() >= reportStandard) {
                     discussion.updateState();
-                    sendReportEmail(member.getEmail(), reportReq);
+                    sendReportEmail(discussion.getMember().getEmail(), reportReq);
                 }
             }
             case WORRY -> {
@@ -87,7 +87,7 @@ public class ReportService {
                     .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
                 if (worryBoard.increaseReport() >= reportStandard) {
                     worryBoard.updateState();
-                    sendReportEmail(member.getEmail(), reportReq);
+                    sendReportEmail(worryBoard.getMember().getEmail(), reportReq);
                 }
             }
             case BOARD_COMMENT -> {
@@ -96,7 +96,7 @@ public class ReportService {
                     () -> new BaseException(BoardCommentErrorCode.EMPTY_BOARD_COMMENT));
                 if (boardComment.increaseReport() >= reportStandard) {
                     boardComment.updateState();
-                    sendReportEmail(member.getEmail(), reportReq);
+                    sendReportEmail(boardComment.getMember().getEmail(), reportReq);
                 }
             }
             case DISCUSSION_COMMENT -> {
@@ -105,7 +105,7 @@ public class ReportService {
                     () -> new BaseException(DiscussionCommentErrorCode.EMPTY_DISCUSSION_COMMENT));
                 if (discussionComment.increaseReport() >= reportStandard) {
                     discussionComment.updateState();
-                    sendReportEmail(member.getEmail(), reportReq);
+                    sendReportEmail(discussionComment.getMember().getEmail(), reportReq);
                 }
             }
             case MEMBER -> {
@@ -114,7 +114,7 @@ public class ReportService {
                     .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
                 if (targetMember.increaseReport() >= reportStandard) {
                     targetMember.updateStatus();
-                    sendReportEmail(member.getEmail(), reportReq);
+                    sendReportEmail(targetMember.getEmail(), reportReq);
                 }
             }
         }
