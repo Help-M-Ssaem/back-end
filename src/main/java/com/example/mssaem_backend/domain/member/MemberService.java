@@ -60,16 +60,11 @@ public class MemberService {
     }
 
     public Member register(RegisterMember registerMember) {
-        Member member = Member.builder()
-            .email(registerMember.getEmail())
-            .nickName(registerMember.getNickname())
-            .mbti(registerMember.getMbti())
-            .caseSensitivity(registerMember.getCaseSensitivity())
-            .refreshToken("")
-            .report(0)
-            .status(true)
-            .role(Role.ROLE_MEMBER)
-            .build();
+        Member member = new Member(
+                registerMember.getEmail(),
+                registerMember.getNickname(),
+                registerMember.getMbti(),
+                registerMember.getCaseSensitivity());
         save(member);
         return member;
     }
@@ -144,11 +139,16 @@ public class MemberService {
         return teacherInfos;
     }
 
-    public void modifyProfile(Member member, ModifyProfile modifyProfile, List<MultipartFile> multipartFile) {
+    public String modifyProfile(Member currentMember, ModifyProfile modifyProfile, List<MultipartFile> multipartFile) {
+        Member member = memberRepository.findById(currentMember.getId())
+                .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+
         String profileImageUrl = "";
         if (multipartFile != null) {
             //현재 저장된 이미지 삭제
-            s3Service.deleteFile(s3Service.parseFileName(member.getProfileImageUrl()));
+            if(member.getProfileImageUrl() != null) {
+                s3Service.deleteFile(s3Service.parseFileName(member.getProfileImageUrl()));
+            }
             //새로운 이미지 업로드
             List<S3Result> s3Results = s3Service.uploadFile(multipartFile);
             profileImageUrl = s3Results.get(0).getImgUrl();
@@ -156,7 +156,8 @@ public class MemberService {
 
         member.modifyMember(modifyProfile.getNickName(), modifyProfile.getIntroduction(),
                 profileImageUrl, modifyProfile.getMbti(), modifyProfile.getCaseSensitivity(),
-                badgeRepository.findNameByIdAndMember(modifyProfile.getBadgeId(), member));
+                badgeRepository.findNameByIdAndMember(modifyProfile.getBadgeId(), member).orElse(null));
+        return "수정 성공";
     }
 
     public MemberProfileInfo getProfile(Long memberId) {

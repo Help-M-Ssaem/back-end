@@ -73,11 +73,10 @@ public class MemberController {
      * [PATCH] 프로필 수정
      */
     @PatchMapping("/member/profile")
-    public ResponseEntity<Integer> modifyProfile(
-            @CurrentMember Member member, @RequestBody ModifyProfile modifyProfile,
+    public ResponseEntity<String> modifyProfile(
+            @CurrentMember Member member, @RequestPart(value = "modifyProfile") ModifyProfile modifyProfile,
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
-        memberService.modifyProfile(member, modifyProfile, multipartFile);
-        return new ResponseEntity<>(200, HttpStatus.OK);
+        return new ResponseEntity<>(memberService.modifyProfile(member, modifyProfile, multipartFile), HttpStatus.OK);
     }
 
     /**
