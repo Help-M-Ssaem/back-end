@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.domain.discussion;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,4 +36,7 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
         + "and d.state = true order by d.createdAt desc",
         countQuery = "select count(d) from Discussion d")
     Page<Discussion> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    Optional<Discussion> findByIdAndStateIsTrue(Long id);
+
 }
