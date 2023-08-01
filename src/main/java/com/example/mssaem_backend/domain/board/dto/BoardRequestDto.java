@@ -15,7 +15,6 @@ public class BoardRequestDto {
         private String title;
         private String content;
         private MbtiEnum mbti;
-        private Long memberId;
     }
 
     @Getter
@@ -25,16 +24,6 @@ public class BoardRequestDto {
 
         private String title;
         private String content;
-        private MbtiEnum mbti;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class SearchBoardByMbtiReq {
-
-        private int type; // 제목+내용, 제목, 내용, 글쓴이로 순서대로 0,1,2,3을 의미
-        private String keyword; // 검색어
         private MbtiEnum mbti;
     }
 }

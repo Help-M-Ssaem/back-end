@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.chatroom;
 
+import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatInfo;
 import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatRoomInfo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,11 @@ public class ChatRoomService {
   /**
    * Redis에 저장되어 있는 chatRoom 조회
    */
-  public List<ChatRoom> selectRedisChatRoom(){
+  public List<ChatRoom> selectRedisChatRoom() {
     return chatRoomCustomRepository.findAllRoom();
+  }
+
+  public ChatInfo chatEnter(String sessionId) {
+    return chatRoomCustomRepository.getUserEnterRoomId(sessionId);
   }
 }

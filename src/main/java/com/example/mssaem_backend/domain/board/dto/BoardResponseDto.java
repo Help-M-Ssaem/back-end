@@ -11,108 +11,100 @@ import lombok.NoArgsConstructor;
 
 public class BoardResponseDto {
 
-  @Getter
-  @NoArgsConstructor
-  public static class BoardSimpleInfo {
+    @Getter
+    @NoArgsConstructor
+    public static class BoardSimpleInfo {
 
-    private Long id;
-    private String title;
-    private String content;
-    private String imgUrl;
-    private MbtiEnum boardMbti;
-    private Long likeCount;
-    private Long commentCount;
-    private String createdAt;
-    private MemberSimpleInfo memberSimpleInfo;
+        private Long id;
+        private String title;
+        private String content;
+        private String imgUrl;
+        private MbtiEnum boardMbti;
+        private Long likeCount;
+        private Long commentCount;
+        private String createdAt;
+        private MemberSimpleInfo memberSimpleInfo;
 
-    public BoardSimpleInfo(Long id, String title, String content, String imgUrl,
-        MbtiEnum boardMbti,
-        Long likeCount, Long commentCount, String createdAt,
-        MemberSimpleInfo memberSimpleInfo) {
-      this.id = id;
-      this.title = title;
-      this.content = content;
-      this.imgUrl = imgUrl == null ? "" : imgUrl;
-      this.boardMbti = boardMbti;
-      this.likeCount = likeCount;
-      this.commentCount = commentCount;
-      this.createdAt = createdAt;
-      this.memberSimpleInfo = memberSimpleInfo;
+        public BoardSimpleInfo(Long id, String title, String content, String imgUrl,
+            MbtiEnum boardMbti,
+            Long likeCount, Long commentCount, String createdAt,
+            MemberSimpleInfo memberSimpleInfo) {
+            this.id = id;
+            this.title = title;
+            this.content = content;
+            this.imgUrl = imgUrl == null ? "" : imgUrl;
+            this.boardMbti = boardMbti;
+            this.likeCount = likeCount;
+            this.commentCount = commentCount;
+            this.createdAt = createdAt;
+            this.memberSimpleInfo = memberSimpleInfo;
+        }
     }
 
-    public BoardSimpleInfo(Board board, String imgUrl, Long commentCount,
-        MemberSimpleInfo memberSimpleInfo) {
-      this.id = board.getId();
-      this.title = board.getTitle();
-      this.content = board.getContent();
-      this.imgUrl = imgUrl;
-      this.likeCount = board.getLikeCount();
-      this.commentCount = commentCount;
-      this.createdAt = board.getCreatedAt().toString();
-      this.memberSimpleInfo = memberSimpleInfo;
+    @Getter
+    @NoArgsConstructor
+    public static class ThreeHotInfo {
+
+        private Long boardId;
+        private String boardTitle;
+        private Long discussionId;
+        private String discussionTitle;
+        private Long worryBoardId;
+        private String worryBoardTitle;
+
+        @Builder
+        public ThreeHotInfo(Long boardId, String boardTitle, Long discussionId,
+            String discussionTitle, Long worryBoardId, String worryBoardTitle) {
+            this.boardId = boardId;
+            this.boardTitle =
+                boardTitle != null && boardTitle.length() >= 35
+                    ? boardTitle.substring(0, 35)
+                    : boardTitle;
+            this.discussionId = discussionId;
+            this.discussionTitle =
+                discussionTitle != null && discussionTitle.length() >= 35
+                    ? discussionTitle.substring(0, 35)
+                    : discussionTitle;
+            this.worryBoardId = worryBoardId;
+            this.worryBoardTitle =
+                worryBoardTitle != null && worryBoardTitle.length() >= 35
+                    ? worryBoardTitle.substring(0, 35)
+                    : worryBoardTitle;
+        }
     }
-  }
 
-  @Getter
-  @NoArgsConstructor
-  public static class ThreeHotInfo {
 
-    private Long boardId;
-    private String boardTitle;
-    private Long discussionId;
-    private String discussionTitle;
-    private Long worryBoardId;
-    private String worryBoardTitle;
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GetBoardRes {
 
-    @Builder
-    public ThreeHotInfo(Long boardId, String boardTitle, Long discussionId,
-        String discussionTitle, Long worryBoardId, String worryBoardTitle) {
-      this.boardId = boardId;
-      this.boardTitle =
-          boardTitle != null && boardTitle.length() >= 35
-              ? boardTitle.substring(0, 35)
-              : boardTitle;
-      this.discussionId = discussionId;
-      this.discussionTitle =
-          discussionTitle != null && discussionTitle.length() >= 35
-              ? discussionTitle.substring(0, 35)
-              : discussionTitle;
-      this.worryBoardId = worryBoardId;
-      this.worryBoardTitle =
-          worryBoardTitle != null && worryBoardTitle.length() >= 35
-              ? worryBoardTitle.substring(0, 35)
-              : worryBoardTitle;
+        private MemberSimpleInfo memberSimpleInfo;
+        private Long boardId;
+        private String title;
+        private String content;
+        private List<String> imgUrlList;
+        private String createdAt;
+        private Long likeCount;
+        private Long commentCount;
+        private Boolean isAllowed; //게시글 수정 삭제 권한 확인
+        private Boolean isLiked; //게시글 좋아요 눌렀는지 확인
+        private MbtiEnum boardMbti; //게시글 MBTI
+
+        @Builder
+        public GetBoardRes(MemberSimpleInfo memberSimpleInfo, Board board, List<String> imgUrlList,
+            String createdAt, Long commentCount, Boolean isAllowed, Boolean isLiked) {
+            this.memberSimpleInfo = memberSimpleInfo;
+            this.boardId = board.getId();
+            this.title = board.getTitle();
+            this.content = board.getContent();
+            this.imgUrlList = imgUrlList;
+            this.createdAt = createdAt;
+            this.likeCount = board.getLikeCount();
+            this.commentCount = commentCount;
+            this.isAllowed = isAllowed;
+            this.isLiked = isLiked;
+            this.boardMbti = board.getMbti();
+        }
     }
-  }
-
-
-  @Getter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class GetBoardRes {
-
-    private MemberSimpleInfo memberSimpleInfo;
-    private Long boardId;
-    private String title;
-    private String content;
-    private List<String> imgUrlList;
-    private String createdAt;
-    private Long likeCount;
-    private Long commentCount;
-    private Boolean isAllowed;
-
-    @Builder
-    public GetBoardRes(MemberSimpleInfo memberSimpleInfo, Board board, List<String> imgUrlList,
-        String createdAt, Long commentCount, Boolean isAllowed) {
-      this.memberSimpleInfo = memberSimpleInfo;
-      this.boardId = board.getId();
-      this.title = board.getTitle();
-      this.content = board.getContent();
-      this.imgUrlList = imgUrlList;
-      this.createdAt = createdAt;
-      this.likeCount = board.getLikeCount();
-      this.commentCount = commentCount;
-      this.isAllowed = isAllowed;
-    }
-  }
 }

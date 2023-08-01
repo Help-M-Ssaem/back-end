@@ -5,6 +5,7 @@ import com.example.mssaem_backend.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -31,4 +32,18 @@ public class DiscussionOption extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Discussion discussion;
 
+    @Builder
+    public DiscussionOption(String content, String imgUrl, Discussion discussion) {
+        this.content = content;
+        this.imgUrl = imgUrl;
+        this.discussion = discussion;
+    }
+
+    public void increaseCount() {
+        this.selectCount += 1;
+    }
+
+    public void decreaseCount() {
+        this.selectCount -= 1;
+    }
 }

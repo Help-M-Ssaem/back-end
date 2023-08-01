@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.domain.board;
 
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
+import com.example.mssaem_backend.domain.member.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,31 +18,20 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findAllByMemberIdAndStateIsTrue(Long memberId, Pageable pageable);
 
-    // 전체 게시판 검색하기
+    // 검색하기
     @Query("SELECT b FROM Board b WHERE"
         + "(    (:type = 0 AND (LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
         + " OR (:type = 1 AND LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')))"
         + " OR (:type = 2 AND LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%')))"
         + " OR (:type = 3 AND LOWER(b.member.nickName) LIKE LOWER(CONCAT('%', :keyword, '%'))) )"
-        + " AND b.state = true ORDER BY b.createdAt DESC ")
-    Page<Board> searchByType(
-        @Param("type") int type,
-        @Param("keyword") String keyword,
-        Pageable pageable);
-
-
-    // Mbti 카테고리 별 검색하기
-    @Query("SELECT b FROM Board b WHERE"
-        + "(    (:type = 0 AND (LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
-        + " OR (:type = 1 AND LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')))"
-        + " OR (:type = 2 AND LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%')))"
-        + " OR (:type = 3 AND LOWER(b.member.nickName) LIKE LOWER(CONCAT('%', :keyword, '%'))) )"
-        + " AND b.state = true AND b.mbti = :mbti ORDER BY b.createdAt DESC ")
+        + " AND b.state = true AND (:mbti IS NULL OR b.mbti = :mbti) ORDER BY b.createdAt DESC ")
     Page<Board> searchByTypeAndMbti(
         @Param("type") int type,
         @Param("keyword") String keyword,
         @Param("mbti") MbtiEnum mbti,
         Pageable pageable);
+
+    Board findByMemberAndIdAndStateIsTrue(Member member, Long id);
 
 
     //내용, 제목, 닉네임 별 검색어 한 번에 조회
