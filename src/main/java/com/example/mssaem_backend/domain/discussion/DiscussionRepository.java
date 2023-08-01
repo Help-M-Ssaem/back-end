@@ -28,5 +28,15 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
         @Param("keyword") String keyword,
         Pageable pageable);
 
+
+    @Query(value = "select d from Discussion d join fetch d.member "
+        + "where (lower(d.title) like lower(concat('%', :keyword, '%')))"
+        + "or (lower(d.content) like lower(concat('%', :keyword, '%')))"
+        + "or (lower(d.member.nickName) like lower(concat('%', :keyword, '%')))"
+        + "and d.state = true order by d.createdAt desc",
+        countQuery = "select count(d) from Discussion d")
+    Page<Discussion> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
     Optional<Discussion> findByIdAndStateIsTrue(Long id);
+
 }

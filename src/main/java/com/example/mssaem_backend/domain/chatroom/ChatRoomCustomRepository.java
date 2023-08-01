@@ -45,7 +45,6 @@ public class ChatRoomCustomRepository implements Serializable {
   // 유저가 입장한 채팅방ID와 유저 세션ID 맵핑 정보 저장
   public void setUserEnterInfo(String sessionId, ChatInfo chatInfo) {
     hashOpsEnterInfo.put(ENTER_INFO, sessionId, chatInfo);
-    System.out.println(3);
   }
 
   public void setRoomEnterInfo(String sessionId, Long roomId) {

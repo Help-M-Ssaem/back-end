@@ -39,6 +39,20 @@ public class BoardResponseDto {
             this.createdAt = createdAt;
             this.memberSimpleInfo = memberSimpleInfo;
         }
+
+        public BoardSimpleInfo(Board board, MemberSimpleInfo memberSimpleInfo){
+            this.id = board.getId();
+            this.title = board.getTitle();
+            this.content = board.getContent();
+            this.imgUrl = board.getThumbnail();
+            this.boardMbti = board.getMbti();
+            this.likeCount = board.getLikeCount();
+            this.commentCount = board.getCommentCount();
+            this.createdAt = board.getCreatedAt().toString();
+            this.memberSimpleInfo = memberSimpleInfo;
+
+
+        }
     }
 
     @Getter
