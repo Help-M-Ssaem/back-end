@@ -22,4 +22,13 @@ public class DiscussionResponseDto {
         private MemberSimpleInfo memberSimpleInfo;
         private List<T> options;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DiscussionDetailInfo<T> {
+
+        DiscussionSimpleInfo<T> discussionSimpleInfo;
+        private Boolean isEditAllowed;
+    }
 }

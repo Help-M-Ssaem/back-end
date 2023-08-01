@@ -1,9 +1,11 @@
 package com.example.mssaem_backend.domain.discussion;
 
+import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.CheckWriter.match;
 
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
+import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionDetailInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
@@ -344,5 +346,19 @@ public class DiscussionService {
         Page<Discussion> discussions = discussionRepository.findByStateTrue(pageRequest);
         List<Discussion> discussionList = discussions.stream().toList();
         return new PageResponseDto<>(discussions.getNumber(), discussions.getTotalPages(), setDiscussionSimpleInfo(member, discussionList, 1));
+    }
+
+    //토론글 상세 조회
+    public DiscussionDetailInfo findDiscussion(Member viewer, Long id) {
+        Discussion discussion = discussionRepository.findById(id)
+            .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+
+
+        //수정,삭제 권한 확인
+        Boolean isEditAllowed = isMatch(viewer, discussion.getMember());
+
+        List<Discussion> discussions = new ArrayList<>();
+        discussions.add(discussion);
+        return  new DiscussionDetailInfo(setDiscussionSimpleInfo(viewer, discussions, 1).get(0), isEditAllowed);
     }
 }

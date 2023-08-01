@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.domain.discussion;
 
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
+import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionDetailInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionLoginInfo;
 import com.example.mssaem_backend.domain.member.Member;
@@ -93,7 +94,8 @@ public class DiscussionController {
      * 토론글 참여하기
      */
     @PostMapping("/member/discussions/{discussionId}/discussion-options/{discussionOptionId}")
-    public ResponseEntity<List<DiscussionOptionLoginInfo>> selectDiscussion(@CurrentMember Member member,
+    public ResponseEntity<List<DiscussionOptionLoginInfo>> selectDiscussion(
+        @CurrentMember Member member,
         @PathVariable Long discussionId,
         @PathVariable Long discussionOptionId
     ) {
@@ -110,5 +112,15 @@ public class DiscussionController {
         @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(discussionService.findDiscussions(member, page, size));
+    }
+
+    /**
+     * 토론글 상세조회
+     */
+    @GetMapping("/discussions/{id}")
+    public ResponseEntity<DiscussionDetailInfo> findDiscussion(
+        @CurrentMember Member member,
+        @PathVariable Long id) {
+        return ResponseEntity.ok(discussionService.findDiscussion(member, id));
     }
 }
