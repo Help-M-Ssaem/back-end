@@ -2,7 +2,7 @@ package com.example.mssaem_backend.domain.boardimage;
 
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.global.s3.S3Service;
-import com.example.mssaem_backend.global.s3.dto.S3Result;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,30 +17,12 @@ public class BoardImageService {
     private final BoardImageRepository boardImageRepository;
     private final S3Service s3Service;
 
-    public String uploadImage(String boardImageUrl, Board board) {
-        BoardImage boardImage = new BoardImage(boardImageUrl);
-        boardImage.setBoard(board);
-        boardImageRepository.save(boardImage);
-        return "이미지 업로드 완료";
-    }
-
     public List<BoardImage> loadImage(Long boardId) {
         return boardImageRepository.findAllByBoardId(boardId);
     }
 
     public void deleteImage(Board board) {
         boardImageRepository.deleteAllByBoard(board);
-    }
-
-    public void uploadBoardImage(Board board, List<MultipartFile> multipartFiles) {
-        //multipartFiles 로 부터 파일 받아오기
-        List<S3Result> boardImageList = s3Service.uploadFile(multipartFiles);
-        //이미지 저장
-        if (!boardImageList.isEmpty()) {
-            for (S3Result s3Result : boardImageList) {
-                uploadImage(s3Result.getImgUrl(), board);
-            }
-        }
     }
 
     public void deleteBoardImage(Board board) {
@@ -64,5 +46,24 @@ public class BoardImageService {
         return boardImageList.stream()
             .map(BoardImage::getImageUrl)
             .collect(Collectors.toList());
+    }
+
+    //이미지 S3에 저장 후 해당 파일에 대한 url 바로 반환
+    public String uploadFile(MultipartFile multipartFile) {
+        return s3Service.uploadImage(multipartFile);
+    }
+
+    //전달받은 imgUrl 리스트 DB에 저장
+    public String uploadBoardImageUrl(Board board, List<String> imgUrls) {
+        List<BoardImage> boardImages = new ArrayList<>();
+
+        if (!imgUrls.isEmpty()) {
+            for (String result : imgUrls) {
+                boardImages.add(new BoardImage(board, result));
+            }
+        }
+        boardImageRepository.saveAll(boardImages);
+
+        return imgUrls.isEmpty() ? null : imgUrls.get(0);
     }
 }

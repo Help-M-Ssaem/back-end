@@ -32,4 +32,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
         Pageable pageable);
 
     Integer countAllByStateIsTrueAndMember(@Param("member") Member member);
+
+    Board findByMemberAndIdAndStateIsTrue(Member member, Long id);
 }

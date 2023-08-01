@@ -15,7 +15,6 @@ public class BoardRequestDto {
         private String title;
         private String content;
         private MbtiEnum mbti;
-        private Long memberId;
     }
 
     @Getter

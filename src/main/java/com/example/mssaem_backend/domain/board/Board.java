@@ -3,9 +3,20 @@ package com.example.mssaem_backend.domain.board;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -50,11 +61,12 @@ public class Board extends BaseTimeEntity {
     private Long commentCount;
 
     @Builder
-    public Board(String title, String content, MbtiEnum mbti, Member member) {
+    public Board(String title, String content, MbtiEnum mbti, Member member, String thumbnail) {
         this.title = title;
         this.content = content;
         this.mbti = mbti;
         this.member = member;
+        this.thumbnail = thumbnail;
     }
 
     public void modifyBoard(String title, String content, MbtiEnum mbti) {
@@ -65,5 +77,17 @@ public class Board extends BaseTimeEntity {
 
     public void deleteBoard() {
         this.state = false;
+    }
+
+    public void changeThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount--;
     }
 }

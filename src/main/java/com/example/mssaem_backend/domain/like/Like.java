@@ -3,12 +3,17 @@ package com.example.mssaem_backend.domain.like;
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @DynamicInsert
@@ -31,4 +36,22 @@ public class Like extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
 
+    public Like(Board board, Member member) {
+        this.board = board;
+        this.member = member;
+        this.board.increaseLikeCount();
+    }
+
+    public void updateBoardLike() {
+        this.state = !this.state;
+        if (!this.state) {
+            this.board.decreaseLikeCount();
+        } else {
+            this.board.increaseLikeCount();
+        }
+    }
+
+    public Boolean nowBoardLikeState() {
+        return this.state;
+    }
 }

@@ -30,13 +30,7 @@ public class BoardComment extends BaseTimeEntity {
     private Long likeCount;
 
     @ColumnDefault("0")
-    private Integer depth; //댓글 : 0, 대 댓글 : 1
-
-    @ColumnDefault("0")
     private Integer parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
-
-    @ColumnDefault("0")
-    private Integer orders; //대댓글의 순서
 
     private boolean state = true; //true : 존재, false : 삭제
 
@@ -44,4 +38,24 @@ public class BoardComment extends BaseTimeEntity {
     private Board board;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public BoardComment(String content, Member member, Board board, Integer parentId) {
+        this.content = content;
+        this.member = member;
+        this.board = board;
+        this.parentId = parentId;
+    }
+
+    public void deleteBoardComment() {
+        this.content = "삭제된 댓글입니다.";
+        this.state = false;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount--;
+    }
 }

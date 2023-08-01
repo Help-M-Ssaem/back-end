@@ -17,7 +17,6 @@ public class BoardCommentResponseDto {
         private Long commentId;
         private String Content;
         private Long likeCount;
-        private Integer depth;
         private Integer parentId;
         private String createdAt;
         private Boolean isLiked; // 댓글 좋아요 눌렀는지 확인
@@ -27,9 +26,9 @@ public class BoardCommentResponseDto {
         @Builder
         public BoardCommentSimpleInfo(MemberSimpleInfo memberSimpleInfo, BoardComment boardComment,
             String createdAt , Boolean isAllowed , Boolean isLiked) {
+            this.commentId = boardComment.getId();
             this.Content = boardComment.getContent();
             this.likeCount = boardComment.getLikeCount();
-            this.depth = boardComment.getDepth();
             this.parentId = boardComment.getParentId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.createdAt = createdAt;
