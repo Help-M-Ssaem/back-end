@@ -69,4 +69,12 @@ public class Member extends BaseTimeEntity {
         return String.valueOf(charArray);
     }
 
+    public Integer increaseReport() {
+        return this.report++;
+    }
+
+    public void updateStatus() {
+        this.status = false;
+    }
+
 }
