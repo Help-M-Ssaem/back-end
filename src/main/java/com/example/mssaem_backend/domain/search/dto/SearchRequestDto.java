@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.search.dto;
 
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,8 @@ public class SearchRequestDto {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class SearchInfo{
+  public static class SearchInfo implements Serializable {
+
     private String keyword;
   }
 

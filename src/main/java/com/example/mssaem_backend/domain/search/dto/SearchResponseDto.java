@@ -11,14 +11,23 @@ import lombok.NoArgsConstructor;
 
 public class SearchResponseDto {
 
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class SearchRes {
+
+    private PageResponseDto<List<BoardSimpleInfo>> boardSimpleInfos; // 전체 게시판
+    private PageResponseDto<List<GetWorriesRes>> getWorriesRes; // 고민 게시판
+    private PageResponseDto<List<DiscussionSimpleInfo>> discussionSimpleInfo;
+  }
 
   @Getter
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class SearchRes{
-    private PageResponseDto<List<BoardSimpleInfo>> boardSimpleInfos; // 전체 게시판
-    private PageResponseDto<List<GetWorriesRes>> getWorriesRes; // 고민 게시판
-    private PageResponseDto<List<DiscussionSimpleInfo>> discussionSimpleInfo;
+  public static class SearchPopular {
+
+    private String keyword;
+    private Double score;
   }
 
 }

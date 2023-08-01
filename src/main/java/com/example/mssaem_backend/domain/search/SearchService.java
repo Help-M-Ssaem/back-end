@@ -7,10 +7,10 @@ import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
 import com.example.mssaem_backend.domain.discussion.DiscussionService;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
-import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchInfo;
+import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchPopular;
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRes;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
@@ -32,9 +32,8 @@ public class SearchService {
   private final BoardRepository boardRepository;
   private final DiscussionRepository discussionRepository;
   private final WorryBoardRepository worryBoardRepository;
-  private final DiscussionOptionRepository discussionOptionRepository;
   private final DiscussionService discussionService;
-
+  private final SearchCustomRepository searchCustomRepository;
 
   /**
    * 최근 검색어 저장
@@ -59,6 +58,7 @@ public class SearchService {
         searchRepository.save(search);
       }
     }
+
   }
 
   /**
@@ -70,7 +70,7 @@ public class SearchService {
     // Board 5개 가져오기
     Page<Board> pageBoards = boardRepository.findByKeyword(searchInfo.getKeyword(), pageRequest);
     List<BoardSimpleInfo> boardSimpleResults = pageBoards.stream()
-        .map(b -> new BoardSimpleInfo(b, b.getThumbnail(), b.getCommentCount(),
+        .map(b -> new BoardSimpleInfo(b,
             new MemberSimpleInfo(b.getMember(), b.getMember().getBadgeName())))
         .collect(Collectors.toList());
 
@@ -94,6 +94,14 @@ public class SearchService {
             worrySimpleResults),
         new PageResponseDto<>(pageDiscussions.getNumber(), pageDiscussions.getTotalPages(),
             discussionSimpleInfos));
+  }
+
+  public void insertRedisSearch(SearchInfo searchInfo) {
+    searchCustomRepository.insertRedis(searchInfo);
+  }
+
+  public List<SearchPopular> selectAllSearch() {
+    return searchCustomRepository.selectAllSearch();
   }
 
 
