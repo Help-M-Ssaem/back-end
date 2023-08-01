@@ -81,7 +81,7 @@ public class DiscussionService {
     }
 
     // 토론글의 정보를 Dto에 매핑하는 메소드
-    private List<DiscussionSimpleInfo> setDiscussionSimpleInfo(Member member,
+    public List<DiscussionSimpleInfo> setDiscussionSimpleInfo(Member member,
         List<Discussion> discussions, int dateType) {
         List<DiscussionSimpleInfo> discussionSimpleInfos = new ArrayList<>();
 

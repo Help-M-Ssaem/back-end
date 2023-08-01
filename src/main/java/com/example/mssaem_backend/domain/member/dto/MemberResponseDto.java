@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.member.dto;
 
+
 import com.example.mssaem_backend.domain.badge.dto.BadgeResponse.BadgeInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardHistory;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;
@@ -33,6 +34,14 @@ public class MemberResponseDto {
         private String mbti;
         private String badge;
         private String profileImgUrl;
+
+        public MemberSimpleInfo(Member member, String badge){
+            this.id = member.getId();
+            this.nickName = member.getNickName();
+            this.mbti = member.getDetailMbti();
+            this.badge = badge;
+            this.profileImgUrl = member.getProfileImageUrl();
+        }
     }
 
     @Getter
