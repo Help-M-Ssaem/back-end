@@ -100,4 +100,15 @@ public class DiscussionController {
         return ResponseEntity.ok(
             discussionService.participateDiscussion(member, discussionId, discussionOptionId));
     }
+
+    /**
+     * 토론글 전체조회
+     */
+    @GetMapping("/discussions")
+    public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findDiscussions(
+        @CurrentMember Member member,
+        @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(discussionService.findDiscussions(member, page, size));
+    }
 }

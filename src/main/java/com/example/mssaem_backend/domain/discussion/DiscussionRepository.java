@@ -27,4 +27,5 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
         @Param("keyword") String keyword,
         Pageable pageable);
 
+    Page<Discussion> findByStateTrue(PageRequest pageRequest);
 }

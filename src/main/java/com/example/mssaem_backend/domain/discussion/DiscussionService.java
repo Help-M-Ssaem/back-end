@@ -337,4 +337,12 @@ public class DiscussionService {
         //해당 토론의 참여율 계산해서 반환
         return setDiscussionOptionSelectedInfo(discussion.getParticipantCount(), discussionOptions, selectIdx);
     }
+    //토론글 전체 조회하기
+    public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussions(Member member, int page,
+        int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Discussion> discussions = discussionRepository.findByStateTrue(pageRequest);
+        List<Discussion> discussionList = discussions.stream().toList();
+        return new PageResponseDto<>(discussions.getNumber(), discussions.getTotalPages(), setDiscussionSimpleInfo(member, discussionList, 1));
+    }
 }
