@@ -28,5 +28,5 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
     Boolean existsBoardCommentById(Long id);
 
     BoardComment findByIdAndBoardIdAndStateIsTrue(Long id, Long boardId);
-
+  
 }

@@ -41,7 +41,7 @@ public class BoardComment extends BaseTimeEntity {
     private Board board;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
-  
+
     public BoardComment(String content, Member member, Board board, Integer parentId) {
         this.content = content;
         this.member = member;
@@ -61,7 +61,7 @@ public class BoardComment extends BaseTimeEntity {
     public void decreaseLikeCount() {
         this.likeCount--;
     }
-  
+
    public Integer increaseReport(){
         return this.report++;
     }
@@ -69,4 +69,5 @@ public class BoardComment extends BaseTimeEntity {
     public void updateState() {
         this.state = false;
     }
+
 }
