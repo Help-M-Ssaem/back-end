@@ -41,8 +41,28 @@ public class BoardComment extends BaseTimeEntity {
     private Board board;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+  
+    public BoardComment(String content, Member member, Board board, Integer parentId) {
+        this.content = content;
+        this.member = member;
+        this.board = board;
+        this.parentId = parentId;
+    }
 
-    public Integer increaseReport(){
+    public void deleteBoardComment() {
+        this.content = "삭제된 댓글입니다.";
+        this.state = false;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount--;
+    }
+  
+   public Integer increaseReport(){
         return this.report++;
     }
 
