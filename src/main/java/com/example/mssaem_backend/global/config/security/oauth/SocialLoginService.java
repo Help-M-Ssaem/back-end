@@ -4,6 +4,7 @@ import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.AuthErrorCode;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
@@ -15,6 +16,7 @@ import java.net.URL;
 
 @Profile("dev")
 @Service
+@Slf4j
 public class SocialLoginService {
 
     @Value("${social.grant-type}")
@@ -62,6 +64,7 @@ public class SocialLoginService {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
         bw.write(parameter);
         bw.flush();
+
 
         if (conn.getResponseCode() >= 400) {
             throw new BaseException(AuthErrorCode.INVALID_ID_TOKEN);
