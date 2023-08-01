@@ -30,6 +30,9 @@ public class BoardComment extends BaseTimeEntity {
     private Long likeCount;
 
     @ColumnDefault("0")
+    private Integer report;
+
+    @ColumnDefault("0")
     private Integer parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
 
     private boolean state = true; //true : 존재, false : 삭제
@@ -58,4 +61,13 @@ public class BoardComment extends BaseTimeEntity {
     public void decreaseLikeCount() {
         this.likeCount--;
     }
+
+   public Integer increaseReport(){
+        return this.report++;
+    }
+
+    public void updateState() {
+        this.state = false;
+    }
+
 }

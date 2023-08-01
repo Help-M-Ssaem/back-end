@@ -4,6 +4,7 @@ import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,5 +50,20 @@ public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
         @Param("fromMbti") MbtiEnum fromMbti,
         @Param("toMbti") MbtiEnum toMbti,
         Pageable pageable);
+
+
+    @Query(value = "select w from WorryBoard w join fetch w.member "
+        + "where (lower(w.title) like lower(concat('%', :keyword, '%')))"
+        + "or (lower(w.content) like lower(concat('%', :keyword, '%')))"
+        + "or (lower(w.member.nickName) like lower(concat('%', :keyword, '%')))"
+        + "and w.state = true order by w.createdAt desc",
+        countQuery = "select count(w) from WorryBoard w")
+    Page<WorryBoard> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    Optional<WorryBoard> findByIdAndStateIsTrue(Long id);
+
+    Integer countAllByStateIsTrueAndMember(@Param("member") Member member);
+
+    Integer countALlBySolveMember(@Param("solveMember") Member solveMember);
 
 }
