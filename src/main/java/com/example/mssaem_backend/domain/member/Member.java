@@ -90,4 +90,12 @@ public class Member extends BaseTimeEntity {
     }
 
 
+    public Integer increaseReport() {
+        return this.report++;
+    }
+
+    public void updateStatus() {
+        this.status = false;
+    }
+
 }

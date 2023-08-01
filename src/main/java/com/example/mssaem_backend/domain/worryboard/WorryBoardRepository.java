@@ -4,6 +4,7 @@ import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +50,8 @@ public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
         @Param("fromMbti") MbtiEnum fromMbti,
         @Param("toMbti") MbtiEnum toMbti,
         Pageable pageable);
+
+    Optional<WorryBoard> findByIdAndStateIsTrue(Long id);
 
     Integer countAllByStateIsTrueAndMember(@Param("member") Member member);
 

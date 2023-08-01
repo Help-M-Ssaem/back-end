@@ -30,6 +30,9 @@ public class DiscussionComment extends BaseTimeEntity {
     private Long likeCount;
 
     @ColumnDefault("0")
+    private Integer report;
+
+    @ColumnDefault("0")
     private Integer depth; //댓글 : 0, 대 댓글 : 1
 
     @ColumnDefault("0")
@@ -44,4 +47,12 @@ public class DiscussionComment extends BaseTimeEntity {
     private Discussion discussion;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    public Integer increaseReport() {
+        return this.report++;
+    }
+
+    public void updateState() {
+        this.state = false;
+    }
 }

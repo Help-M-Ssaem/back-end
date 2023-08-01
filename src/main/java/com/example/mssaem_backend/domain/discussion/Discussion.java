@@ -38,7 +38,7 @@ public class Discussion extends BaseTimeEntity {
     private Long participantCount; // 참여자 수
 
     @ColumnDefault("0")
-    private Long report;
+    private Integer report;
 
     @ColumnDefault("0")
     private Long hits;
@@ -67,6 +67,14 @@ public class Discussion extends BaseTimeEntity {
         this.state = false;
     }
 
+    public Integer increaseReport() {
+        return this.report++;
+    }
+
+    public void updateState() {
+        this.state = false;
+    }
+      
     public void increaseCount() {
         this.participantCount +=1;
     }

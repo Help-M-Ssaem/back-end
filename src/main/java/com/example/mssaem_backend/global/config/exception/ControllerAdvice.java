@@ -1,6 +1,8 @@
 package com.example.mssaem_backend.global.config.exception;
 
 import com.example.mssaem_backend.global.config.exception.errorCode.GlobalErrorCode;
+import com.example.mssaem_backend.global.config.exception.errorCode.ReportError;
+import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -72,6 +74,15 @@ public class ControllerAdvice {
         System.out.println(e);
         String detailMessage = extractMessage(e.getBindingResult().getFieldErrors());
         return convert(GlobalErrorCode.NOT_VALID_ARGUMENT_ERROR, detailMessage);
+    }
+
+    /**
+     * CASE: 메일 관련 에러
+     */
+    @ExceptionHandler(MessagingException.class)
+    public ResponseEntity<ExceptionResponse> handleException(MessagingException e) {
+        System.out.println(e);
+        return convert(ReportError.FAIL_SEND_MAIL, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private String extractMessage(List<FieldError> fieldErrors) {
