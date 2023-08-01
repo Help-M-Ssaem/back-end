@@ -27,9 +27,8 @@ public class DiscussionResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class DiscussionHistory {
-        private int discussionCount;          // 전체 토론글 수
-        private int discussionCommentCount;   // 전체 토론글 댓글 수
-        private int participationCount1;      // 내 토론에 참여한 사람의 수
-        private int participationCount2;      // 내가 참여한 토론의 수
+        private Long discussionCount;          // 전체 토론글 수
+        private Long discussionCommentCount;   // 전체 토론글 댓글 수
+        private Long participationCount;       // 내 토론에 참여한 사람의 수
     }
 }

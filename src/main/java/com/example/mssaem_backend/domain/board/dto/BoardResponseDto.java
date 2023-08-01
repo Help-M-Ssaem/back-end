@@ -93,7 +93,7 @@ public class BoardResponseDto {
 
         @Builder
         public GetBoardRes(MemberSimpleInfo memberSimpleInfo, Board board, List<String> imgUrlList,
-                           String createdAt, Long commentCount, Boolean isAllowed) {
+                           String createdAt, Long commentCount, Boolean isAllowed, Boolean isLiked) {
             this.memberSimpleInfo = memberSimpleInfo;
             this.boardId = board.getId();
             this.title = board.getTitle();
@@ -112,9 +112,8 @@ public class BoardResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardHistory {
-        private int boardCount;         // 전체 게시글 수
-        private int boardCommentCount;  // 전체 게시글 댓글 수
-        private int likeCount1;         // 받은 좋아요의 수
-        private int likeCount2;         // 누른 좋아요의 수
+        private Long boardCount;         // 전체 게시글 수
+        private Long boardCommentCount;  // 전체 게시글 댓글 수
+        private Long likeAllCount;       // 받은 좋아요의 수
     }
 }

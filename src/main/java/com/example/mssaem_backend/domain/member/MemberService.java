@@ -67,6 +67,7 @@ public class MemberService {
             .caseSensitivity(registerMember.getCaseSensitivity())
             .refreshToken("")
             .report(0)
+            .status(true)
             .role(Role.ROLE_MEMBER)
             .build();
         save(member);

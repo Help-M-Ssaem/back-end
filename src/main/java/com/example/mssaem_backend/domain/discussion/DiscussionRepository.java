@@ -29,5 +29,8 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
         @Param("keyword") String keyword,
         Pageable pageable);
 
-    Integer countAllByStateIsTrueAndMember(@Param("member") Member member);
+    Long countAllByStateIsTrueAndMember(Member member);
+
+    @Query(value = "SELECT SUM(d.participantCount) FROM Discussion d WHERE d.member = :member AND d.state = true")
+    Long sumParticipantCountByMember(@Param("member") Member member);
 }

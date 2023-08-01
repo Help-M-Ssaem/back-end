@@ -300,9 +300,8 @@ public class BoardService {
         return new BoardHistory(
                 boardRepository.countAllByStateIsTrueAndMember(member),
                 boardCommentRepository.countAllByStateIsTrueAndMember(member),
-                //수정 필요
-                0, 0
-                );
+                boardRepository.sumLikeCountByMember(member)
+        );
     }
 
 }

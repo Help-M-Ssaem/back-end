@@ -17,7 +17,7 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
 
     List<BoardComment> findAllByBoardId(Long id);
 
-    Integer countAllByStateIsTrueAndMember(@Param("member") Member member);
+    Long countAllByStateIsTrueAndMember(@Param("member") Member member);
 
     @Query(value = "select bc from BoardComment bc join fetch bc.member where bc.board.id = :id", countQuery = "select count(bc) from BoardComment bc")
     Page<BoardComment> findAllByBoardId(@Param("id") Long id, Pageable pageable);

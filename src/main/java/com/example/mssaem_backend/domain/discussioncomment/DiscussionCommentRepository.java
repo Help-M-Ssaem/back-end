@@ -9,5 +9,5 @@ public interface DiscussionCommentRepository extends JpaRepository<DiscussionCom
 
     Long countByDiscussionAndStateTrue(Discussion discussion);
 
-    Integer countAllByStateIsTrueAndMember(@Param("member") Member member);
+    Long countAllByStateIsTrueAndMember(@Param("member") Member member);
 }

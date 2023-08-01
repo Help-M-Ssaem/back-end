@@ -259,12 +259,9 @@ public class DiscussionService {
         return new DiscussionHistory(
                 discussionRepository.countAllByStateIsTrueAndMember(member),
                 discussionCommentRepository.countAllByStateIsTrueAndMember(member),
-                //수정 필요
-                0, 0
+                discussionRepository.sumParticipantCountByMember(member)
         );
     }
-
-}
 
     //토론글 참여하기
     @Transactional

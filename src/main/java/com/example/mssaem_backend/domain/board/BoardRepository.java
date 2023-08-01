@@ -31,7 +31,10 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
         @Param("mbti") MbtiEnum mbti,
         Pageable pageable);
 
-    Integer countAllByStateIsTrueAndMember(@Param("member") Member member);
+    Long countAllByStateIsTrueAndMember(@Param("member") Member member);
 
     Board findByMemberAndIdAndStateIsTrue(Member member, Long id);
+
+    @Query(value = "SELECT SUM(b.likeCount) FROM Board b WHERE b.member = :member AND b.state = true")
+    Long sumLikeCountByMember(@Param("member") Member member);
 }
