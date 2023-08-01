@@ -4,6 +4,7 @@ import static com.example.mssaem_backend.global.common.CheckWriter.match;
 
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
+import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
@@ -252,6 +253,14 @@ public class DiscussionService {
         discussion.deleteDiscussion();
 
         return "토론글 삭제완료";
+    }
+
+    public DiscussionHistory getDiscussionHistory(Member member) {
+        return new DiscussionHistory(
+                discussionRepository.countAllByStateIsTrueAndMember(member),
+                discussionCommentRepository.countAllByStateIsTrueAndMember(member),
+                discussionRepository.sumParticipantCountByMember(member)
+        );
     }
 
     //토론글 참여하기

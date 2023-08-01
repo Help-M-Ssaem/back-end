@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    @Query(value = "select m from Member m where m.id = :memberId and m.status = false")
+    @Query(value = "select m from Member m where m.id = :memberId and m.status = true")
     Optional<Member> findByIdWithStatus(@Param("memberId") Long memberId);
     Optional<Member> findByEmail(String email);
     Boolean existsByNickName(String nickName);

@@ -10,4 +10,6 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
   Evaluation findByWorryBoardAndMember(WorryBoard worryBoard, Member member);
 
   List<Evaluation> findAllByMember(Member member);
+
+  Integer countAllByMember(Member member);
 }

@@ -22,4 +22,13 @@ public class DiscussionResponseDto {
         private MemberSimpleInfo memberSimpleInfo;
         private List<T> options;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DiscussionHistory {
+        private Long discussionCount;          // 전체 토론글 수
+        private Long discussionCommentCount;   // 전체 토론글 댓글 수
+        private Long participationCount;       // 내 토론에 참여한 사람의 수
+    }
 }

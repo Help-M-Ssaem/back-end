@@ -62,4 +62,8 @@ public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
 
     Optional<WorryBoard> findByIdAndStateIsTrue(Long id);
 
+    Integer countAllByStateIsTrueAndMember(@Param("member") Member member);
+
+    Integer countALlBySolveMember(@Param("solveMember") Member solveMember);
+
 }
