@@ -10,7 +10,7 @@ import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionInfo;
-import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
+import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionLoginInfo;
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelected;
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelectedRepository;
 import com.example.mssaem_backend.domain.member.Member;
@@ -113,7 +113,7 @@ public class DiscussionService {
                         discussion.getMember().getProfileImageUrl()
                     ),
                     selectedOptionIdx != -1
-                        ? setDiscussionOptionSelectedInfo(discussion.getParticipantCount(),
+                        ? setDiscussionOptionLoginInfo(discussion.getParticipantCount(),
                         discussionOptions, selectedOptionIdx)
                         : setDiscussionOptionInfo(discussionOptions)
                 )
@@ -141,10 +141,10 @@ public class DiscussionService {
     }
 
     // 로그인한 유저가 옵션을 선택한 경우 고민글 옵션 정보 Dto에 매핑
-    private List<DiscussionOptionSelectedInfo> setDiscussionOptionSelectedInfo(Long participants,
+    private List<DiscussionOptionLoginInfo> setDiscussionOptionLoginInfo(Long participants,
         List<DiscussionOption> discussionOptions, int selectedOptionIdx) {
-
-        List<DiscussionOptionSelectedInfo> discussionOptionSelectedInfos = new ArrayList<>();
+        
+        List<DiscussionOptionLoginInfo> DiscussionOptionLoginInfos = new ArrayList<>();
         DiscussionOption discussionOption;
         String selectedPercent;
         for (int i = 0; i < discussionOptions.size(); i++) {
@@ -154,8 +154,8 @@ public class DiscussionService {
                 (double) discussionOption.getSelectCount() / (double) participants * 100.0);
 
             // 유저가 선택을 완료한 고민글 Dto 처리
-            discussionOptionSelectedInfos.add(
-                new DiscussionOptionSelectedInfo(
+            DiscussionOptionLoginInfos.add(
+                new DiscussionOptionLoginInfo(
                     discussionOption.getId(),
                     discussionOption.getContent(),
                     discussionOption.getImgUrl(),
@@ -163,7 +163,7 @@ public class DiscussionService {
                     i == selectedOptionIdx)
             );
         }
-        return discussionOptionSelectedInfos;
+        return DiscussionOptionLoginInfos;
     }
 
     // 옵션을 선택하지 않은 경우 고민글 옵션 정보 Dto에 매핑
@@ -256,7 +256,7 @@ public class DiscussionService {
 
     //토론글 참여하기
     @Transactional
-    public List<DiscussionOptionSelectedInfo> participateDiscussion(Member member,
+    public List<DiscussionOptionLoginInfo> participateDiscussion(Member member,
         Long discussionId, Long discussionOptionId) {
         Discussion discussion = discussionRepository.findById(discussionId)
             .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
@@ -335,7 +335,7 @@ public class DiscussionService {
         discussionOption.increaseCount();
 
         //해당 토론의 참여율 계산해서 반환
-        return setDiscussionOptionSelectedInfo(discussion.getParticipantCount(), discussionOptions, selectIdx);
+        return setDiscussionOptionLoginInfo(discussion.getParticipantCount(), discussionOptions, selectIdx);
     }
     //토론글 전체 조회하기
     public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussions(Member member, int page,

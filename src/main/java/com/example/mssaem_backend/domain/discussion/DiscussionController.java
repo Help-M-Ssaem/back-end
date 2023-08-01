@@ -2,7 +2,7 @@ package com.example.mssaem_backend.domain.discussion;
 
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
-import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
+import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionLoginInfo;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -93,7 +93,7 @@ public class DiscussionController {
      * 토론글 참여하기
      */
     @PostMapping("/member/discussions/{discussionId}/discussion-options/{discussionOptionId}")
-    public ResponseEntity<List<DiscussionOptionSelectedInfo>> selectDiscussion(@CurrentMember Member member,
+    public ResponseEntity<List<DiscussionOptionLoginInfo>> selectDiscussion(@CurrentMember Member member,
         @PathVariable Long discussionId,
         @PathVariable Long discussionOptionId
     ) {
