@@ -3,6 +3,8 @@ package com.example.mssaem_backend.domain.discussioncomment;
 import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
+import com.example.mssaem_backend.domain.boardcomment.BoardComment;
+import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncommentlike.DiscussionCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
@@ -68,5 +70,15 @@ public class DiscussionCommentService {
                     .stream()
                     .collect(Collectors.toList()), viewer)
         );
+    }
+
+    //베스트 댓글 조회
+    public List<DiscussionCommentSimpleInfo> findDiscussionCommentBestListByDiscussionId(Member viewer, Long discussionId) {
+        PageRequest pageRequest = PageRequest.of(0, 3);
+
+        List<DiscussionComment> discussionCommentList = discussionCommentLikeRepository.findDiscussionCommentsByDiscussionIdWithMoreThanTenDiscussionCommentLikeAndStateTrue(
+            pageRequest, discussionId).stream().collect(Collectors.toList());
+
+        return setDiscussionCommentSimpleInfo(discussionCommentList, viewer);
     }
 }
