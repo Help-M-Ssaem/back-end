@@ -29,4 +29,13 @@ public class Search extends BaseTimeEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   private Member member;
+
+  public Search(String keyword, Member member) {
+    this.keyword = keyword;
+    this.member = member;
+  }
+
+  public void setKeyword(String keyword) {
+    this.keyword = keyword;
+  }
 }

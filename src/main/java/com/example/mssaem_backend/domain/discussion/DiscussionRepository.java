@@ -1,6 +1,9 @@
 package com.example.mssaem_backend.domain.discussion;
 
 import java.time.LocalDateTime;
+
+import com.example.mssaem_backend.domain.member.Member;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,5 +30,20 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
         @Param("keyword") String keyword,
         Pageable pageable);
 
+
+    @Query(value = "select d from Discussion d join fetch d.member "
+        + "where (lower(d.title) like lower(concat('%', :keyword, '%')))"
+        + "or (lower(d.content) like lower(concat('%', :keyword, '%')))"
+        + "or (lower(d.member.nickName) like lower(concat('%', :keyword, '%')))"
+        + "and d.state = true order by d.createdAt desc",
+        countQuery = "select count(d) from Discussion d")
+    Page<Discussion> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    Optional<Discussion> findByIdAndStateIsTrue(Long id);
+
+    Long countAllByStateIsTrueAndMember(Member member);
+
+    @Query(value = "SELECT SUM(d.participantCount) FROM Discussion d WHERE d.member = :member AND d.state = true")
+    Long sumParticipantCountByMember(@Param("member") Member member);
     Page<Discussion> findByStateTrue(PageRequest pageRequest);
 }

@@ -81,5 +81,15 @@ public class WorryBoardResponseDto {
             this.worryBoardId = worryBoardId;
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class WorryBoardHistory {
+        private int worryBoardCount;         // 내가 작성한 고민글의 수
+        private int solvedWorryBoardCount;   // 내가 해결한 고민글의 수
+        private int evaluationCount;         // 내가 남긴 평가의 수
+    }
+
 }
 

@@ -11,7 +11,6 @@ import org.hibernate.annotations.DynamicInsert;
 
 @DynamicInsert
 @Getter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -67,6 +66,36 @@ public class Member extends BaseTimeEntity {
             }
         }
         return String.valueOf(charArray);
+    }
+
+    public Member(String email, String nickName, MbtiEnum mbti, String caseSensitivity) {
+        this.email = email;
+        this.nickName = nickName;
+        this.mbti = mbti;
+        this.caseSensitivity = caseSensitivity;
+        this.refreshToken = "";
+        this.report = 0;
+        this.role = Role.ROLE_MEMBER;
+    }
+
+    public void modifyMember(String nickName, String introduction, String profileImageUrl,
+                             MbtiEnum mbti, String caseSensitivity, String badgeName) {
+        this.nickName = nickName != null ? nickName : this.nickName;
+        this.introduction = introduction != null ? introduction : this.introduction;
+        this.profileImageUrl = profileImageUrl != null ? profileImageUrl : this.profileImageUrl;
+        this.mbti = mbti != null ? mbti : this.mbti;
+        this.caseSensitivity = caseSensitivity != null ? caseSensitivity : this.caseSensitivity;
+        this.badgeName = badgeName != null ? badgeName : this.badgeName;
+
+    }
+
+
+    public Integer increaseReport() {
+        return this.report++;
+    }
+
+    public void updateStatus() {
+        this.status = false;
     }
 
 }

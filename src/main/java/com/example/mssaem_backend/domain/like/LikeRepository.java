@@ -21,4 +21,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Like findByMemberAndBoardId(Member member, Long id);
 
     Boolean existsLikeByMemberAndBoardId(Member member, Long id);
+
+    @Query(value = "SELECT COUNT(l) FROM Like l WHERE l.board.member = :member AND l.board.state = true AND l.state = true")
+    Integer countLikesByMember(@Param("member") Member member);
 }

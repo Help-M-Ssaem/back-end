@@ -11,12 +11,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
-
 @Service
+@Slf4j
 public class SocialLoginService {
 
     @Value("${social.grant-type}")
@@ -64,6 +65,7 @@ public class SocialLoginService {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
         bw.write(parameter);
         bw.flush();
+
 
         if (conn.getResponseCode() >= 400) {
             throw new BaseException(AuthErrorCode.INVALID_ID_TOKEN);
