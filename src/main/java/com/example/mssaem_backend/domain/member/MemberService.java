@@ -84,7 +84,7 @@ public class MemberService {
         switch (socialLoginType) {
             case KAKAO -> email = socialLoginService.getKaKaoEmail(socialLoginService.getKaKaoAccessToken(idToken));
             case GOOGLE -> email = socialLoginService.getGoogleEmail(socialLoginService.getGoogleAccessToken(idToken));
-            //case NAVER -> email =
+            case NAVER -> email = socialLoginService.getNaverEmail(socialLoginService.getNaverAccessToken(idToken));
         }
 
         Member member = memberRepository.findByEmail(email).orElse(null);
