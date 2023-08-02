@@ -14,7 +14,7 @@ public interface DiscussionCommentLikeRepository extends
 
     Boolean existsDiscussionCommentLikeByMemberAndStateIsTrueAndDiscussionCommentId(Member member, Long id);
 
-    @Query(value = "SELECT dc FROM DiscussionComment dc WHERE dc.discussion.id = :discussionId AND dc.likeCount >= 10 AND dc.state = true ORDER BY bc.likeCount DESC")
+    @Query(value = "SELECT dc FROM DiscussionComment dc WHERE dc.discussion.id = :discussionId AND dc.likeCount >= 10 AND dc.state = true ORDER BY dc.likeCount DESC")
     Page<DiscussionComment> findDiscussionCommentsByDiscussionIdWithMoreThanTenDiscussionCommentLikeAndStateTrue(
         PageRequest pageRequest, @Param("discussionId") Long discussionId);
 }
