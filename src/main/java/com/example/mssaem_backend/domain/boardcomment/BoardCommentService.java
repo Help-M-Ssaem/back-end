@@ -111,7 +111,7 @@ public class BoardCommentService {
         }
         return boardComment.isState();
     }
-  
+
     // 좋아요 수 10개 이상으로 베스트 댓글 3개 조회
     public List<BoardCommentSimpleInfo> findBoardCommentBestListByBoardId(Member viewer,
         Long boardId) {
@@ -122,5 +122,21 @@ public class BoardCommentService {
 
         return setBoardCommentSimpleInfo(boardCommentList, viewer);
     }
-      
+
+    public PageResponseDto<List<BoardCommentSimpleInfo>> findBoardCommentListByMemberId(
+        Long memberId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BoardComment> result = boardCommentRepository.findAllByMemberIdAndStateIsTrue(memberId,
+            pageable);
+
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setBoardCommentSimpleInfo(
+                result
+                    .stream()
+                    .collect(Collectors.toList()), null)
+        );
+    }
+
 }
