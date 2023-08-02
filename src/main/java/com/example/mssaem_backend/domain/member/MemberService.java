@@ -172,4 +172,11 @@ public class MemberService {
                 .worryBoardHistory(worryBoardService.getWorryBoardHistory(member))
                 .build();
     }
+
+    public TokenInfo refreshAccessToken(Member member) {
+        return TokenInfo.builder()
+                .accessToken(jwtTokenProvider.generateAccessToken(member.getId()))
+                .refreshToken(member.getRefreshToken())
+                .build();
+    }
 }
