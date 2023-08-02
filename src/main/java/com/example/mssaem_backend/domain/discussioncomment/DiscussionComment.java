@@ -33,9 +33,6 @@ public class DiscussionComment extends BaseTimeEntity {
     private Integer report;
 
     @ColumnDefault("0")
-    private Integer depth; //댓글 : 0, 대 댓글 : 1
-
-    @ColumnDefault("0")
     private Integer parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
 
     @ColumnDefault("0")
