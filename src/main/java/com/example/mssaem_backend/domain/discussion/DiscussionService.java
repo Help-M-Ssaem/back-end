@@ -17,12 +17,14 @@ import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionRe
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelected;
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelectedRepository;
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionErrorCode;
+import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,7 @@ public class DiscussionService {
     private final DiscussionOptionSelectedRepository discussionOptionSelectedRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
+    private final MemberRepository memberRepository;
 
 
     // HOT 토론글 더보기 조회
@@ -355,10 +358,11 @@ public class DiscussionService {
     public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussions(Member member, int page,
         int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Discussion> discussions = discussionRepository.findByStateTrue(pageRequest);
+        Page<Discussion> discussions = discussionRepository.findByStateTrueOrderByCreatedAtDesc(
+            pageRequest);
         List<Discussion> discussionList = discussions.stream().toList();
         return new PageResponseDto<>(discussions.getNumber(), discussions.getTotalPages(),
-            setDiscussionSimpleInfo(member, discussionList, 1));
+            setDiscussionSimpleInfo(member, discussionList, 3));
     }
 
     //토론글 상세 조회
@@ -371,21 +375,32 @@ public class DiscussionService {
 
         List<Discussion> discussions = new ArrayList<>();
         discussions.add(discussion);
-        return new DiscussionDetailInfo(setDiscussionSimpleInfo(viewer, discussions, 1).get(0),
+        return new DiscussionDetailInfo(setDiscussionSimpleInfo(viewer, discussions, 2).get(0),
             isEditAllowed);
     }
 
     //특정 멤버별 올린 토론글 조회
-    public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussionsByMember(Member member, int page,
+    public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussionsByMemberId(Member member,
+        Long memberId,
+        int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
+        //memberId가 있으면 타인의 프로필
+        Member profileMember;
+        if (memberId != null) {
+            profileMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+        } else {
+            profileMember = member;
+        }
 
-        Page<Discussion> discussions = discussionRepository.findAllByMemberAndStateIsTrue(member, pageable);
+        Page<Discussion> discussions = discussionRepository.findAllByMemberAndStateIsTrueOrderByCreatedAtDesc(
+            profileMember, pageable);
         return new PageResponseDto<>(
             discussions.getNumber(),
             discussions.getTotalPages(),
             setDiscussionSimpleInfo(
-                member,
+                profileMember,
                 discussions
                     .stream()
                     .collect(Collectors.toList()), 3)

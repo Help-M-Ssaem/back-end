@@ -127,10 +127,11 @@ public class DiscussionController {
     /**
      * 멤버별 올린 토론글 조회
      */
-    @GetMapping("/member/discussion/post-list")
+    @GetMapping("/discussion/post-list")
     public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findDiscussionsById(
-        @CurrentMember Member member, @RequestParam(value = "page") int page,
+        @CurrentMember Member member,
+        @RequestParam(required = false) Long memberId, @RequestParam(value = "page") int page,
         @RequestParam(value = "size") int size) {
-        return ResponseEntity.ok(discussionService.findDiscussionsByMember(member, page, size));
+        return ResponseEntity.ok(discussionService.findDiscussionsByMemberId(member, memberId, page, size));
     }
 }

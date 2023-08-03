@@ -107,6 +107,8 @@ public class DiscussionCommentService {
         if (isMatch(member, discussionComment.getMember())) {
             //같다면 삭제(삭제된 댓글입니다. 로 표시)
             discussionComment.deleteDiscussionComment();
+            discussionCommentLikeRepository.deleteAllByDiscussionComment(discussionComment);
+
         } else {
             throw new BaseException(MemberErrorCode.INVALID_MEMBER);
         }

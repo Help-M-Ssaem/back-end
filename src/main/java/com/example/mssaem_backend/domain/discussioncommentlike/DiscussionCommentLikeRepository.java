@@ -18,4 +18,6 @@ public interface DiscussionCommentLikeRepository extends
         PageRequest pageRequest, @Param("discussionId") Long discussionId);
 
     DiscussionCommentLike findDiscussionCommentLikeByMemberAndDiscussionCommentId(Member member, Long commentId);
+
+    void deleteAllByDiscussionComment(DiscussionComment discussionComment);
 }
