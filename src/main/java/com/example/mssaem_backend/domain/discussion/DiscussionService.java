@@ -4,8 +4,6 @@ import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.CheckWriter.match;
 
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
-import com.example.mssaem_backend.domain.board.Board;
-import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionDetailInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;

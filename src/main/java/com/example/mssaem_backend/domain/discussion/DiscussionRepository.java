@@ -1,9 +1,7 @@
 package com.example.mssaem_backend.domain.discussion;
 
-import com.example.mssaem_backend.domain.board.Board;
-import java.time.LocalDateTime;
-
 import com.example.mssaem_backend.domain.member.Member;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

@@ -16,4 +16,6 @@ public interface DiscussionCommentLikeRepository extends
     @Query(value = "SELECT dc FROM DiscussionComment dc WHERE dc.discussion.id = :discussionId AND dc.likeCount >= 10 AND dc.state = true ORDER BY dc.likeCount DESC")
     Page<DiscussionComment> findDiscussionCommentsByDiscussionIdWithMoreThanTenDiscussionCommentLikeAndStateTrue(
         PageRequest pageRequest, @Param("discussionId") Long discussionId);
+
+    DiscussionCommentLike findDiscussionCommentLikeByMemberAndDiscussionCommentId(Member member, Long commentId);
 }

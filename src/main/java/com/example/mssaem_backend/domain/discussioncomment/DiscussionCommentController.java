@@ -63,8 +63,4 @@ public class DiscussionCommentController {
         return ResponseEntity.ok(
             discussionCommentService.deleteDiscussionComment(member, discussionId, commentId));
     }
-
-    /**
-     * 멤버별 고민글 조회
-     */
 }

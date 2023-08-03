@@ -1,6 +1,5 @@
 package com.example.mssaem_backend.domain.discussion;
 
-import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionDetailInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
