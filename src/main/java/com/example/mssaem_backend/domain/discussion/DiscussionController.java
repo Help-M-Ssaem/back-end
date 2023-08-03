@@ -1,8 +1,9 @@
 package com.example.mssaem_backend.domain.discussion;
 
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
+import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionDetailInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
-import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
+import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionLoginInfo;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -93,11 +94,44 @@ public class DiscussionController {
      * 토론글 참여하기
      */
     @PostMapping("/member/discussions/{discussionId}/discussion-options/{discussionOptionId}")
-    public ResponseEntity<List<DiscussionOptionSelectedInfo>> selectDiscussion(@CurrentMember Member member,
+    public ResponseEntity<List<DiscussionOptionLoginInfo>> selectDiscussion(
+        @CurrentMember Member member,
         @PathVariable Long discussionId,
         @PathVariable Long discussionOptionId
     ) {
         return ResponseEntity.ok(
             discussionService.participateDiscussion(member, discussionId, discussionOptionId));
+    }
+
+    /**
+     * 토론글 전체조회
+     */
+    @GetMapping("/discussions")
+    public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findDiscussions(
+        @CurrentMember Member member,
+        @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(discussionService.findDiscussions(member, page, size));
+    }
+
+    /**
+     * 토론글 상세조회
+     */
+    @GetMapping("/discussions/{id}")
+    public ResponseEntity<DiscussionDetailInfo> findDiscussion(
+        @CurrentMember Member member,
+        @PathVariable Long id) {
+        return ResponseEntity.ok(discussionService.findDiscussion(member, id));
+    }
+
+    /**
+     * 멤버별 올린 토론글 조회
+     */
+    @GetMapping("/discussion/post-list")
+    public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findDiscussionsById(
+        @CurrentMember Member member,
+        @RequestParam(required = false) Long memberId, @RequestParam(value = "page") int page,
+        @RequestParam(value = "size") int size) {
+        return ResponseEntity.ok(discussionService.findDiscussionsByMemberId(member, memberId, page, size));
     }
 }

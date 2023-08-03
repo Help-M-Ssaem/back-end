@@ -33,9 +33,6 @@ public class DiscussionComment extends BaseTimeEntity {
     private Integer report;
 
     @ColumnDefault("0")
-    private Integer depth; //댓글 : 0, 대 댓글 : 1
-
-    @ColumnDefault("0")
     private Integer parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
 
     @ColumnDefault("0")
@@ -48,11 +45,31 @@ public class DiscussionComment extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    public DiscussionComment(String content, Member member, Discussion discussion, Integer parentId) {
+        this.content = content;
+        this.member = member;
+        this.discussion = discussion;
+        this.parentId = parentId;
+    }
+
     public Integer increaseReport() {
         return this.report++;
     }
 
     public void updateState() {
         this.state = false;
+    }
+
+    public void deleteDiscussionComment() {
+        this.content = "삭제된 댓글입니다.";
+        this.state = false;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount--;
     }
 }
