@@ -3,6 +3,7 @@ package com.example.mssaem_backend.domain.search;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchInfo;
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchPopular;
+import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRecent;
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRes;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
@@ -43,8 +44,17 @@ public class SearchController {
   /**
    * 최근 검색어
    */
+  @GetMapping("/member/recent/keywords")
+  public ResponseEntity<List<SearchRecent>> selectRecentSearch(@CurrentMember Member member){
+    return ResponseEntity.ok(searchService.selectRecentSearch(member));
+  }
 
   /**
    * 실시간 인기 검색어
    */
+  @GetMapping("/realtime/keywords")
+  public ResponseEntity<List<SearchPopular>> selectAllPopularSearch(){
+    return ResponseEntity.ok(searchService.selectPopularSearch());
+  }
+
 }
