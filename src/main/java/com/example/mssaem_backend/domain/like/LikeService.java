@@ -1,7 +1,10 @@
 package com.example.mssaem_backend.domain.like;
 
+import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.board.BoardRepository;
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.domain.notification.NotificationService;
+import com.example.mssaem_backend.domain.notification.TypeEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +16,7 @@ public class LikeService {
     private final LikeRepository likeRepository;
 
     private final BoardRepository boardRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public Boolean updateBoardLike(Member member, Long boardId) {
@@ -20,10 +24,29 @@ public class LikeService {
         if (likeRepository.existsLikeByMemberAndBoardId(member, boardId)) {
             //존재한다면 해당 Like 상태 변경
             likeRepository.findByMemberAndBoardId(member, boardId).updateBoardLike();
+            //해당 게시물의 like 수가 10개 이상이면 HOT 게시글이 됨
+            Board board = boardRepository.findByMemberAndIdAndStateIsTrue(member, boardId);
+            if (board.getLikeCount() == 10) {
+                // 해당 게시물의 like 수가 10개 이상이면 HOT 게시글이 됨
+                notificationService.createNotification(
+                    boardId,
+                    board.getTitle(),
+                    TypeEnum.HOT_BOARD,
+                    board.getMember()
+                );
+            }
         } else {
             //존재하지 않는다면 새로운 Like 추가
-            likeRepository.save(
-                new Like(boardRepository.findByMemberAndIdAndStateIsTrue(member, boardId), member));
+            Board board = boardRepository.findByMemberAndIdAndStateIsTrue(member, boardId);
+            if (likeRepository.save(new Like(board, member)).getBoard().getLikeCount() == 10) {
+                // 해당 게시물의 like 수가 10개 이상이면 HOT 게시글이 됨
+                notificationService.createNotification(
+                    boardId,
+                    board.getTitle(),
+                    TypeEnum.HOT_BOARD,
+                    board.getMember()
+                );
+            }
         }
         return likeRepository.findByMemberAndBoardId(member, boardId).nowBoardLikeState();
     }

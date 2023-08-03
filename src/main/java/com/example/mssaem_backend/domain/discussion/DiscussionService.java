@@ -19,6 +19,8 @@ import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOpti
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.notification.NotificationService;
+import com.example.mssaem_backend.domain.notification.TypeEnum;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -47,6 +49,7 @@ public class DiscussionService {
     private final DiscussionOptionSelectedRepository discussionOptionSelectedRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
+    private final NotificationService notificationService;
     private final MemberRepository memberRepository;
 
 
@@ -301,6 +304,15 @@ public class DiscussionService {
 
             //discussion의 count수 증가
             discussion.increaseCount();
+            //discussion의 참여자수가 10명 이상일 경우 HOT 토론이 됨
+            if (discussion.getParticipantCount() == 10) {
+                notificationService.createNotification(
+                    discussionId,
+                    discussion.getTitle(),
+                    TypeEnum.HOT_DISCUSSION,
+                    discussion.getMember()
+                );
+            }
             discussionOptionSelectedRepository.save(discussionOptionSelected);
         }
 
