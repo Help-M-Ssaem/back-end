@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.discussion;
 
+import com.example.mssaem_backend.domain.board.Board;
 import java.time.LocalDateTime;
 
 import com.example.mssaem_backend.domain.member.Member;
@@ -46,4 +47,6 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
     @Query(value = "SELECT SUM(d.participantCount) FROM Discussion d WHERE d.member = :member AND d.state = true")
     Long sumParticipantCountByMember(@Param("member") Member member);
     Page<Discussion> findByStateTrue(PageRequest pageRequest);
+
+    Page<Discussion> findAllByMemberAndStateIsTrue(Member member, Pageable pageable);
 }

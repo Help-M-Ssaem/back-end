@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.discussion;
 
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionDetailInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
@@ -122,5 +123,15 @@ public class DiscussionController {
         @CurrentMember Member member,
         @PathVariable Long id) {
         return ResponseEntity.ok(discussionService.findDiscussion(member, id));
+    }
+
+    /**
+     * 멤버별 올린 토론글 조회
+     */
+    @GetMapping("/member/discussion/post-list")
+    public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findDiscussionsById(
+        @CurrentMember Member member, @RequestParam(value = "page") int page,
+        @RequestParam(value = "size") int size) {
+        return ResponseEntity.ok(discussionService.findDiscussionsByMember(member, page, size));
     }
 }
