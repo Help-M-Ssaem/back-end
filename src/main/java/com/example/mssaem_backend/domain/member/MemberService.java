@@ -84,7 +84,7 @@ public class MemberService {
         switch (socialLoginType) {
             case KAKAO -> email = socialLoginService.getKaKaoEmail(socialLoginService.getKaKaoAccessToken(idToken));
             case GOOGLE -> email = socialLoginService.getGoogleEmail(socialLoginService.getGoogleAccessToken(idToken));
-            //case NAVER -> email =
+            case NAVER -> email = socialLoginService.getNaverEmail(socialLoginService.getNaverAccessToken(idToken));
         }
 
         Member member = memberRepository.findByEmail(email).orElse(null);
@@ -170,6 +170,13 @@ public class MemberService {
                 .boardHistory(boardService.getBoardHistory(member))
                 .discussionHistory(discussionService.getDiscussionHistory(member))
                 .worryBoardHistory(worryBoardService.getWorryBoardHistory(member))
+                .build();
+    }
+
+    public TokenInfo refreshAccessToken(Member member) {
+        return TokenInfo.builder()
+                .accessToken(jwtTokenProvider.generateAccessToken(member.getId()))
+                .refreshToken(member.getRefreshToken())
                 .build();
     }
 }

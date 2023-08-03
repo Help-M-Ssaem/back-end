@@ -88,5 +88,12 @@ public class MemberController {
         return new ResponseEntity<>(memberService.getProfile(memberId), HttpStatus.OK);
     }
 
+    /**
+     * [PATCH] 로그인 토큰 갱신
+     */
+    @PatchMapping("/member/refresh")
+    public ResponseEntity<TokenInfo> refreshLogin(@CurrentMember Member member) {
+        return new ResponseEntity<>(memberService.refreshAccessToken(member), HttpStatus.OK);
+    }
 
 }
