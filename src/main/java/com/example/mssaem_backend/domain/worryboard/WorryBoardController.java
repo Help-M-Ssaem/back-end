@@ -103,9 +103,9 @@ public class WorryBoardController {
     @PostMapping("/member/worry-board")
     public ResponseEntity<String> createWorryBoard(@CurrentMember Member currentMember,
         @RequestPart(value = "postWorryReq") PostWorryReq postWorryReq,
-        @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
+        @RequestPart(value = "image", required = false) List<String> imgUrls) {
         return ResponseEntity.ok(
-            worryBoardService.createWorryBoard(currentMember, postWorryReq, multipartFiles));
+            worryBoardService.createWorryBoard(currentMember, postWorryReq, imgUrls));
     }
 
     //고민글 수정
@@ -113,9 +113,9 @@ public class WorryBoardController {
     public ResponseEntity<String> modifyWorryBoard(@CurrentMember Member currentMember,
         @PathVariable Long id,
         @RequestPart(value = "patchWorryReq") PatchWorryReq patchWorryReq,
-        @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles) {
+        @RequestPart(value = "image", required = false) List<String> imgUrls) {
         return ResponseEntity.ok(
-            worryBoardService.modifyWorryBoard(currentMember, id, patchWorryReq, multipartFiles));
+            worryBoardService.modifyWorryBoard(currentMember, id, patchWorryReq, imgUrls));
     }
 
     //고민글 삭제
