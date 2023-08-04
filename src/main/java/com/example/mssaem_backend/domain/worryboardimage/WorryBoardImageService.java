@@ -2,7 +2,6 @@ package com.example.mssaem_backend.domain.worryboardimage;
 
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.global.s3.S3Service;
-import com.example.mssaem_backend.global.s3.dto.S3Result;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
