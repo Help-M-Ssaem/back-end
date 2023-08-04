@@ -4,6 +4,8 @@ import com.example.mssaem_backend.domain.chatparticipate.dto.ChatParticipateResp
 import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
+import com.example.mssaem_backend.domain.notification.NotificationService;
+import com.example.mssaem_backend.domain.notification.TypeEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -15,25 +17,40 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ChatParticipateService {
 
-  private final ChatParticipateRepository chatParticipateRepository;
-  private final MemberRepository memberRepository;
+    private final ChatParticipateRepository chatParticipateRepository;
+    private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
-  public void insertChatParticipate(String sessionID, ChatRoom chatRoom, String memberName) {
-    Member member = memberRepository.findByNickName(memberName);
-    ChatParticipate chatParticipate = new ChatParticipate(sessionID, chatRoom, member);
-    chatParticipateRepository.save(chatParticipate);
-  }
+    @Transactional
+    public void insertChatParticipate(String sessionID, ChatRoom chatRoom, String memberName) {
+        Member member = memberRepository.findByNickName(memberName);
+        ChatParticipate chatParticipate = new ChatParticipate(sessionID, chatRoom, member);
 
-  public List<ChatParticipateRes> selectChatRooms(Member member) {
-    List<ChatParticipate> allByMember = chatParticipateRepository.findAllByMember(member);
-    return allByMember.stream()
-        .map(ChatParticipateRes::new).collect(Collectors.toList());
-  }
+        // 채팅방이 만들어져 있고 해당 채팅방의 두번째 참가자(고민을 올린 사람)일 경우 채팅 시작 알림 전송
+        ChatParticipate prevParticipate = chatParticipateRepository.findByChatRoom(chatRoom);
+        System.out.println(prevParticipate +"존재함");
+        if (prevParticipate != null) {
+            notificationService.createChatNotification(
+                chatRoom.getId(),
+                chatRoom.getTitle(),
+                TypeEnum.CHAT,
+                prevParticipate.getMember(),
+                member
+            );
+        }
+        chatParticipateRepository.save(chatParticipate);
+    }
 
-  @Transactional
-  public void deleteChatParticipate(String sessionId){
-    ChatParticipate chatParticipate = chatParticipateRepository.findBySessionId(sessionId);
-    chatParticipateRepository.delete(chatParticipate);
-  }
+    public List<ChatParticipateRes> selectChatRooms(Member member) {
+        List<ChatParticipate> allByMember = chatParticipateRepository.findAllByMember(member);
+        return allByMember.stream()
+            .map(ChatParticipateRes::new).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteChatParticipate(String sessionId) {
+        ChatParticipate chatParticipate = chatParticipateRepository.findBySessionId(sessionId);
+        chatParticipateRepository.delete(chatParticipate);
+    }
 
 }

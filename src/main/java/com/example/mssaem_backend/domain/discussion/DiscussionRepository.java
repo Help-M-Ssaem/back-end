@@ -1,8 +1,7 @@
 package com.example.mssaem_backend.domain.discussion;
 
-import java.time.LocalDateTime;
-
 import com.example.mssaem_backend.domain.member.Member;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,4 +44,7 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
 
     @Query(value = "SELECT SUM(d.participantCount) FROM Discussion d WHERE d.member = :member AND d.state = true")
     Long sumParticipantCountByMember(@Param("member") Member member);
+    Page<Discussion> findByStateTrueOrderByCreatedAtDesc(PageRequest pageRequest);
+
+    Page<Discussion> findAllByMemberAndStateIsTrueOrderByCreatedAtDesc(Member member, Pageable pageable);
 }

@@ -20,14 +20,33 @@ import lombok.NoArgsConstructor;
 @Entity
 public class DiscussionCommentLike extends BaseTimeEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
-  private Boolean state = true;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Boolean state = true;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private DiscussionComment discussionComment;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private DiscussionComment discussionComment;
+
+    public DiscussionCommentLike(DiscussionComment discussionComment, Member member) {
+        this.discussionComment = discussionComment;
+        this.member = member;
+        this.discussionComment.increaseLikeCount();
+    }
+
+    public void updateDiscussionCommentLike() {
+        this.state = !this.state;
+        if (!this.state) {
+            this.discussionComment.decreaseLikeCount();
+        } else {
+            this.discussionComment.increaseLikeCount();
+        }
+    }
+
+    public Boolean nowDiscussionCommentLikeState() {
+        return this.state;
+    }
 }

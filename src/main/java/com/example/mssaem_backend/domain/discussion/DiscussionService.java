@@ -1,9 +1,11 @@
 package com.example.mssaem_backend.domain.discussion;
 
+import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.CheckWriter.match;
 
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
+import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionDetailInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
@@ -11,16 +13,20 @@ import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionInfo;
-import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionSelectedInfo;
+import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionLoginInfo;
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelected;
 import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOptionSelectedRepository;
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.notification.NotificationService;
+import com.example.mssaem_backend.domain.notification.TypeEnum;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionErrorCode;
+import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +34,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +49,8 @@ public class DiscussionService {
     private final DiscussionOptionSelectedRepository discussionOptionSelectedRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
+    private final NotificationService notificationService;
+    private final MemberRepository memberRepository;
 
 
     // HOT 토론글 더보기 조회
@@ -114,7 +123,7 @@ public class DiscussionService {
                         discussion.getMember().getProfileImageUrl()
                     ),
                     selectedOptionIdx != -1
-                        ? setDiscussionOptionSelectedInfo(discussion.getParticipantCount(),
+                        ? setDiscussionOptionLoginInfo(discussion.getParticipantCount(),
                         discussionOptions, selectedOptionIdx)
                         : setDiscussionOptionInfo(discussionOptions)
                 )
@@ -142,10 +151,10 @@ public class DiscussionService {
     }
 
     // 로그인한 유저가 옵션을 선택한 경우 고민글 옵션 정보 Dto에 매핑
-    private List<DiscussionOptionSelectedInfo> setDiscussionOptionSelectedInfo(Long participants,
+    private List<DiscussionOptionLoginInfo> setDiscussionOptionLoginInfo(Long participants,
         List<DiscussionOption> discussionOptions, int selectedOptionIdx) {
 
-        List<DiscussionOptionSelectedInfo> discussionOptionSelectedInfos = new ArrayList<>();
+        List<DiscussionOptionLoginInfo> DiscussionOptionLoginInfos = new ArrayList<>();
         DiscussionOption discussionOption;
         String selectedPercent;
         for (int i = 0; i < discussionOptions.size(); i++) {
@@ -155,8 +164,8 @@ public class DiscussionService {
                 (double) discussionOption.getSelectCount() / (double) participants * 100.0);
 
             // 유저가 선택을 완료한 고민글 Dto 처리
-            discussionOptionSelectedInfos.add(
-                new DiscussionOptionSelectedInfo(
+            DiscussionOptionLoginInfos.add(
+                new DiscussionOptionLoginInfo(
                     discussionOption.getId(),
                     discussionOption.getContent(),
                     discussionOption.getImgUrl(),
@@ -164,7 +173,7 @@ public class DiscussionService {
                     i == selectedOptionIdx)
             );
         }
-        return discussionOptionSelectedInfos;
+        return DiscussionOptionLoginInfos;
     }
 
     // 옵션을 선택하지 않은 경우 고민글 옵션 정보 Dto에 매핑
@@ -257,15 +266,15 @@ public class DiscussionService {
 
     public DiscussionHistory getDiscussionHistory(Member member) {
         return new DiscussionHistory(
-                discussionRepository.countAllByStateIsTrueAndMember(member),
-                discussionCommentRepository.countAllByStateIsTrueAndMember(member),
-                discussionRepository.sumParticipantCountByMember(member)
+            discussionRepository.countAllByStateIsTrueAndMember(member),
+            discussionCommentRepository.countAllByStateIsTrueAndMember(member),
+            discussionRepository.sumParticipantCountByMember(member)
         );
     }
 
     //토론글 참여하기
     @Transactional
-    public List<DiscussionOptionSelectedInfo> participateDiscussion(Member member,
+    public List<DiscussionOptionLoginInfo> participateDiscussion(Member member,
         Long discussionId, Long discussionOptionId) {
         Discussion discussion = discussionRepository.findById(discussionId)
             .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
@@ -274,8 +283,8 @@ public class DiscussionService {
 
         //선택할 option 가져오기
         int selectIdx = 0;
-        for(DiscussionOption discussionOption : discussionOptions) {
-            if(discussionOption.getId().equals(discussionOptionId))  {
+        for (DiscussionOption discussionOption : discussionOptions) {
+            if (discussionOption.getId().equals(discussionOptionId)) {
                 break;
             }
             selectIdx++;
@@ -295,6 +304,15 @@ public class DiscussionService {
 
             //discussion의 count수 증가
             discussion.increaseCount();
+            //discussion의 참여자수가 10명 이상일 경우 HOT 토론이 됨
+            if (discussion.getParticipantCount() == 10) {
+                notificationService.createNotification(
+                    discussionId,
+                    discussion.getTitle(),
+                    TypeEnum.HOT_DISCUSSION,
+                    discussion.getMember()
+                );
+            }
             discussionOptionSelectedRepository.save(discussionOptionSelected);
         }
 
@@ -309,14 +327,14 @@ public class DiscussionService {
             //&& 직전 선택한 beforeOptionSelected idx값도 확인
             int beforeSelectedIdx = 0;
             boolean isOptionSelectExsist = false;
-            for(int i =0 ; i< discussionOptionSelects.size(); i++) {
+            for (int i = 0; i < discussionOptionSelects.size(); i++) {
                 Long id = discussionOptionSelects.get(i).getDiscussionOption().getId();
                 String content = discussionOptionSelects.get(i).getDiscussionOption().getContent();
                 System.out.println(content);
-                if(id.equals(discussionOptionId)) {
+                if (id.equals(discussionOptionId)) {
                     isOptionSelectExsist = true;
                 }
-                if(id.equals(beforeDiscussionOption.getId())) {
+                if (id.equals(beforeDiscussionOption.getId())) {
                     beforeSelectedIdx = i;
                 }
             }
@@ -344,6 +362,60 @@ public class DiscussionService {
         discussionOption.increaseCount();
 
         //해당 토론의 참여율 계산해서 반환
-        return setDiscussionOptionSelectedInfo(discussion.getParticipantCount(), discussionOptions, selectIdx);
+        return setDiscussionOptionLoginInfo(discussion.getParticipantCount(), discussionOptions,
+            selectIdx);
+    }
+
+    //토론글 전체 조회하기
+    public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussions(Member member, int page,
+        int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Discussion> discussions = discussionRepository.findByStateTrueOrderByCreatedAtDesc(
+            pageRequest);
+        List<Discussion> discussionList = discussions.stream().toList();
+        return new PageResponseDto<>(discussions.getNumber(), discussions.getTotalPages(),
+            setDiscussionSimpleInfo(member, discussionList, 3));
+    }
+
+    //토론글 상세 조회
+    public DiscussionDetailInfo findDiscussion(Member viewer, Long id) {
+        Discussion discussion = discussionRepository.findById(id)
+            .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+
+        //수정,삭제 권한 확인
+        Boolean isEditAllowed = isMatch(viewer, discussion.getMember());
+
+        List<Discussion> discussions = new ArrayList<>();
+        discussions.add(discussion);
+        return new DiscussionDetailInfo(setDiscussionSimpleInfo(viewer, discussions, 2).get(0),
+            isEditAllowed);
+    }
+
+    //특정 멤버별 올린 토론글 조회
+    public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussionsByMemberId(Member member,
+        Long memberId,
+        int page,
+        int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        //memberId가 있으면 타인의 프로필
+        Member profileMember;
+        if (memberId != null) {
+            profileMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+        } else {
+            profileMember = member;
+        }
+
+        Page<Discussion> discussions = discussionRepository.findAllByMemberAndStateIsTrueOrderByCreatedAtDesc(
+            profileMember, pageable);
+        return new PageResponseDto<>(
+            discussions.getNumber(),
+            discussions.getTotalPages(),
+            setDiscussionSimpleInfo(
+                profileMember,
+                discussions
+                    .stream()
+                    .collect(Collectors.toList()), 3)
+        );
     }
 }
