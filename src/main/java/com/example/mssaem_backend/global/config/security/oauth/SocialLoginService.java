@@ -100,7 +100,7 @@ public class SocialLoginService {
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/nid/me")
                         .build())
-                .header("Authorization", "Bearer" + accessToken)
+                .header("Authorization", "Bearer " + accessToken)
                 .retrieve().bodyToMono(JSONObject.class).block();
 
         if (response == null) {
