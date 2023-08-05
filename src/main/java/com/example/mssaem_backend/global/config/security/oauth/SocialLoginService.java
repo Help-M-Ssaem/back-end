@@ -10,11 +10,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.HttpHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @Slf4j
@@ -34,6 +40,13 @@ public class SocialLoginService {
     @Value("${social.google.redirect-uri}")
     private String googleRedirectUrl;
 
+    @Value("${social.naver.client-id}")
+    private String naverClientId;
+    @Value("${social.naver.redirect-uri}")
+    private String naverRedirectUrl;
+    @Value("${social.naver.client-secret}")
+    private String naverClientSecret;
+
     public String getGoogleAccessToken(String idToken) throws IOException {
         String reqUrl = "https://oauth2.googleapis.com/token";
         String parameter = "grant_type=" + grantType +
@@ -52,6 +65,52 @@ public class SocialLoginService {
                 "&code=" + idToken;
         return getAccessToken(idToken, reqUrl, parameter);
     }
+
+    public String getNaverAccessToken(String idToken) throws IOException {
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://nid.naver.com")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+
+        JSONObject response = webClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/oauth2.0/token")
+                        .queryParam("client_id", naverClientId)
+                        .queryParam("client_secret", naverClientSecret)
+                        .queryParam("grant_type", grantType)
+                        .queryParam("state", "test")
+                        .queryParam("code", idToken)
+                        .build())
+                .retrieve().bodyToMono(JSONObject.class).block();
+
+        if (response == null) {
+            throw new BaseException(AuthErrorCode.INVALID_ID_TOKEN);
+        }
+
+        return (String) response.get("access_token");
+    }
+
+    public String getNaverEmail(String accessToken) {
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://openapi.naver.com")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+
+        JSONObject response = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/v1/nid/me")
+                        .build())
+                .header("Authorization", "Bearer " + accessToken)
+                .retrieve().bodyToMono(JSONObject.class).block();
+
+        if (response == null) {
+            throw new BaseException(AuthErrorCode.INVALID_ACCESS_TOKEN);
+        }
+
+        Map<String, Object> res = (Map<String, Object>) response.get("response");
+        return (String) res.get("email");
+    }
+
 
     public String getAccessToken(String idToken, String requestUrl, String parameter) throws IOException {
         String accessToken = "";
@@ -97,7 +156,7 @@ public class SocialLoginService {
     }
 
     public String getGoogleEmail(String accessToken) throws IOException {
-        String requestUrl = "https://www.googleapis.com/drive/v2/files";
+        String requestUrl = "https://oauth2.googleapis.com/token";
         StringBuilder result = getEmail(accessToken, requestUrl);
         return new JsonParser().parse(result.toString()).getAsJsonObject().get("email").getAsString();
     }

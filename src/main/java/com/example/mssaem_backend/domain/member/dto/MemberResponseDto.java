@@ -17,6 +17,7 @@ import java.util.List;
 public class MemberResponseDto {
 
     @Getter
+    @Builder
     @AllArgsConstructor
     public static class TokenInfo {
 
