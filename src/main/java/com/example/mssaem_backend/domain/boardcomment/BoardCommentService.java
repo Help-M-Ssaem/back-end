@@ -7,6 +7,7 @@ import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.board.BoardRepository;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentRequestDto.PostBoardCommentReq;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
+import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.PostBoardCommentRes;
 import com.example.mssaem_backend.domain.boardcommentlike.BoardCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
@@ -82,7 +83,7 @@ public class BoardCommentService {
 
     //댓글 작성
     @Transactional
-    public Boolean createBoardComment(Member member, Long boardId,
+    public PostBoardCommentRes createBoardComment(Member member, Long boardId,
         PostBoardCommentReq postBoardCommentReq, Long commentId) {
         //해당 게시글이 없다면 예외처리
         Board board = boardRepository.findById(boardId)
@@ -123,7 +124,12 @@ public class BoardCommentService {
                 );
             }
         }
-        return true;
+        //댓글 작성 시 parentId 와 content 반환
+        return PostBoardCommentRes.builder()
+            .parentId(
+                boardCommentRepository.existsBoardCommentById(commentId) ? commentId.intValue() : 0)
+            .content(postBoardCommentReq.getContent())
+            .build();
     }
 
     //댓글 삭제

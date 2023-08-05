@@ -25,7 +25,7 @@ public class BoardCommentResponseDto {
 
         @Builder
         public BoardCommentSimpleInfo(MemberSimpleInfo memberSimpleInfo, BoardComment boardComment,
-            String createdAt , Boolean isAllowed , Boolean isLiked) {
+            String createdAt, Boolean isAllowed, Boolean isLiked) {
             this.commentId = boardComment.getId();
             this.Content = boardComment.getContent();
             this.likeCount = boardComment.getLikeCount();
@@ -34,6 +34,21 @@ public class BoardCommentResponseDto {
             this.createdAt = createdAt;
             this.isAllowed = isAllowed;
             this.isLiked = isLiked;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class PostBoardCommentRes {
+
+        private Integer parentId;
+
+        private String content;
+
+        @Builder
+        public PostBoardCommentRes(Integer parentId, String content) {
+            this.parentId = parentId;
+            this.content = content;
         }
     }
 
