@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
@@ -41,5 +42,14 @@ public class SearchCustomRepository implements Serializable {
       result.add(new SearchPopular(s, zSetOperations.score(KEYWORD, s)));
     }
     return result;
+  }
+
+  /**
+   * 실시간 인기 검색어 출력
+   */
+  public List<SearchPopular> selectAllPopular(){
+    return zSetOperations.reverseRange(KEYWORD, 0, 10).stream()
+        .map(s -> new SearchPopular(s,zSetOperations.score(KEYWORD,s)))
+        .collect(Collectors.toList());
   }
 }

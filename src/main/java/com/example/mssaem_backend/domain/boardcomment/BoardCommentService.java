@@ -10,6 +10,8 @@ import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDt
 import com.example.mssaem_backend.domain.boardcommentlike.BoardCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.notification.NotificationService;
+import com.example.mssaem_backend.domain.notification.TypeEnum;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
@@ -31,6 +33,7 @@ public class BoardCommentService {
     private final BoardCommentRepository boardCommentRepository;
     private final BoardCommentLikeRepository boardCommentLikeRepository;
     private final BoardRepository boardRepository;
+    private final NotificationService notificationService;
 
     public List<BoardCommentSimpleInfo> setBoardCommentSimpleInfo(List<BoardComment> boardComments,
         Member viewer) {
@@ -87,12 +90,38 @@ public class BoardCommentService {
 
         //만약 코멘트가 존재한다면 그 댓글에 대댓글
         if (boardCommentRepository.existsBoardCommentById(commentId)) {
-            boardCommentRepository.save(
-                new BoardComment(postBoardCommentReq.getContent(), member, board,
+            BoardComment newBoardComment = boardCommentRepository.save(
+                new BoardComment(
+                    postBoardCommentReq.getContent(),
+                    member,
+                    board,
                     commentId.intValue()));
+            // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
+            if (!board.getId().equals(member.getId())) {
+                notificationService.createNotification(
+                    newBoardComment.getId(),
+                    postBoardCommentReq.getContent(),
+                    TypeEnum.REPLY_OF_COMMENT,
+                    board.getMember()
+                );
+            }
         } else { //존재하지 않다면 새로운 댓글
-            boardCommentRepository.save(
-                new BoardComment(postBoardCommentReq.getContent(), member, board, 0));
+            BoardComment newBoardComment = boardCommentRepository.save(
+                new BoardComment(
+                    postBoardCommentReq.getContent(),
+                    member,
+                    board,
+                    0)
+            );
+            // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
+            if (!board.getId().equals(member.getId())) {
+                notificationService.createNotification(
+                    newBoardComment.getId(),
+                    postBoardCommentReq.getContent(),
+                    TypeEnum.BOARD_COMMENT,
+                    board.getMember()
+                );
+            }
         }
         return true;
     }
@@ -111,7 +140,7 @@ public class BoardCommentService {
         }
         return boardComment.isState();
     }
-  
+
     // 좋아요 수 10개 이상으로 베스트 댓글 3개 조회
     public List<BoardCommentSimpleInfo> findBoardCommentBestListByBoardId(Member viewer,
         Long boardId) {
@@ -122,5 +151,5 @@ public class BoardCommentService {
 
         return setBoardCommentSimpleInfo(boardCommentList, viewer);
     }
-      
+
 }

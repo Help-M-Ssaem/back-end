@@ -11,6 +11,7 @@ import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchInfo;
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchPopular;
+import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRecent;
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRes;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
@@ -104,5 +105,14 @@ public class SearchService {
     return searchCustomRepository.selectAllSearch();
   }
 
+  public List<SearchRecent> selectRecentSearch(Member member) {
+    return searchRepository.findAllByMemberOrderByUpdatedAtDesc(member).stream()
+        .map(SearchRecent::new).collect(
+        Collectors.toList());
+  }
+
+  public List<SearchPopular> selectPopularSearch(){
+    return searchCustomRepository.selectAllPopular();
+  }
 
 }

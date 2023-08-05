@@ -19,7 +19,7 @@ public class DiscussionOptionResponseDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class DiscussionOptionSelectedInfo {
+    public static class DiscussionOptionLoginInfo {
 
         private Long id;
         private String content;
