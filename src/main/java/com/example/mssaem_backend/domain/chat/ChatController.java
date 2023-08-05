@@ -41,8 +41,8 @@ public class ChatController {
         request.getMessage(), request.getType());
 
     // Websocket에 발행된 메시지를 redis로 발행(publish)
-    chatService.sendChatMessage(message);
     chatMessageService.insertChatMessage(message);
+    chatService.sendChatMessage(message);
   }
 
 }
