@@ -25,7 +25,6 @@ public class ChatParticipateResponseDto {
     public ChatParticipateRes(ChatParticipate chatParticipate, MemberSimpleInfo memberSimpleInfo, ChatMessage message) {
       this.chatRoomTitle = chatParticipate.getChatRoom().getTitle();
       this.state = chatParticipate.getChatRoom().isState();
-      this.memberNickName = chatParticipate.getMember().getNickName();
       this.lastMessage = message == null ? "" : message.getMessage();
       this.lastSendAt = message == null ? "" : Time.calculateTime(message.getCreatedAt(), 3);
       this.memberSimpleInfo = memberSimpleInfo;
