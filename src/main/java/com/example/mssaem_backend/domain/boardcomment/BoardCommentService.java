@@ -46,7 +46,7 @@ public class BoardCommentService {
                     .boardComment(boardComment)
                     .createdAt(calculateTime(boardComment.getCreatedAt(), 3))
                     .isAllowed(isMatch(viewer,
-                        boardComment.getMember())) //해당 게시글을 보는 viewer 와 해당 댓글의 작성자와 같은지 확인
+                        boardComment.getMember())) //해당 댓글을 보는 viewer 와 해당 댓글의 작성자와 같은지 확인
                     .isLiked(
                         boardCommentLikeRepository.existsBoardCommentLikeByMemberAndStateIsTrueAndBoardCommentId(
                             boardComment.getMember(), boardComment.getId())) //댓글 좋아요 눌렀는지 안눌렀는지 확인
@@ -155,7 +155,7 @@ public class BoardCommentService {
 
     // 특정 멤버별 댓글 조회를 위한 매핑
     public List<BoardCommentSimpleInfoByMember> setBoardCommentSimpleInfoByBoard(
-        List<BoardComment> boardComments) {
+        List<BoardComment> boardComments, Member viewer) {
         List<BoardCommentSimpleInfoByMember> boardCommentSimpleInfoList = new ArrayList<>();
 
         for (BoardComment boardComment : boardComments) {
@@ -164,6 +164,11 @@ public class BoardCommentService {
                     .boardId(boardComment.getBoard().getId())
                     .boardComment(boardComment)
                     .createdAt(calculateTime(boardComment.getCreatedAt(), 3))
+                    .isAllowed(isMatch(viewer,
+                        boardComment.getMember())) //해당 댓글 보는 viewer 와 해당 댓글의 작성자와 같은지 확인
+                    .isLiked(
+                        boardCommentLikeRepository.existsBoardCommentLikeByMemberAndStateIsTrueAndBoardCommentId(
+                            boardComment.getMember(), boardComment.getId())) //댓글 좋아요 눌렀는지 안눌렀는지 확인
                     .memberSimpleInfo(
                         new MemberSimpleInfo(
                             boardComment.getMember().getId(),
@@ -180,7 +185,7 @@ public class BoardCommentService {
 
     //특정 멤버별 댓글 조회
     public PageResponseDto<List<BoardCommentSimpleInfoByMember>> findBoardCommentListByMemberId(
-        Long memberId, int page, int size) {
+        Long memberId, int page, int size, Member viewer) {
         Pageable pageable = PageRequest.of(page, size);
         Page<BoardComment> result = boardCommentRepository.findAllByMemberIdAndStateIsTrue(memberId,
             pageable);
@@ -191,7 +196,7 @@ public class BoardCommentService {
             setBoardCommentSimpleInfoByBoard(
                 result
                     .stream()
-                    .collect(Collectors.toList()))
+                    .collect(Collectors.toList()), viewer)
         );
     }
 

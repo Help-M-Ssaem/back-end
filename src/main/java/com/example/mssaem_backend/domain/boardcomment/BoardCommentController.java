@@ -68,9 +68,9 @@ public class BoardCommentController {
     @GetMapping("/boards/comments")
     public ResponseEntity<PageResponseDto<List<BoardCommentSimpleInfoByMember>>> findBoardCommentListByMemberId(
         @RequestParam(value = "memberId") Long memberId, @RequestParam(value = "page") int page,
-        @RequestParam(value = "size") int size) {
+        @RequestParam(value = "size") int size, @CurrentMember Member member) {
         return ResponseEntity.ok(
-            boardCommentService.findBoardCommentListByMemberId(memberId, page, size));
+            boardCommentService.findBoardCommentListByMemberId(memberId, page, size, member));
     }
 
 }
