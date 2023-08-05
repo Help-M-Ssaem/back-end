@@ -17,7 +17,6 @@ public class ChatParticipateResponseDto {
 
     private String chatRoomTitle;
     private boolean state;
-    private String memberNickName;
     private String lastMessage;
     private String lastSendAt;
     private MemberSimpleInfo memberSimpleInfo;
