@@ -64,11 +64,12 @@ public class WorryBoard extends BaseTimeEntity {
 
     @Builder
     public WorryBoard(String title, String content, MbtiEnum targetMbti,
-        Member member) {
+        Member member, String thumbnail) {
         this.title = title;
         this.content = content;
         this.targetMbti = targetMbti;
         this.member = member;
+        this.thumbnail = thumbnail;
     }
 
     public void solveWorryBoard(Member solveMember) {
@@ -93,5 +94,9 @@ public class WorryBoard extends BaseTimeEntity {
 
     public void updateState() {
         this.state = false;
+    }
+
+    public void changeThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }

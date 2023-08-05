@@ -205,7 +205,7 @@ public class BoardService {
     //게시글 전체 조회 , 게시글 상세 조회시 boardId 입력 받아 현재 게시글 제외하고 전체 조회
     public PageResponseDto<List<BoardSimpleInfo>> findBoards(int page, int size, Long boardId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Board> result = boardRepository.findAllByStateIsTrueAndId(boardId, pageable);
+        Page<Board> result = boardRepository.findAllByStateIsTrueAndIdOrderByCreatedAtDesc(boardId, pageable);
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),
@@ -220,7 +220,7 @@ public class BoardService {
     public PageResponseDto<List<BoardSimpleInfo>> findBoardsByMbti(MbtiEnum mbti, int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Board> result = boardRepository.findAllByStateIsTrueAndMbti(mbti, pageable);
+        Page<Board> result = boardRepository.findAllByStateIsTrueAndMbtiOrderByCreatedAtDesc(mbti, pageable);
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),
@@ -235,7 +235,7 @@ public class BoardService {
     public PageResponseDto<List<BoardSimpleInfo>> findBoardsByMemberId(Long id, int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Board> result = boardRepository.findAllByMemberIdAndStateIsTrue(id, pageable);
+        Page<Board> result = boardRepository.findAllByMemberIdAndStateIsTrueOrderByCreatedAtDesc(id, pageable);
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),

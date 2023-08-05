@@ -7,6 +7,8 @@ import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.board.BoardRepository;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentRequestDto.PostBoardCommentReq;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
+import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.PostBoardCommentRes;
+import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.boardcommentlike.BoardCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
@@ -45,7 +47,7 @@ public class BoardCommentService {
                     .boardComment(boardComment)
                     .createdAt(calculateTime(boardComment.getCreatedAt(), 3))
                     .isAllowed(isMatch(viewer,
-                        boardComment.getMember())) //해당 게시글을 보는 viewer 와 해당 댓글의 작성자와 같은지 확인
+                        boardComment.getMember())) //해당 댓글을 보는 viewer 와 해당 댓글의 작성자와 같은지 확인
                     .isLiked(
                         boardCommentLikeRepository.existsBoardCommentLikeByMemberAndStateIsTrueAndBoardCommentId(
                             boardComment.getMember(), boardComment.getId())) //댓글 좋아요 눌렀는지 안눌렀는지 확인
@@ -82,7 +84,7 @@ public class BoardCommentService {
 
     //댓글 작성
     @Transactional
-    public Boolean createBoardComment(Member member, Long boardId,
+    public PostBoardCommentRes createBoardComment(Member member, Long boardId,
         PostBoardCommentReq postBoardCommentReq, Long commentId) {
         //해당 게시글이 없다면 예외처리
         Board board = boardRepository.findById(boardId)
@@ -123,7 +125,12 @@ public class BoardCommentService {
                 );
             }
         }
-        return true;
+        //댓글 작성 시 parentId 와 content 반환
+        return PostBoardCommentRes.builder()
+            .parentId(
+                boardCommentRepository.existsBoardCommentById(commentId) ? commentId.intValue() : 0)
+            .content(postBoardCommentReq.getContent())
+            .build();
     }
 
     //댓글 삭제
@@ -150,6 +157,53 @@ public class BoardCommentService {
             pageRequest, boardId).stream().collect(Collectors.toList());
 
         return setBoardCommentSimpleInfo(boardCommentList, viewer);
+    }
+
+    // 특정 멤버별 댓글 조회를 위한 매핑
+    public List<BoardCommentSimpleInfoByMember> setBoardCommentSimpleInfoByBoard(
+        List<BoardComment> boardComments, Member viewer) {
+        List<BoardCommentSimpleInfoByMember> boardCommentSimpleInfoList = new ArrayList<>();
+
+        for (BoardComment boardComment : boardComments) {
+            boardCommentSimpleInfoList.add(
+                BoardCommentSimpleInfoByMember.builder()
+                    .boardId(boardComment.getBoard().getId())
+                    .boardComment(boardComment)
+                    .createdAt(calculateTime(boardComment.getCreatedAt(), 3))
+                    .isAllowed(isMatch(viewer,
+                        boardComment.getMember())) //해당 댓글 보는 viewer 와 해당 댓글의 작성자와 같은지 확인
+                    .isLiked(
+                        boardCommentLikeRepository.existsBoardCommentLikeByMemberAndStateIsTrueAndBoardCommentId(
+                            boardComment.getMember(), boardComment.getId())) //댓글 좋아요 눌렀는지 안눌렀는지 확인
+                    .memberSimpleInfo(
+                        new MemberSimpleInfo(
+                            boardComment.getMember().getId(),
+                            boardComment.getMember().getNickName(),
+                            boardComment.getMember().getDetailMbti(),
+                            boardComment.getMember().getBadgeName(),
+                            boardComment.getMember().getProfileImageUrl())
+                    )
+                    .build()
+            );
+        }
+        return boardCommentSimpleInfoList;
+    }
+
+    //특정 멤버별 댓글 조회
+    public PageResponseDto<List<BoardCommentSimpleInfoByMember>> findBoardCommentListByMemberId(
+        Long memberId, int page, int size, Member viewer) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BoardComment> result = boardCommentRepository.findAllByMemberIdAndStateIsTrue(memberId,
+            pageable);
+
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setBoardCommentSimpleInfoByBoard(
+                result
+                    .stream()
+                    .collect(Collectors.toList()), viewer)
+        );
     }
 
 }
