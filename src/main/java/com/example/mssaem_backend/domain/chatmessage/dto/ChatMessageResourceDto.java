@@ -21,13 +21,15 @@ public class ChatMessageResourceDto {
     private MessageType type;
     private String sender;
     private String message;
+    private String createdAt;
 
-    public ChatMessageRes(ChatMessage chatMessage) {
+    public ChatMessageRes(ChatMessage chatMessage, String createdAt) {
       this.chatRoomId = chatMessage.getChatRoom().getId();
       this.worryBoardId = chatMessage.getChatRoom().getWorryBoardId();
       this.type = chatMessage.getType();
       this.sender = chatMessage.getSender();
       this.message = chatMessage.getMessage();
+      this.createdAt = createdAt;
     }
   }
 }
