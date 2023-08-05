@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.boardcomment;
 
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentRequestDto.PostBoardCommentReq;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
+import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
@@ -65,7 +66,7 @@ public class BoardCommentController {
 
     //특정 멤버별 게시글 댓글 전체 조회
     @GetMapping("/boards/comments")
-    public ResponseEntity<PageResponseDto<List<BoardCommentSimpleInfo>>> findBoardCommentListByMemberId(
+    public ResponseEntity<PageResponseDto<List<BoardCommentSimpleInfoByMember>>> findBoardCommentListByMemberId(
         @RequestParam(value = "memberId") Long memberId, @RequestParam(value = "page") int page,
         @RequestParam(value = "size") int size) {
         return ResponseEntity.ok(

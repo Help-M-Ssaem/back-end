@@ -7,6 +7,7 @@ import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.board.BoardRepository;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentRequestDto.PostBoardCommentReq;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
+import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.boardcommentlike.BoardCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
@@ -123,7 +124,33 @@ public class BoardCommentService {
         return setBoardCommentSimpleInfo(boardCommentList, viewer);
     }
 
-    public PageResponseDto<List<BoardCommentSimpleInfo>> findBoardCommentListByMemberId(
+    // 특정 멤버별 댓글 조회를 위한 매핑
+    public List<BoardCommentSimpleInfoByMember> setBoardCommentSimpleInfoByBoard(
+        List<BoardComment> boardComments) {
+        List<BoardCommentSimpleInfoByMember> boardCommentSimpleInfoList = new ArrayList<>();
+
+        for (BoardComment boardComment : boardComments) {
+            boardCommentSimpleInfoList.add(
+                BoardCommentSimpleInfoByMember.builder()
+                    .boardId(boardComment.getBoard().getId())
+                    .boardComment(boardComment)
+                    .createdAt(calculateTime(boardComment.getCreatedAt(), 3))
+                    .memberSimpleInfo(
+                        new MemberSimpleInfo(
+                            boardComment.getMember().getId(),
+                            boardComment.getMember().getNickName(),
+                            boardComment.getMember().getDetailMbti(),
+                            boardComment.getMember().getBadgeName(),
+                            boardComment.getMember().getProfileImageUrl())
+                    )
+                    .build()
+            );
+        }
+        return boardCommentSimpleInfoList;
+    }
+
+    //특정 멤버별 댓글 조회
+    public PageResponseDto<List<BoardCommentSimpleInfoByMember>> findBoardCommentListByMemberId(
         Long memberId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<BoardComment> result = boardCommentRepository.findAllByMemberIdAndStateIsTrue(memberId,
@@ -132,10 +159,10 @@ public class BoardCommentService {
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),
-            setBoardCommentSimpleInfo(
+            setBoardCommentSimpleInfoByBoard(
                 result
                     .stream()
-                    .collect(Collectors.toList()), null)
+                    .collect(Collectors.toList()))
         );
     }
 
