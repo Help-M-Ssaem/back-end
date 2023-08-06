@@ -168,6 +168,8 @@ public class BoardService {
             board.deleteBoard();
             //현재 저장된 이미지 삭제
             boardImageService.deleteBoardImage(board);
+            //해당 게시글 좋아요 삭제
+            likeRepository.deleteAllByBoard(board);
             return "게시글 삭제 완료";
         } else {
             throw new BaseException(BoardErrorCode.EMPTY_BOARD);
