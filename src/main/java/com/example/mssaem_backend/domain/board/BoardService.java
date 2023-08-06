@@ -12,6 +12,7 @@ import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleI
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
+import com.example.mssaem_backend.domain.boardcomment.BoardCommentService;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
@@ -47,6 +48,7 @@ public class BoardService {
     private final BadgeRepository badgeRepository;
     private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
+    private final BoardCommentService boardCommentService;
 
     // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
@@ -170,6 +172,8 @@ public class BoardService {
             boardImageService.deleteBoardImage(board);
             //해당 게시글 좋아요 삭제
             likeRepository.deleteAllByBoard(board);
+            //게시글 삭제 시 모든 댓글 삭제, 댓글 좋아요 삭제
+            boardCommentService.deleteAllBoardComment(board);
             return "게시글 삭제 완료";
         } else {
             throw new BaseException(BoardErrorCode.EMPTY_BOARD);
@@ -207,7 +211,8 @@ public class BoardService {
     //게시글 전체 조회 , 게시글 상세 조회시 boardId 입력 받아 현재 게시글 제외하고 전체 조회
     public PageResponseDto<List<BoardSimpleInfo>> findBoards(int page, int size, Long boardId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Board> result = boardRepository.findAllByStateIsTrueAndIdOrderByCreatedAtDesc(boardId, pageable);
+        Page<Board> result = boardRepository.findAllByStateIsTrueAndIdOrderByCreatedAtDesc(boardId,
+            pageable);
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),
@@ -222,7 +227,8 @@ public class BoardService {
     public PageResponseDto<List<BoardSimpleInfo>> findBoardsByMbti(MbtiEnum mbti, int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Board> result = boardRepository.findAllByStateIsTrueAndMbtiOrderByCreatedAtDesc(mbti, pageable);
+        Page<Board> result = boardRepository.findAllByStateIsTrueAndMbtiOrderByCreatedAtDesc(mbti,
+            pageable);
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),
@@ -237,7 +243,8 @@ public class BoardService {
     public PageResponseDto<List<BoardSimpleInfo>> findBoardsByMemberId(Long id, int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Board> result = boardRepository.findAllByMemberIdAndStateIsTrueOrderByCreatedAtDesc(id, pageable);
+        Page<Board> result = boardRepository.findAllByMemberIdAndStateIsTrueOrderByCreatedAtDesc(id,
+            pageable);
         return new PageResponseDto<>(
             result.getNumber(),
             result.getTotalPages(),
@@ -300,9 +307,9 @@ public class BoardService {
 
     public BoardHistory getBoardHistory(Member member) {
         return new BoardHistory(
-                boardRepository.countAllByStateIsTrueAndMember(member),
-                boardCommentRepository.countAllByStateIsTrueAndMember(member),
-                boardRepository.sumLikeCountByMember(member)
+            boardRepository.countAllByStateIsTrueAndMember(member),
+            boardCommentRepository.countAllByStateIsTrueAndMember(member),
+            boardRepository.sumLikeCountByMember(member)
         );
     }
 
