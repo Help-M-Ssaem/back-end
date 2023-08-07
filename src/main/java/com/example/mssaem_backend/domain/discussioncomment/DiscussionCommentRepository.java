@@ -23,4 +23,6 @@ public interface DiscussionCommentRepository extends JpaRepository<DiscussionCom
     Boolean existsDiscussionCommentById(Long id);
 
     DiscussionComment findByIdAndDiscussionIdAndStateIsTrue(Long commentId, Long discussionId);
+
+    Page<DiscussionComment> findAllByMemberIdAndStateTrue(Long memberId, Pageable pageable);
 }

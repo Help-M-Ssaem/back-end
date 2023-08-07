@@ -7,6 +7,7 @@ import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
 import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentRequestDto.PostDiscussionCommentReq;
 import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfo;
+import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.discussioncommentlike.DiscussionCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
@@ -157,5 +158,52 @@ public class DiscussionCommentService {
             pageRequest, discussionId).stream().collect(Collectors.toList());
 
         return setDiscussionCommentSimpleInfo(discussionCommentList, viewer);
+    }
+
+    // 특정 멤버별 댓글 조회를 위한 매핑
+    public List<DiscussionCommentSimpleInfoByMember> setDiscussionCommentSimpleInfoByDiscussion(
+        List<DiscussionComment> discussionComments, Member viewer) {
+        List<DiscussionCommentSimpleInfoByMember> discussionCommentSimpleInfoList = new ArrayList<>();
+
+        for (DiscussionComment discussionComment : discussionComments) {
+            discussionCommentSimpleInfoList.add(
+                DiscussionCommentSimpleInfoByMember.builder()
+                    .discussionId(discussionComment.getDiscussion().getId())
+                    .discussionComment(discussionComment)
+                    .createdAt(calculateTime(discussionComment.getCreatedAt(), 3))
+                    .isAllowed(isMatch(viewer,
+                        discussionComment.getMember())) //해당 댓글 보는 viewer 와 해당 댓글의 작성자와 같은지 확인
+                    .isLiked(
+                        discussionCommentLikeRepository.existsDiscussionCommentLikeByMemberAndStateIsTrueAndDiscussionCommentId(
+                            discussionComment.getMember(),
+                            discussionComment.getId())) //댓글 좋아요 눌렀는지 안눌렀는지 확인
+                    .memberSimpleInfo(
+                        new MemberSimpleInfo(
+                            discussionComment.getMember().getId(),
+                            discussionComment.getMember().getNickName(),
+                            discussionComment.getMember().getDetailMbti(),
+                            discussionComment.getMember().getBadgeName(),
+                            discussionComment.getMember().getProfileImageUrl())
+                    )
+                    .build()
+            );
+        }
+        return discussionCommentSimpleInfoList;
+    }
+
+    //특정 멤버별 댓글 조회
+    public PageResponseDto<List<DiscussionCommentSimpleInfoByMember>> findDiscussionCommentListByMemberId(
+        Long memberId, int page, int size, Member viewer) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<DiscussionComment> result = discussionCommentRepository.findAllByMemberIdAndStateTrue(
+            memberId, pageable);
+
+        return new PageResponseDto<>(
+            result.getNumber(),
+            result.getTotalPages(),
+            setDiscussionCommentSimpleInfoByDiscussion(
+                result.stream()
+                    .collect(Collectors.toList()), viewer)
+        );
     }
 }

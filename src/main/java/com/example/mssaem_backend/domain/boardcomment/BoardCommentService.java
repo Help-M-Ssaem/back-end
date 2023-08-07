@@ -7,8 +7,8 @@ import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.board.BoardRepository;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentRequestDto.PostBoardCommentReq;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
-import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.PostBoardCommentRes;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfoByMember;
+import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.PostBoardCommentRes;
 import com.example.mssaem_backend.domain.boardcommentlike.BoardCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
@@ -204,6 +204,20 @@ public class BoardCommentService {
                     .stream()
                     .collect(Collectors.toList()), viewer)
         );
+    }
+
+
+    //게시글 삭제 시 해당 게시글 댓글 완전 삭제
+    @Transactional
+    public Boolean deleteAllBoardComment(Board board) {
+        List<BoardComment> comments = boardCommentRepository.findAllByBoardId(board.getId());
+        //모든 댓글에 대한 댓글 좋아요 먼저 삭제
+        for (BoardComment comment : comments) {
+            boardCommentLikeRepository.deleteAllByBoardComment(comment);
+        }
+        // 게시글에 대한 모든 댓글 삭제
+        boardCommentRepository.deleteAllByBoard(board);
+        return true;
     }
 
 }

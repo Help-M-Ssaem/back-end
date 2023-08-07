@@ -14,7 +14,7 @@ public class DiscussionCommentResponseDto {
     @NoArgsConstructor
     public static class DiscussionCommentSimpleInfo {
         private Long commentId;
-        private String Content;
+        private String content;
         private Long likeCount;
         private Integer parentId;
         private String createdAt;
@@ -26,7 +26,7 @@ public class DiscussionCommentResponseDto {
         public DiscussionCommentSimpleInfo(MemberSimpleInfo memberSimpleInfo, DiscussionComment discussionComment,
             String createdAt , Boolean isEditAllowed , Boolean isLiked) {
             this.commentId = discussionComment.getId();
-            this.Content = discussionComment.getContent();
+            this.content = discussionComment.getContent();
             this.likeCount = discussionComment.getLikeCount();
             this.parentId = discussionComment.getParentId();
             this.memberSimpleInfo = memberSimpleInfo;
@@ -35,4 +35,35 @@ public class DiscussionCommentResponseDto {
             this.isLiked = isLiked;
         }
     }
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DiscussionCommentSimpleInfoByMember {
+
+        private Long discussionId;
+        private Long commentId;
+        private String Content;
+        private Long likeCount;
+        private Integer parentId;
+        private String createdAt;
+        private Boolean isLiked; // 댓글 좋아요 눌렀는지 확인
+        private Boolean isAllowed; //삭제 또는 신고를 위한 내 댓글인지 확인
+        private MemberSimpleInfo memberSimpleInfo;
+
+        @Builder
+        public DiscussionCommentSimpleInfoByMember(MemberSimpleInfo memberSimpleInfo,
+            DiscussionComment discussionComment, String createdAt, Long discussionId, Boolean isAllowed,
+            Boolean isLiked) {
+            this.discussionId = discussionId;
+            this.commentId = discussionComment.getId();
+            this.Content = discussionComment.getContent();
+            this.likeCount = discussionComment.getLikeCount();
+            this.parentId = discussionComment.getParentId();
+            this.memberSimpleInfo = memberSimpleInfo;
+            this.createdAt = createdAt;
+            this.isAllowed = isAllowed;
+            this.isLiked = isLiked;
+        }
+    }
+
 }
