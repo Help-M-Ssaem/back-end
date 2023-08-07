@@ -206,6 +206,7 @@ public class BoardCommentService {
         );
     }
 
+
     //게시글 삭제 시 해당 게시글 댓글 완전 삭제
     @Transactional
     public Boolean deleteAllBoardComment(Board board) {
