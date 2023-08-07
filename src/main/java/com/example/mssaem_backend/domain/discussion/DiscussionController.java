@@ -62,10 +62,10 @@ public class DiscussionController {
      */
     @PostMapping("/member/discussion")
     public ResponseEntity<String> createDiscussion(@CurrentMember Member member,
-        @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles,
+        @RequestPart(value = "image", required = false) List<String> imgUrls,
         @RequestPart(value = "DiscussionReq") DiscussionReq postDiscussionReq) {
         return ResponseEntity.ok(
-            discussionService.createDiscussion(member, multipartFiles, postDiscussionReq));
+            discussionService.createDiscussion(member, imgUrls, postDiscussionReq));
     }
 
     /**
@@ -74,10 +74,10 @@ public class DiscussionController {
     @PatchMapping("/member/discussion/{id}")
     public ResponseEntity<String> modifyDiscussion(@CurrentMember Member member,
         @PathVariable Long id,
-        @RequestPart(value = "image", required = false) List<MultipartFile> multipartFiles,
+        @RequestPart(value = "image", required = false) List<String> imgUrls,
         @RequestPart(value = "DiscussionReq") DiscussionReq patchDiscussionReq) {
         return ResponseEntity.ok(
-            discussionService.modifyDiscussion(member, id, patchDiscussionReq, multipartFiles));
+            discussionService.modifyDiscussion(member, id, patchDiscussionReq, imgUrls));
     }
 
     /**

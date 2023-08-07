@@ -19,21 +19,16 @@ public class DiscussionOptionService {
 
     //s3에 이미지 저장 후 DiscussionOption 생성
     public void createOption(Discussion discussion, DiscussionReq discussionReq,
-        List<MultipartFile> multipartFiles) {
+        List<String> imgUrls) {
         //option 리스트 가져오기
         List<GetOptionReq> getOptionReqs = discussionReq.getGetOptionReqs();
 
-        //s3 저장 후 url 리스트 가져오기
-        List<S3Result> s3ResultList = null;
-        if (multipartFiles != null) {
-            s3ResultList = s3Service.uploadFile(multipartFiles);
-        }
         //option 리스트를 돌며 DiscussionOption 생성
         for (GetOptionReq getOptionReq : getOptionReqs) {
             String imgUrl;
-            if (getOptionReq.isHasImage() && (s3ResultList != null)) {
-                imgUrl = s3ResultList.get(0).getImgUrl();
-                s3ResultList.remove(0);
+            if (getOptionReq.isHasImage() && (imgUrls != null)) {
+                imgUrl = imgUrls.get(0);
+                imgUrls.remove(0);
             } else {
                 imgUrl = null;
             }
@@ -56,5 +51,9 @@ public class DiscussionOptionService {
         }
         //해당 discussion에 존재하는 option 삭제
         discussionOptionRepository.deleteAllByDiscussion(discussion);
+    }
+
+    public String uploadFile(MultipartFile multipartFile) {
+        return s3Service.uploadImage(multipartFile);
     }
 }

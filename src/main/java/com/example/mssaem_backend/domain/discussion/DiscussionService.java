@@ -214,7 +214,7 @@ public class DiscussionService {
 
     //토른글 생성하기
     @Transactional
-    public String createDiscussion(Member member, List<MultipartFile> multipartFiles,
+    public String createDiscussion(Member member, List<String> imgUrls,
         DiscussionReq postDiscussionReq) {
         //Discussion 생성
         Discussion discussion = Discussion.builder()
@@ -225,14 +225,14 @@ public class DiscussionService {
         discussionRepository.save(discussion);
 
         //DiscussionOption 생성
-        discussionOptionService.createOption(discussion, postDiscussionReq, multipartFiles);
+        discussionOptionService.createOption(discussion, postDiscussionReq, imgUrls);
         return "토론글 생성완료";
     }
 
     //토론글 수정하기
     @Transactional
     public String modifyDiscussion(Member member, Long id, DiscussionReq patchDiscussionReq,
-        List<MultipartFile> multipartFiles) {
+        List<String> imgUrls) {
         //수정 권한 확인
         Discussion discussion = discussionRepository.findById(id)
             .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
@@ -245,7 +245,7 @@ public class DiscussionService {
         );
 
         discussionOptionService.deleteOption(discussion);
-        discussionOptionService.createOption(discussion, patchDiscussionReq, multipartFiles);
+        discussionOptionService.createOption(discussion, patchDiscussionReq, imgUrls);
 
         return "토론글 수정완료";
     }
