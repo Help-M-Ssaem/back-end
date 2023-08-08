@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.discussioncomment;
 
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.member.Member;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,4 +26,8 @@ public interface DiscussionCommentRepository extends JpaRepository<DiscussionCom
     DiscussionComment findByIdAndDiscussionIdAndStateIsTrue(Long commentId, Long discussionId);
 
     Page<DiscussionComment> findAllByMemberIdAndStateTrue(Long memberId, Pageable pageable);
+
+    List<DiscussionComment> findAllByDiscussion(Discussion discussion);
+
+    List<DiscussionComment> deleteAllByDiscussion(Discussion discussion);
 }

@@ -9,6 +9,7 @@ import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.Di
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
+import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentService;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
@@ -50,6 +51,7 @@ public class DiscussionService {
     private final BadgeRepository badgeRepository;
     private final NotificationService notificationService;
     private final MemberRepository memberRepository;
+    private final DiscussionCommentService discussionCommentService;
 
 
     // HOT 토론글 더보기 조회
@@ -258,6 +260,8 @@ public class DiscussionService {
         match(member, discussion.getMember());
 
         discussionOptionService.deleteOption(discussion);
+        //토론글 삭제 시 모든 댓글,댓글 좋아요 삭제
+        discussionCommentService.deleteAllDiscussionComment(discussion);
         discussion.deleteDiscussion();
 
         return "토론글 삭제완료";

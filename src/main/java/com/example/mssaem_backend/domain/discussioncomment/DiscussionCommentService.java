@@ -206,4 +206,18 @@ public class DiscussionCommentService {
                     .collect(Collectors.toList()), viewer)
         );
     }
+
+    //토론글 삭제 시 해당 토론글 댓글 완전 삭제
+    @Transactional
+    public Boolean deleteAllDiscussionComment(Discussion discussion) {
+        List<DiscussionComment> discussionComments = discussionCommentRepository.findAllByDiscussion(
+            discussion);
+        //모든 댓글에 대한 댓글 좋아요 먼저 삭제
+        for (DiscussionComment discussionComment : discussionComments) {
+            discussionCommentLikeRepository.deleteAllByDiscussionComment(discussionComment);
+        }
+        //토론글에 대한 모든 댓글 삭제
+        discussionCommentRepository.deleteAllByDiscussion(discussion);
+        return true;
+    }
 }
