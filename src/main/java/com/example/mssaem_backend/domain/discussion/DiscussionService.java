@@ -385,8 +385,10 @@ public class DiscussionService {
         Discussion discussion = discussionRepository.findById(id)
             .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
 
+        boolean isParticipantExist = discussion.getParticipantCount() > 0;
+
         //수정,삭제 권한 확인
-        Boolean isEditAllowed = isMatch(viewer, discussion.getMember());
+        Boolean isEditAllowed = (isMatch(viewer, discussion.getMember()) && !isParticipantExist);
 
         List<Discussion> discussions = new ArrayList<>();
         discussions.add(discussion);
