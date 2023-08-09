@@ -142,6 +142,8 @@ public class BoardCommentService {
         if (isMatch(member, boardComment.getMember())) {
             //같다면 삭제(삭제된 댓글입니다. 로 표시)
             boardComment.deleteBoardComment();
+            //댓글 삭제시 해당 댓글에 달린 좋아요 삭제
+            boardCommentLikeRepository.deleteAllByBoardComment(boardComment);
         } else {
             throw new BaseException(MemberErrorCode.INVALID_MEMBER);
         }
@@ -210,10 +212,10 @@ public class BoardCommentService {
     //게시글 삭제 시 해당 게시글 댓글 완전 삭제
     @Transactional
     public Boolean deleteAllBoardComment(Board board) {
-        List<BoardComment> comments = boardCommentRepository.findAllByBoardId(board.getId());
+        List<BoardComment> boardComments = boardCommentRepository.findAllByBoardId(board.getId());
         //모든 댓글에 대한 댓글 좋아요 먼저 삭제
-        for (BoardComment comment : comments) {
-            boardCommentLikeRepository.deleteAllByBoardComment(comment);
+        for (BoardComment boardComment : boardComments) {
+            boardCommentLikeRepository.deleteAllByBoardComment(boardComment);
         }
         // 게시글에 대한 모든 댓글 삭제
         boardCommentRepository.deleteAllByBoard(board);

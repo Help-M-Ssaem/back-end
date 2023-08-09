@@ -15,7 +15,8 @@ import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRece
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRes;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
-import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesSearchRes;
+import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,15 +73,16 @@ public class SearchService {
     Page<Board> pageBoards = boardRepository.findByKeyword(searchInfo.getKeyword(), pageRequest);
     List<BoardSimpleInfo> boardSimpleResults = pageBoards.stream()
         .map(b -> new BoardSimpleInfo(b,
-            new MemberSimpleInfo(b.getMember(), b.getMember().getBadgeName())))
+            new MemberSimpleInfo(b.getMember(), b.getMember().getBadgeName()),
+            Time.calculateTime(b.getCreatedAt(), 3)))
         .collect(Collectors.toList());
 
     // 고민글 5개 가져오기
     Page<WorryBoard> pageWorryBoards = worryBoardRepository.findByKeyword(searchInfo.getKeyword(),
         pageRequest);
-    List<GetWorriesRes> worrySimpleResults = pageWorryBoards.stream()
-        .map(wb -> new GetWorriesRes(wb, wb.getThumbnail(),
-            wb.getCreatedAt().toString()))
+    List<GetWorriesSearchRes> worrySimpleResults = pageWorryBoards.stream()
+        .map(wb -> new GetWorriesSearchRes(wb, wb.getThumbnail(),
+            Time.calculateTime(wb.getCreatedAt(), 2)))
         .collect(Collectors.toList());
 
     // 토른글 5개 가져오기
@@ -108,10 +110,10 @@ public class SearchService {
   public List<SearchRecent> selectRecentSearch(Member member) {
     return searchRepository.findAllByMemberOrderByUpdatedAtDesc(member).stream()
         .map(SearchRecent::new).collect(
-        Collectors.toList());
+            Collectors.toList());
   }
 
-  public List<SearchPopular> selectPopularSearch(){
+  public List<SearchPopular> selectPopularSearch() {
     return searchCustomRepository.selectAllPopular();
   }
 
