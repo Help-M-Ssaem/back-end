@@ -73,6 +73,7 @@ public class Member extends BaseTimeEntity {
         this.nickName = nickName;
         this.mbti = mbti;
         this.caseSensitivity = caseSensitivity;
+        this.profileImageUrl = mbti.getProfileUrl();
         this.refreshToken = "";
         this.report = 0;
         this.role = Role.ROLE_MEMBER;
@@ -88,7 +89,6 @@ public class Member extends BaseTimeEntity {
         this.badgeName = badgeName != null ? badgeName : this.badgeName;
 
     }
-
 
     public Integer increaseReport() {
         return this.report++;
