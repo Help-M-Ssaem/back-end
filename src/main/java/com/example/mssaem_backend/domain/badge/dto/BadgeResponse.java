@@ -12,5 +12,6 @@ public class BadgeResponse {
     public static class BadgeInfo {
         private Long id;
         private String name;
+        private boolean status;
     }
 }

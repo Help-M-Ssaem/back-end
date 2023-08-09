@@ -4,7 +4,7 @@ import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfi
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
-import com.example.mssaem_backend.domain.member.dto.MemberResponseDto;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberProfileInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
@@ -75,7 +75,7 @@ public class MemberController {
     @PatchMapping("/member/profile")
     public ResponseEntity<String> modifyProfile(
             @CurrentMember Member member, @RequestPart(value = "modifyProfile") ModifyProfile modifyProfile,
-            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
+            @RequestPart(value = "image", required = false) MultipartFile multipartFile) {
         return new ResponseEntity<>(memberService.modifyProfile(member, modifyProfile, multipartFile), HttpStatus.OK);
     }
 
@@ -94,6 +94,22 @@ public class MemberController {
     @PatchMapping("/member/refresh")
     public ResponseEntity<TokenInfo> refreshLogin(@CurrentMember Member member) {
         return new ResponseEntity<>(memberService.refreshAccessToken(member), HttpStatus.OK);
+    }
+
+    /**
+     * [GET] 로그인한 유저 정보 조회
+     */
+    @GetMapping("/member/info")
+    public ResponseEntity<MemberSimpleInfo> getCurrentMemberInfo(@CurrentMember Member member) {
+        return new ResponseEntity<>(memberService.getMemberInfo(member), HttpStatus.OK);
+    }
+
+    /**
+     * [DELETE] 프로필 이미지 삭제
+     */
+    @DeleteMapping("/member/profile")
+    public ResponseEntity<String> deleteProfileImage(@CurrentMember Member member) {
+        return new ResponseEntity<>(memberService.deleteProfileImage(member), HttpStatus.OK);
     }
 
 }
