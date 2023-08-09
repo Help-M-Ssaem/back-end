@@ -3,6 +3,7 @@ package com.example.mssaem_backend.domain.board.dto;
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.global.common.Time;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,7 +49,7 @@ public class BoardResponseDto {
             this.boardMbti = board.getMbti();
             this.likeCount = board.getLikeCount();
             this.commentCount = board.getCommentCount();
-            this.createdAt = board.getCreatedAt().toString();
+            this.createdAt = Time.calculateTime(board.getCreatedAt(),2);
             this.memberSimpleInfo = memberSimpleInfo;
 
 
