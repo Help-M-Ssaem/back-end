@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.discussioncomment;
 
 import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentRequestDto.PostDiscussionCommentReq;
 import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfo;
+import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
@@ -54,7 +55,6 @@ public class DiscussionCommentController {
                 commentId));
     }
 
-
     //댓글 삭제
     @DeleteMapping("/member/discussions/{discussionId}/comments/{commentId}")
     public ResponseEntity<Boolean> deleteDiscussionComment(@CurrentMember Member member,
@@ -62,5 +62,15 @@ public class DiscussionCommentController {
         @PathVariable(value = "commentId") Long commentId) {
         return ResponseEntity.ok(
             discussionCommentService.deleteDiscussionComment(member, discussionId, commentId));
+    }
+
+    //특정 멤버별 토론글 댓글 보기
+    @GetMapping("/discussions/comments")
+    public ResponseEntity<PageResponseDto<List<DiscussionCommentSimpleInfoByMember>>> findDiscussionCommentListByMemberId(
+        @RequestParam(value = "memberId") Long memberId, @RequestParam(value = "page") int page,
+        @RequestParam(value = "size") int size, @CurrentMember Member member) {
+        return ResponseEntity.ok(
+            discussionCommentService.findDiscussionCommentListByMemberId(memberId, page, size,
+                member));
     }
 }

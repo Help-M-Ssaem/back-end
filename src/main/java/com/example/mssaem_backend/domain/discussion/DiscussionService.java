@@ -9,6 +9,7 @@ import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.Di
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
+import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentService;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
@@ -19,6 +20,8 @@ import com.example.mssaem_backend.domain.discussionoptionselected.DiscussionOpti
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
+import com.example.mssaem_backend.domain.notification.NotificationService;
+import com.example.mssaem_backend.domain.notification.TypeEnum;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -35,7 +38,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -47,7 +49,9 @@ public class DiscussionService {
     private final DiscussionOptionSelectedRepository discussionOptionSelectedRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
     private final BadgeRepository badgeRepository;
+    private final NotificationService notificationService;
     private final MemberRepository memberRepository;
+    private final DiscussionCommentService discussionCommentService;
 
 
     // HOT 토론글 더보기 조회
@@ -211,7 +215,7 @@ public class DiscussionService {
 
     //토른글 생성하기
     @Transactional
-    public String createDiscussion(Member member, List<MultipartFile> multipartFiles,
+    public String createDiscussion(Member member, List<String> imgUrls,
         DiscussionReq postDiscussionReq) {
         //Discussion 생성
         Discussion discussion = Discussion.builder()
@@ -222,14 +226,14 @@ public class DiscussionService {
         discussionRepository.save(discussion);
 
         //DiscussionOption 생성
-        discussionOptionService.createOption(discussion, postDiscussionReq, multipartFiles);
+        discussionOptionService.createOption(discussion, postDiscussionReq, imgUrls);
         return "토론글 생성완료";
     }
 
     //토론글 수정하기
     @Transactional
     public String modifyDiscussion(Member member, Long id, DiscussionReq patchDiscussionReq,
-        List<MultipartFile> multipartFiles) {
+        List<String> imgUrls) {
         //수정 권한 확인
         Discussion discussion = discussionRepository.findById(id)
             .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
@@ -242,7 +246,7 @@ public class DiscussionService {
         );
 
         discussionOptionService.deleteOption(discussion);
-        discussionOptionService.createOption(discussion, patchDiscussionReq, multipartFiles);
+        discussionOptionService.createOption(discussion, patchDiscussionReq, imgUrls);
 
         return "토론글 수정완료";
     }
@@ -256,6 +260,8 @@ public class DiscussionService {
         match(member, discussion.getMember());
 
         discussionOptionService.deleteOption(discussion);
+        //토론글 삭제 시 모든 댓글,댓글 좋아요 삭제
+        discussionCommentService.deleteAllDiscussionComment(discussion);
         discussion.deleteDiscussion();
 
         return "토론글 삭제완료";
@@ -301,6 +307,15 @@ public class DiscussionService {
 
             //discussion의 count수 증가
             discussion.increaseCount();
+            //discussion의 참여자수가 10명 이상일 경우 HOT 토론이 됨
+            if (discussion.getParticipantCount() == 10) {
+                notificationService.createNotification(
+                    discussionId,
+                    discussion.getTitle(),
+                    TypeEnum.HOT_DISCUSSION,
+                    discussion.getMember()
+                );
+            }
             discussionOptionSelectedRepository.save(discussionOptionSelected);
         }
 
@@ -370,8 +385,10 @@ public class DiscussionService {
         Discussion discussion = discussionRepository.findById(id)
             .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
 
+        boolean isParticipantExist = discussion.getParticipantCount() > 0;
+
         //수정,삭제 권한 확인
-        Boolean isEditAllowed = isMatch(viewer, discussion.getMember());
+        Boolean isEditAllowed = (isMatch(viewer, discussion.getMember()) && !isParticipantExist);
 
         List<Discussion> discussions = new ArrayList<>();
         discussions.add(discussion);

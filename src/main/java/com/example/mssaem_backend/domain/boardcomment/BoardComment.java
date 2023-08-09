@@ -51,6 +51,7 @@ public class BoardComment extends BaseTimeEntity {
 
     public void deleteBoardComment() {
         this.content = "삭제된 댓글입니다.";
+        this.likeCount = 0L;
         this.state = false;
     }
 

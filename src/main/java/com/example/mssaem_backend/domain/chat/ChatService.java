@@ -3,6 +3,7 @@ package com.example.mssaem_backend.domain.chat;
 import com.example.mssaem_backend.domain.chatmessage.ChatMessage;
 import com.example.mssaem_backend.domain.chatmessage.ChatMessage.MessageType;
 import com.example.mssaem_backend.domain.chatmessage.dto.ChatMessageResourceDto.ChatMessageRes;
+import com.example.mssaem_backend.global.common.Time;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -35,6 +36,10 @@ public class ChatService {
       chatMessage.setMessage(chatMessage.getSender() + "님이 방에서 나갔습니다.");
       chatMessage.setSender("[알림]");
     }
-    redisTemplate.convertAndSend(channelTopic.getTopic(), new ChatMessageRes(chatMessage));
+    String time = "";
+    if(chatMessage.getCreatedAt() != null) {
+       time = Time.calculateTime(chatMessage.getCreatedAt(), 2);
+    }
+    redisTemplate.convertAndSend(channelTopic.getTopic(), new ChatMessageRes(chatMessage, time));
   }
 }
