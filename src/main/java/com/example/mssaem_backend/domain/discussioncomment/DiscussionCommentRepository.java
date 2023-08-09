@@ -30,4 +30,5 @@ public interface DiscussionCommentRepository extends JpaRepository<DiscussionCom
     List<DiscussionComment> findAllByDiscussion(Discussion discussion);
 
     List<DiscussionComment> deleteAllByDiscussion(Discussion discussion);
+
 }
