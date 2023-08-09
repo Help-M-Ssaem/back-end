@@ -75,7 +75,7 @@ public class MemberController {
     @PatchMapping("/member/profile")
     public ResponseEntity<String> modifyProfile(
             @CurrentMember Member member, @RequestPart(value = "modifyProfile") ModifyProfile modifyProfile,
-            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
+            @RequestPart(value = "image", required = false) MultipartFile multipartFile) {
         return new ResponseEntity<>(memberService.modifyProfile(member, modifyProfile, multipartFile), HttpStatus.OK);
     }
 

@@ -139,19 +139,15 @@ public class MemberService {
         return teacherInfos;
     }
 
-    public String modifyProfile(Member currentMember, ModifyProfile modifyProfile, List<MultipartFile> multipartFile) {
+    public String modifyProfile(Member currentMember, ModifyProfile modifyProfile, MultipartFile multipartFile) {
         Member member = memberRepository.findById(currentMember.getId())
                 .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
         String profileImageUrl = "";
         if (multipartFile != null) {
-            //현재 저장된 이미지 삭제
-            if(member.getProfileImageUrl() != null) {
-                s3Service.deleteFile(s3Service.parseFileName(member.getProfileImageUrl()));
-            }
-            //새로운 이미지 업로드
-            List<S3Result> s3Results = s3Service.uploadFile(multipartFile);
-            profileImageUrl = s3Results.get(0).getImgUrl();
+            // 기존 이미지 삭제 후 새로운 이미지 업로드
+            s3Service.deleteFile(s3Service.parseFileName(member.getProfileImageUrl()));
+            profileImageUrl = s3Service.uploadImage(multipartFile);
         }
 
         member.modifyMember(modifyProfile.getNickName(), modifyProfile.getIntroduction(),
