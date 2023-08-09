@@ -73,7 +73,8 @@ public class SearchService {
     Page<Board> pageBoards = boardRepository.findByKeyword(searchInfo.getKeyword(), pageRequest);
     List<BoardSimpleInfo> boardSimpleResults = pageBoards.stream()
         .map(b -> new BoardSimpleInfo(b,
-            new MemberSimpleInfo(b.getMember(), b.getMember().getBadgeName())))
+            new MemberSimpleInfo(b.getMember(), b.getMember().getBadgeName()),
+            Time.calculateTime(b.getCreatedAt(), 3)))
         .collect(Collectors.toList());
 
     // 고민글 5개 가져오기
@@ -81,7 +82,7 @@ public class SearchService {
         pageRequest);
     List<GetWorriesSearchRes> worrySimpleResults = pageWorryBoards.stream()
         .map(wb -> new GetWorriesSearchRes(wb, wb.getThumbnail(),
-            Time.calculateTime(wb.getCreatedAt(),2)))
+            Time.calculateTime(wb.getCreatedAt(), 2)))
         .collect(Collectors.toList());
 
     // 토른글 5개 가져오기
@@ -109,10 +110,10 @@ public class SearchService {
   public List<SearchRecent> selectRecentSearch(Member member) {
     return searchRepository.findAllByMemberOrderByUpdatedAtDesc(member).stream()
         .map(SearchRecent::new).collect(
-        Collectors.toList());
+            Collectors.toList());
   }
 
-  public List<SearchPopular> selectPopularSearch(){
+  public List<SearchPopular> selectPopularSearch() {
     return searchCustomRepository.selectAllPopular();
   }
 

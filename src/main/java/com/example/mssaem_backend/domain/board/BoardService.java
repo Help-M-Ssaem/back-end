@@ -23,6 +23,7 @@ import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimp
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
+import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
@@ -94,21 +95,8 @@ public class BoardService {
         for (Board board : boards) {
             boardSimpleInfos.add(
                 new BoardSimpleInfo(
-                    board.getId(),
-                    board.getTitle(),
-                    board.getContent(),
-                    board.getThumbnail(), //imgUrl
-                    board.getMbti(),
-                    board.getLikeCount(),
-                    board.getCommentCount(),
-                    calculateTime(board.getCreatedAt(), dateType),
-                    new MemberSimpleInfo(
-                        board.getMember().getId(),
-                        board.getMember().getNickName(),
-                        board.getMember().getDetailMbti(),
-                        board.getMember().getBadgeName(),
-                        board.getMember().getProfileImageUrl()
-                    )
+                    board, new MemberSimpleInfo(board.getMember(), board.getMember().getBadgeName()),
+                    Time.calculateTime(board.getCreatedAt(), dateType)
                 )
             );
         }

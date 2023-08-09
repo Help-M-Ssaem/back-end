@@ -3,7 +3,6 @@ package com.example.mssaem_backend.domain.board.dto;
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
-import com.example.mssaem_backend.global.common.Time;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,22 +25,7 @@ public class BoardResponseDto {
         private String createdAt;
         private MemberSimpleInfo memberSimpleInfo;
 
-        public BoardSimpleInfo(Long id, String title, String content, String imgUrl,
-            MbtiEnum boardMbti,
-            Long likeCount, Long commentCount, String createdAt,
-            MemberSimpleInfo memberSimpleInfo) {
-            this.id = id;
-            this.title = title;
-            this.content = content;
-            this.imgUrl = imgUrl == null ? "" : imgUrl;
-            this.boardMbti = boardMbti;
-            this.likeCount = likeCount;
-            this.commentCount = commentCount;
-            this.createdAt = createdAt;
-            this.memberSimpleInfo = memberSimpleInfo;
-        }
-
-        public BoardSimpleInfo(Board board, MemberSimpleInfo memberSimpleInfo){
+        public BoardSimpleInfo(Board board, MemberSimpleInfo memberSimpleInfo, String createdAt) {
             this.id = board.getId();
             this.title = board.getTitle();
             this.content = board.getContent();
@@ -49,10 +33,8 @@ public class BoardResponseDto {
             this.boardMbti = board.getMbti();
             this.likeCount = board.getLikeCount();
             this.commentCount = board.getCommentCount();
-            this.createdAt = Time.calculateTime(board.getCreatedAt(),2);
+            this.createdAt = createdAt;
             this.memberSimpleInfo = memberSimpleInfo;
-
-
         }
     }
 
@@ -108,7 +90,7 @@ public class BoardResponseDto {
 
         @Builder
         public GetBoardRes(MemberSimpleInfo memberSimpleInfo, Board board, List<String> imgUrlList,
-                           String createdAt, Long commentCount, Boolean isAllowed, Boolean isLiked) {
+            String createdAt, Long commentCount, Boolean isAllowed, Boolean isLiked) {
             this.memberSimpleInfo = memberSimpleInfo;
             this.boardId = board.getId();
             this.title = board.getTitle();
@@ -127,6 +109,7 @@ public class BoardResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardHistory {
+
         private Long boardCount;         // 전체 게시글 수
         private Long boardCommentCount;  // 전체 게시글 댓글 수
         private Long likeAllCount;       // 받은 좋아요의 수
