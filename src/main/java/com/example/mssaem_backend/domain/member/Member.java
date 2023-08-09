@@ -111,4 +111,9 @@ public class Member extends BaseTimeEntity {
         this.defaultProfile = false;
     }
 
+    public void deleteProfile() {
+        this.profileImageUrl = this.mbti.getProfileUrl();
+        this.defaultProfile = true;
+    }
+
 }

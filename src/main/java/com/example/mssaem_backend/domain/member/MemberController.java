@@ -104,4 +104,12 @@ public class MemberController {
         return new ResponseEntity<>(memberService.getMemberInfo(member), HttpStatus.OK);
     }
 
+    /**
+     * [DELETE] 프로필 이미지 삭제
+     */
+    @DeleteMapping("/member/profile")
+    public ResponseEntity<String> deleteProfileImage(@CurrentMember Member member) {
+        return new ResponseEntity<>(memberService.deleteProfileImage(member), HttpStatus.OK);
+    }
+
 }

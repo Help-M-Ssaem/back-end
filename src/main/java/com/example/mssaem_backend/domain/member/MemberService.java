@@ -182,6 +182,12 @@ public class MemberService {
         return new MemberSimpleInfo(member);
     }
 
+    public String deleteProfileImage(Member member) {
+        member.deleteProfile();
+        save(member);
+        return "삭제 완료";
+    }
+
     private String uploadFile(Member member, MultipartFile multipartFile) {
         if (multipartFile != null) {
             // 기본 이미지가 아니라면 기존 이미지 삭제 후 새로운 이미지 업로드, 기본 이미지가 삭제 되지 않기 위함
