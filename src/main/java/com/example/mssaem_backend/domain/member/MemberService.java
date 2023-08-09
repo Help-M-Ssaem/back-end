@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.member;
 
+import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.badge.BadgeService;
 import com.example.mssaem_backend.domain.board.Board;
@@ -10,6 +11,7 @@ import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfi
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberProfileInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
@@ -17,6 +19,7 @@ import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardService;
 import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.config.exception.errorCode.BadgeErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import com.example.mssaem_backend.global.config.security.jwt.JwtTokenProvider;
 import com.example.mssaem_backend.global.config.security.oauth.SocialLoginService;
@@ -66,6 +69,7 @@ public class MemberService {
                 registerMember.getMbti(),
                 registerMember.getCaseSensitivity());
         save(member);
+        System.out.println("프로필 이미지는 " + member.getProfileImageUrl() + " 이고 디폴트 값은 " + member.isDefaultProfile());
         return member;
     }
 
@@ -139,24 +143,18 @@ public class MemberService {
         return teacherInfos;
     }
 
-    public String modifyProfile(Member currentMember, ModifyProfile modifyProfile, List<MultipartFile> multipartFile) {
-        Member member = memberRepository.findById(currentMember.getId())
-                .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
-
-        String profileImageUrl = "";
-        if (multipartFile != null) {
-            //현재 저장된 이미지 삭제
-            if(member.getProfileImageUrl() != null) {
-                s3Service.deleteFile(s3Service.parseFileName(member.getProfileImageUrl()));
-            }
-            //새로운 이미지 업로드
-            List<S3Result> s3Results = s3Service.uploadFile(multipartFile);
-            profileImageUrl = s3Results.get(0).getImgUrl();
-        }
-
+    public String modifyProfile(Member member, ModifyProfile modifyProfile, MultipartFile multipartFile) {
+        // 프로필 사진 변경
+        String profileImageUrl = uploadFile(member, multipartFile);
+        // 대표 뱃지 변경
+        String badgeName = badgeService.changeRepresentativeBadge(member, modifyProfile.getBadgeId());
+        // 수정
         member.modifyMember(modifyProfile.getNickName(), modifyProfile.getIntroduction(),
                 profileImageUrl, modifyProfile.getMbti(), modifyProfile.getCaseSensitivity(),
-                badgeRepository.findNameByIdAndMember(modifyProfile.getBadgeId(), member).orElse(null));
+                badgeName);
+
+        save(member);
+        System.out.println("프로필 이미지는 " + member.getProfileImageUrl() + " 이고 디폴트 값은 " + member.isDefaultProfile());
         return "수정 성공";
     }
 
@@ -178,5 +176,28 @@ public class MemberService {
                 .accessToken(jwtTokenProvider.generateAccessToken(member.getId()))
                 .refreshToken(member.getRefreshToken())
                 .build();
+    }
+
+    public MemberSimpleInfo getMemberInfo(Member member) {
+        return new MemberSimpleInfo(member);
+    }
+
+    public String deleteProfileImage(Member member) {
+        member.deleteProfile();
+        save(member);
+        return "삭제 완료";
+    }
+
+    private String uploadFile(Member member, MultipartFile multipartFile) {
+        if (multipartFile != null) {
+            // 기본 이미지가 아니라면 기존 이미지 삭제 후 새로운 이미지 업로드, 기본 이미지가 삭제 되지 않기 위함
+            if(!member.isDefaultProfile()) {
+                s3Service.deleteFile(s3Service.parseFileName(member.getProfileImageUrl()));
+            }
+            member.changeFalseDefaultProfile();
+            save(member);
+            return s3Service.uploadImage(multipartFile);
+        }
+        return null;
     }
 }
