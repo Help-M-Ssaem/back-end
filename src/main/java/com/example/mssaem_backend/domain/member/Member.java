@@ -52,6 +52,9 @@ public class Member extends BaseTimeEntity {
 
     private String badgeName;
 
+    @Transient
+    private boolean defaultProfile = true;
+
     public void changeRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
@@ -73,6 +76,8 @@ public class Member extends BaseTimeEntity {
         this.nickName = nickName;
         this.mbti = mbti;
         this.caseSensitivity = caseSensitivity;
+        this.profileImageUrl = mbti.getProfileUrl();
+        System.out.println("프로필 이미지는 " + this.profileImageUrl);
         this.refreshToken = "";
         this.report = 0;
         this.role = Role.ROLE_MEMBER;
@@ -80,15 +85,19 @@ public class Member extends BaseTimeEntity {
 
     public void modifyMember(String nickName, String introduction, String profileImageUrl,
                              MbtiEnum mbti, String caseSensitivity, String badgeName) {
+        // MBTI 변경 시 프로필 사진이 디폴트라면 프로필 사진도 같이 변경
+        if (mbti != null) {
+            this.mbti = mbti;
+            if (this.defaultProfile) {
+                this.profileImageUrl = mbti.getProfileUrl();
+            }
+        }
         this.nickName = nickName != null ? nickName : this.nickName;
         this.introduction = introduction != null ? introduction : this.introduction;
         this.profileImageUrl = profileImageUrl != null ? profileImageUrl : this.profileImageUrl;
-        this.mbti = mbti != null ? mbti : this.mbti;
         this.caseSensitivity = caseSensitivity != null ? caseSensitivity : this.caseSensitivity;
         this.badgeName = badgeName != null ? badgeName : this.badgeName;
-
     }
-
 
     public Integer increaseReport() {
         return this.report++;
@@ -96,6 +105,15 @@ public class Member extends BaseTimeEntity {
 
     public void updateStatus() {
         this.status = false;
+    }
+
+    public void changeFalseDefaultProfile() {
+        this.defaultProfile = false;
+    }
+
+    public void deleteProfile() {
+        this.profileImageUrl = this.mbti.getProfileUrl();
+        this.defaultProfile = true;
     }
 
 }
