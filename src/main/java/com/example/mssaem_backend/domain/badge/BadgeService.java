@@ -31,7 +31,7 @@ public class BadgeService {
         List<Badge> badges = badgeRepository.findAllByMember(member).orElse(null);
         List<BadgeInfo> result = new ArrayList<>();
         if (badges != null) {
-            badges.forEach(badge -> result.add(new BadgeInfo(badge.getId(), badge.getName())));
+            badges.forEach(badge -> result.add(new BadgeInfo(badge.getId(), badge.getName(), badge.isState())));
         }
         return result;
     }
