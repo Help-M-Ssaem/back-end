@@ -62,6 +62,7 @@ public class DiscussionComment extends BaseTimeEntity {
 
     public void deleteDiscussionComment() {
         this.content = "삭제된 댓글입니다.";
+        this.likeCount = 0L;
         this.state = false;
     }
 
