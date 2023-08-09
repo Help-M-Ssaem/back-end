@@ -11,6 +11,7 @@ import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfi
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberProfileInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
@@ -175,6 +176,10 @@ public class MemberService {
                 .accessToken(jwtTokenProvider.generateAccessToken(member.getId()))
                 .refreshToken(member.getRefreshToken())
                 .build();
+    }
+
+    public MemberSimpleInfo getMemberInfo(Member member) {
+        return new MemberSimpleInfo(member);
     }
 
     private String uploadFile(Member member, MultipartFile multipartFile) {

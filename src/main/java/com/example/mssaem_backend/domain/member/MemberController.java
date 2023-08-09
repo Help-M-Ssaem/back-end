@@ -4,7 +4,7 @@ import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfi
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
-import com.example.mssaem_backend.domain.member.dto.MemberResponseDto;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberProfileInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
@@ -94,6 +94,14 @@ public class MemberController {
     @PatchMapping("/member/refresh")
     public ResponseEntity<TokenInfo> refreshLogin(@CurrentMember Member member) {
         return new ResponseEntity<>(memberService.refreshAccessToken(member), HttpStatus.OK);
+    }
+
+    /**
+     * [GET] 로그인한 유저 정보 조회
+     */
+    @GetMapping("/member/info")
+    public ResponseEntity<MemberSimpleInfo> getCurrentMemberInfo(@CurrentMember Member member) {
+        return new ResponseEntity<>(memberService.getMemberInfo(member), HttpStatus.OK);
     }
 
 }
