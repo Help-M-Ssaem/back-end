@@ -3,7 +3,7 @@ package com.example.mssaem_backend.domain.search.dto;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.search.Search;
-import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesSearchRes;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ public class SearchResponseDto {
   public static class SearchRes {
 
     private PageResponseDto<List<BoardSimpleInfo>> boardSimpleInfos; // 전체 게시판
-    private PageResponseDto<List<GetWorriesRes>> getWorriesRes; // 고민 게시판
+    private PageResponseDto<List<GetWorriesSearchRes>> getWorriesRes; // 고민 게시판
     private PageResponseDto<List<DiscussionSimpleInfo>> discussionSimpleInfo;
   }
 

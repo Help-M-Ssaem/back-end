@@ -91,5 +91,32 @@ public class WorryBoardResponseDto {
         private int evaluationCount;         // 내가 남긴 평가의 수
     }
 
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class GetWorriesSearchRes {
+
+        private Long id;
+        private String title;
+        private String content;
+        private MbtiEnum memberMbti;
+        private MbtiEnum targetMbti;
+        private String createdDate;
+        private boolean isSolved;
+        private String thumbnail;
+
+        @Builder
+        public GetWorriesSearchRes(WorryBoard worryBoard, String thumbnail, String createdAt) {
+            this.id = worryBoard.getId();
+            this.title = worryBoard.getTitle();
+            this.content = worryBoard.getContent();
+            this.memberMbti = worryBoard.getMember().getMbti();
+            this.targetMbti = worryBoard.getTargetMbti();
+            this.createdDate = createdAt;
+            this.isSolved = worryBoard.getIsSolved();
+            this.thumbnail = thumbnail;
+        }
+    }
+
 }
 

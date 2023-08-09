@@ -15,7 +15,8 @@ import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRece
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRes;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
-import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesSearchRes;
+import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,9 +79,9 @@ public class SearchService {
     // 고민글 5개 가져오기
     Page<WorryBoard> pageWorryBoards = worryBoardRepository.findByKeyword(searchInfo.getKeyword(),
         pageRequest);
-    List<GetWorriesRes> worrySimpleResults = pageWorryBoards.stream()
-        .map(wb -> new GetWorriesRes(wb, wb.getThumbnail(),
-            wb.getCreatedAt().toString()))
+    List<GetWorriesSearchRes> worrySimpleResults = pageWorryBoards.stream()
+        .map(wb -> new GetWorriesSearchRes(wb, wb.getThumbnail(),
+            Time.calculateTime(wb.getCreatedAt(),2)))
         .collect(Collectors.toList());
 
     // 토른글 5개 가져오기
