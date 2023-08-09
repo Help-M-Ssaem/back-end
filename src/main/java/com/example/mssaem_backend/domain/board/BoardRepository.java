@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     //boardId가 입력되지 않으면 전체 게시글 조회, 입력되면 해당 게시글만 제외하고 전체 조회
-    @Query("SELECT b FROM Board b WHERE b.state = true AND (:boardId IS NULL OR b.id <> :boardId)")
+    @Query("SELECT b FROM Board b WHERE b.state = true AND (:boardId IS NULL OR b.id <> :boardId) order by b.createdAt desc ")
     Page<Board> findAllByStateIsTrueAndIdOrderByCreatedAtDesc(@Param("boardId") Long boardId, Pageable pageable);
 
     Page<Board> findAllByStateIsTrueAndMbtiOrderByCreatedAtDesc(MbtiEnum mbtiEnum, Pageable pageable);
