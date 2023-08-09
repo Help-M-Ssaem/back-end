@@ -33,4 +33,12 @@ public class Badge extends BaseTimeEntity {
     private Member member;
 
     private boolean state; // true : 대표
+
+    public void changeStateTrue() {
+        this.state = true;
+    }
+
+    public void changeStateFalse() {
+        this.state = false;
+    }
 }
