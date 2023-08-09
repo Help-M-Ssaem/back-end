@@ -48,8 +48,6 @@ public class DiscussionOptionService {
                 s3Service.deleteFile(s3Service.parseFileName(discussionOption.getImgUrl()));
             }
         }
-        //해당 discussionOption에 존재하는 discussionOptionSelected 삭제
-
         //해당 discussion에 존재하는 option 삭제
         discussionOptionRepository.deleteAllByDiscussion(discussion);
     }
