@@ -5,6 +5,8 @@ import com.example.mssaem_backend.domain.board.BoardRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.notification.NotificationService;
 import com.example.mssaem_backend.domain.notification.TypeEnum;
+import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,9 @@ public class LikeService {
 
     @Transactional
     public Boolean updateBoardLike(Member member, Long boardId) {
+        //boardId에 대한 유효성 검사
+        boardRepository.findById(boardId)
+            .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //해당 Board Like가 member, boardId 에 대해 존재하는지 확인
         if (likeRepository.existsLikeByMemberAndBoardId(member, boardId)) {
             //존재한다면 해당 Like 상태 변경
