@@ -115,8 +115,7 @@ public class BoardService {
         for (Board board : boards) {
             boardSimpleInfos.add(
                 new BoardSimpleInfo(
-                    board,
-                    new MemberSimpleInfo(board.getMember(), board.getMember().getBadgeName()),
+                    board, new MemberSimpleInfo(board.getMember()),
                     Time.calculateTime(board.getCreatedAt(), dateType)
                 )
             );
