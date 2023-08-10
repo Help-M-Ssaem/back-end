@@ -78,5 +78,9 @@ public class ChatParticipateService {
         chatParticipateRepository.delete(chatParticipate);
     }
 
+    public Integer countChatParticipate(Long roomId){
+        return chatParticipateRepository.countByChatRoomId(roomId);
+    }
+
 }
 
