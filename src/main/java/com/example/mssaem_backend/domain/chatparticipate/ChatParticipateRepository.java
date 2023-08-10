@@ -18,4 +18,6 @@ public interface ChatParticipateRepository extends JpaRepository<ChatParticipate
     ChatParticipate findBySessionId(String sessionId);
 
     ChatParticipate findByChatRoom(ChatRoom chatRoom);
+
+    Integer countByChatRoomId(Long chatRoomId);
 }

@@ -1,5 +1,7 @@
 package com.example.mssaem_backend.global.config.websocket;
 
+import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomParticipateErrorCode.FULL_CHATROOM;
+
 import com.example.mssaem_backend.domain.chat.ChatService;
 import com.example.mssaem_backend.domain.chatmessage.ChatMessage;
 import com.example.mssaem_backend.domain.chatmessage.ChatMessage.MessageType;
@@ -10,6 +12,7 @@ import com.example.mssaem_backend.domain.chatroom.ChatRoomRepository;
 import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatInfo;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
+import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.security.jwt.JwtTokenProvider;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +43,6 @@ public class StompHandler implements ChannelInterceptor {
     // websocket 연결시 헤더의 jwt token 검증
     if (StompCommand.CONNECT == accessor.getCommand()) {
       String sessionId = (String) message.getHeaders().get("simpSessionId");
-      System.out.println(1);
       // 멤버 검사
       String token = accessor.getFirstNativeHeader("token");
       String memberIdByToken = jwtTokenProvider.getMemberIdByToken(token);
@@ -62,6 +64,9 @@ public class StompHandler implements ChannelInterceptor {
           Optional.ofNullable((String) message.getHeaders().get("simpDestination"))
               .orElse("InvalidRoom"));
 
+      if(chatParticipateService.countChatParticipate(Long.valueOf(roomId)) >= 2){
+        throw new BaseException(FULL_CHATROOM);
+      }
       //roomId 다시 저장 (Redis)
       chatRoomCustomRepository.setRoomEnterInfo(sessionId, Long.valueOf(roomId));
 
@@ -78,7 +83,8 @@ public class StompHandler implements ChannelInterceptor {
       String sessionId = (String) message.getHeaders().get("simpSessionId");
 
       ChatInfo chatInfo = chatRoomCustomRepository.getUserEnterRoomId(sessionId);
-      if (chatInfo == null) {
+
+      if (chatInfo.getChatRoomId() == null) {
         return message;
       }
 
