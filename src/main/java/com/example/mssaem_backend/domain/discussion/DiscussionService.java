@@ -28,7 +28,6 @@ import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,35 +52,36 @@ public class DiscussionService {
     private final MemberRepository memberRepository;
     private final DiscussionCommentService discussionCommentService;
 
+    private static final Long participantCountStandard = 10L;
+
+    // HOT 토론글 조회
+    public Page<Discussion> findHotDiscussions(PageRequest pageRequest) {
+        return discussionRepository.findDiscussionByParticipantCountGreaterThanEqualAndStateIsTrueOrderByCreatedAtDesc(
+            participantCountStandard,
+            pageRequest);
+    }
 
     // HOT 토론글 더보기 조회
-    public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionList(Member member,
+    public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionsMore(Member member,
         int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
-            LocalDateTime.now().minusDays(3)
-            , pageRequest);
+        Page<Discussion> discussions = findHotDiscussions(pageRequest);
 
         return new PageResponseDto<>(
             discussions.getNumber(),
             discussions.getTotalPages(),
             setDiscussionSimpleInfo(
                 member,
-                discussions
-                    .stream()
-                    .collect(Collectors.toList()),
+                discussions.stream().collect(Collectors.toList()),
                 3)
         );
     }
 
     // 홈 화면 - 최상위 제외한 HOT 토론글 2개만 조회
-    public List<DiscussionSimpleInfo> findHotDiscussionListForHome(Member member) {
+    public List<DiscussionSimpleInfo> findHotDiscussionsForHome(Member member) {
         PageRequest pageRequest = PageRequest.of(0, 3);
-        List<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
-                LocalDateTime.now().minusDays(3)
-                , pageRequest)
-            .stream()
-            .collect(Collectors.toList());
+        List<Discussion> discussions = findHotDiscussions(pageRequest)
+            .stream().collect(Collectors.toList());
 
         if (!discussions.isEmpty()) {
             discussions.remove(0);

@@ -33,7 +33,7 @@ public class DiscussionController {
     @GetMapping("/discussions/hot")
     public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findHotDiscussionList(
         @CurrentMember Member member, @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(discussionService.findHotDiscussionList(member, page, size));
+        return ResponseEntity.ok(discussionService.findHotDiscussionsMore(member, page, size));
     }
 
     /**
@@ -42,7 +42,7 @@ public class DiscussionController {
     @GetMapping("/discussions/home")
     public ResponseEntity<List<DiscussionSimpleInfo>> findHotDiscussionListForHome(
         @CurrentMember Member member) {
-        return ResponseEntity.ok(discussionService.findHotDiscussionListForHome(member));
+        return ResponseEntity.ok(discussionService.findHotDiscussionsForHome(member));
     }
 
     /**
@@ -131,6 +131,7 @@ public class DiscussionController {
         @CurrentMember Member member,
         @RequestParam(required = false) Long memberId, @RequestParam(value = "page") int page,
         @RequestParam(value = "size") int size) {
-        return ResponseEntity.ok(discussionService.findDiscussionsByMemberId(member, memberId, page, size));
+        return ResponseEntity.ok(
+            discussionService.findDiscussionsByMemberId(member, memberId, page, size));
     }
 }
