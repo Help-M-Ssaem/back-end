@@ -15,7 +15,7 @@ import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentService;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
-import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
+import com.example.mssaem_backend.domain.discussion.DiscussionService;
 import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
@@ -28,7 +28,6 @@ import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,16 +46,18 @@ public class BoardService {
     private final LikeRepository likeRepository;
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
-    private final DiscussionRepository discussionRepository;
     private final WorryBoardRepository worryBoardRepository;
     private final BoardCommentService boardCommentService;
+    private final DiscussionService discussionService;
+
+    private static final Long likeCountStandard = 10L; // HOT 게시글 기준이 되는 좋아요수
 
     // HOT 게시물 더보기
     public PageResponseDto<List<BoardSimpleInfo>> findHotBoardList(int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Board> boards =
-            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
-                LocalDateTime.now().minusDays(3),
+            boardRepository.findBoardsByLikeCountGreaterThanEqualAndStateIsTrueOrderByCreatedAtDesc(
+                likeCountStandard,
                 pageRequest
             );
 
@@ -64,9 +65,7 @@ public class BoardService {
             boards.getNumber(),
             boards.getTotalPages(),
             setBoardSimpleInfo(
-                boards
-                    .stream()
-                    .collect(Collectors.toList()),
+                boards.stream().collect(Collectors.toList()),
                 3)
         );
     }
@@ -75,16 +74,37 @@ public class BoardService {
     public List<BoardSimpleInfo> findHotBoardListForHome() {
         PageRequest pageRequest = PageRequest.of(0, 5);
         List<Board> boards =
-            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
-                    LocalDateTime.now().minusDays(3),
-                    pageRequest
-                ).stream()
-                .collect(Collectors.toList());
+            boardRepository.findBoardsByLikeCountGreaterThanEqualAndStateIsTrueOrderByCreatedAtDesc(
+                    likeCountStandard,
+                    pageRequest)
+                .stream().collect(Collectors.toList());
+
         if (!boards.isEmpty()) {
             boards.remove(0);
         }
-
         return setBoardSimpleInfo(boards, 1);
+    }
+
+    // 홈 화면 조회 - HOT 게시물, HOT 토론, 가장 최신 고민글 조회
+    public ThreeHotInfo findThreeHotForHome() {
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        List<Board> boards =
+            boardRepository.findBoardsByLikeCountGreaterThanEqualAndStateIsTrueOrderByCreatedAtDesc(
+                    likeCountStandard,
+                    pageRequest)
+                .stream().toList();
+        List<Discussion> discussions = discussionService.findHotDiscussions(pageRequest)
+            .stream().toList();
+        WorryBoard worryBoard = worryBoardRepository.findTopByStateFalseOrderByCreatedAtDesc();
+
+        return ThreeHotInfo.builder()
+            .boardId(!boards.isEmpty() ? boards.get(0).getId() : null)
+            .boardTitle(!boards.isEmpty() ? boards.get(0).getTitle() : null)
+            .discussionId(!discussions.isEmpty() ? discussions.get(0).getId() : null)
+            .discussionTitle(!discussions.isEmpty() ? discussions.get(0).getTitle() : null)
+            .worryBoardId(worryBoard != null ? worryBoard.getId() : null)
+            .worryBoardTitle(worryBoard != null ? worryBoard.getTitle() : null)
+            .build();
     }
 
 
@@ -95,7 +115,8 @@ public class BoardService {
         for (Board board : boards) {
             boardSimpleInfos.add(
                 new BoardSimpleInfo(
-                    board, new MemberSimpleInfo(board.getMember(), board.getMember().getBadgeName()),
+                    board,
+                    new MemberSimpleInfo(board.getMember(), board.getMember().getBadgeName()),
                     Time.calculateTime(board.getCreatedAt(), dateType)
                 )
             );
@@ -167,34 +188,6 @@ public class BoardService {
             throw new BaseException(BoardErrorCode.EMPTY_BOARD);
         }
     }
-
-    // 홈 화면에 보여줄 HOT 게시물, HOT 토론, 가장 최신 고민글 조회
-    public ThreeHotInfo findThreeHotForHome() {
-        PageRequest pageRequest = PageRequest.of(0, 1);
-        List<Board> boards =
-            likeRepository.findBoardsWithMoreThanTenLikesInLastThreeDaysAndStateTrue(
-                    LocalDateTime.now().minusDays(3)
-                    , pageRequest
-                )
-                .stream().toList();
-        List<Discussion> discussions =
-            discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
-                LocalDateTime.now().minusDays(3)
-                , pageRequest
-            ).stream().toList();
-        WorryBoard worryBoard = worryBoardRepository.findTopByStateFalseOrderByCreatedAtDesc();
-
-        return ThreeHotInfo.builder()
-            .boardId(!boards.isEmpty() ? boards.get(0).getId() : null)
-            .boardTitle(!boards.isEmpty() ? boards.get(0).getTitle() : null)
-            .discussionId(!discussions.isEmpty() ? discussions.get(0).getId() : null)
-            .discussionTitle(!discussions.isEmpty() ? discussions.get(0).getTitle() : null)
-            .worryBoardId(worryBoard != null ? worryBoard.getId() : null)
-            .worryBoardTitle(worryBoard != null ? worryBoard.getTitle() : null)
-            .build();
-
-    }
-
 
     //게시글 전체 조회 , 게시글 상세 조회시 boardId 입력 받아 현재 게시글 제외하고 전체 조회
     public PageResponseDto<List<BoardSimpleInfo>> findBoards(int page, int size, Long boardId) {
