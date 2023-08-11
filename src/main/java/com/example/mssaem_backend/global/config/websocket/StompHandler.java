@@ -94,6 +94,7 @@ public class StompHandler implements ChannelInterceptor {
       chatService.sendChatMessage(chatMessage);
 
       // 채팅 참여 기록 삭제
+
       chatRoomCustomRepository.removeUserEnterInfo(sessionId);
       chatParticipateService.deleteChatParticipate(sessionId);
       log.info("DISCONNECTED {}, {}", sessionId, chatInfo.getChatRoomId());
