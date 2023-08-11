@@ -9,10 +9,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface ChatParticipateRepository extends JpaRepository<ChatParticipate, Long> {
 
-    @Query("select cp from ChatParticipate cp join fetch cp.chatRoom join fetch cp.member where cp.member = :member")
-    List<ChatParticipate> findAllByMember(@Param("member") Member member);
+    @Query("select cp.chatRoom.id from ChatParticipate cp where cp.member = :member")
+    List<Long> findAllByMemberParticipateRoomId(@Param("member") Member member);
+
+    @Query("select cp from ChatParticipate cp join fetch cp.chatRoom join fetch cp.member where cp.member <> :member and cp.chatRoom.id in (:roomIds)")
+    List<ChatParticipate> findAllParticipateRoom(@Param("member") Member member, @Param("roomIds") List<Long> roomIds);
 
     ChatParticipate findBySessionId(String sessionId);
 
     ChatParticipate findByChatRoom(ChatRoom chatRoom);
+
+    Integer countByChatRoomId(Long chatRoomId);
 }

@@ -15,6 +15,7 @@ public class ChatParticipateResponseDto {
   @AllArgsConstructor
   public static class ChatParticipateRes {
 
+    private Long chatRoomId;
     private String chatRoomTitle;
     private boolean state;
     private String lastMessage;
@@ -22,6 +23,7 @@ public class ChatParticipateResponseDto {
     private MemberSimpleInfo memberSimpleInfo;
 
     public ChatParticipateRes(ChatParticipate chatParticipate, MemberSimpleInfo memberSimpleInfo, ChatMessage message) {
+      this.chatRoomId = chatParticipate.getChatRoom().getId();
       this.chatRoomTitle = chatParticipate.getChatRoom().getTitle();
       this.state = chatParticipate.getChatRoom().isState();
       this.lastMessage = message == null ? "" : message.getMessage();

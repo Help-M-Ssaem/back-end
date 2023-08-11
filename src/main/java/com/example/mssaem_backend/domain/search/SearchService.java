@@ -73,7 +73,7 @@ public class SearchService {
     Page<Board> pageBoards = boardRepository.findByKeyword(searchInfo.getKeyword(), pageRequest);
     List<BoardSimpleInfo> boardSimpleResults = pageBoards.stream()
         .map(b -> new BoardSimpleInfo(b,
-            new MemberSimpleInfo(b.getMember(), b.getMember().getBadgeName()),
+            new MemberSimpleInfo(b.getMember()),
             Time.calculateTime(b.getCreatedAt(), 3)))
         .collect(Collectors.toList());
 

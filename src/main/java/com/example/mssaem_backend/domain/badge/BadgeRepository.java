@@ -17,4 +17,7 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
     Optional<String> findNameByIdAndMember(@Param("id") Long id, @Param("member") Member member);
 
     Optional<List<Badge>> findAllByMember(@Param("member") Member member);
+
+    Optional<Badge> findByMemberAndStateTrue(Member member);
+    Optional<Badge> findByIdAndMember(Long id, Member member);
 }
