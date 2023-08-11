@@ -4,6 +4,8 @@ import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatInf
 import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatRoomInfo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +23,8 @@ public class ChatRoomController {
    * 채팅방 개설
    */
   @PostMapping("member/chat/rooms")
-  public String createRoom(@RequestBody ChatRoomInfo chatRoomInfo) {
-    return chatRoomService.createRoom(chatRoomInfo);
+  public ResponseEntity<String> createRoom(@RequestBody ChatRoomInfo chatRoomInfo) {
+    return ResponseEntity.ok(chatRoomService.createRoom(chatRoomInfo));
   }
 
   /**
@@ -39,6 +41,14 @@ public class ChatRoomController {
   @GetMapping("/redis/enter/{sessionId}")
   public ChatInfo enterChat(@PathVariable("sessionId") String sessionId) {
     return chatRoomService.chatEnter(sessionId);
+  }
+
+  /**
+   * 채팅방 삭제
+   */
+  @DeleteMapping("member/chat/rooms/{roomId}")
+  public ResponseEntity<String> deleteChatRoom(@PathVariable("roomId") Long roomId){
+    return ResponseEntity.ok(chatRoomService.deleteChatRoom(roomId));
   }
 
 }
