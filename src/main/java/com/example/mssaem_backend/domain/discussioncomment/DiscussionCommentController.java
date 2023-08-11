@@ -4,6 +4,8 @@ import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionComment
 import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.global.common.CommentService;
+import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsRes;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
@@ -22,15 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class DiscussionCommentController {
 
     private final DiscussionCommentService discussionCommentService;
+    private final CommentService commentService;
 
     //토론글 상세 조회시 댓글 조회
     @GetMapping("/discussions/{discussionId}/comments")
-    public ResponseEntity<PageResponseDto<List<DiscussionCommentSimpleInfo>>> findDiscussionComments(
+    public ResponseEntity<PageResponseDto<List<GetCommentsRes>>> findDiscussionComments(
         @CurrentMember Member member, @PathVariable Long discussionId, @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            discussionCommentService.findDiscussionCommentListByDiscussionId(member, discussionId,
-                page, size));
+            commentService.findCommentsByPostId(member, discussionId,
+                page, size, "DISCUSSION"));
     }
 
     //토론글 상세 조회시 베스트 댓글 3개 조회

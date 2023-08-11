@@ -1,8 +1,10 @@
 package com.example.mssaem_backend.domain.boardcomment;
 
 import com.example.mssaem_backend.domain.board.Board;
+import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
+import com.example.mssaem_backend.global.common.Comment;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -17,7 +19,7 @@ import org.hibernate.annotations.DynamicInsert;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class BoardComment extends BaseTimeEntity {
+public class BoardComment extends BaseTimeEntity implements Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,4 +73,8 @@ public class BoardComment extends BaseTimeEntity {
         this.state = false;
     }
 
+    @Override
+    public Discussion getDiscussion() {
+        return null;
+    }
 }

@@ -5,6 +5,9 @@ import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDt
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.PostBoardCommentRes;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.member.Member;
+import com.example.mssaem_backend.global.common.CommentService;
+import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsByMemberRes;
+import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsRes;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BoardCommentController {
 
     private final BoardCommentService boardCommentService;
+    private final CommentService commentService;
 
     //특정 게시글 상세 조회시 댓글 전체 조회
     @GetMapping("/boards/{boardId}/comments")
@@ -35,10 +39,11 @@ public class BoardCommentController {
 
     //게시글 상세 조회시 베스트 댓글 3개 조회
     @GetMapping("/boards/{boardId}/comments/best")
-    public ResponseEntity<List<BoardCommentSimpleInfo>> findBoardCommentBestListByBoardId(
+    public ResponseEntity<List<GetCommentsRes>> findBoardCommentBestListByBoardId(
         @CurrentMember Member member, @PathVariable(value = "boardId") Long boardId) {
         return ResponseEntity.ok(
-            boardCommentService.findBoardCommentBestListByBoardId(member, boardId));
+            //boardCommentService.findBoardCommentBestListByBoardId(member, boardId));
+            commentService.findBestCommentsByPostId(member, boardId, "BOARD"));
     }
 
     /**
@@ -67,11 +72,11 @@ public class BoardCommentController {
 
     //특정 멤버별 게시글 댓글 전체 조회
     @GetMapping("/boards/comments")
-    public ResponseEntity<PageResponseDto<List<BoardCommentSimpleInfoByMember>>> findBoardCommentListByMemberId(
+    public ResponseEntity<PageResponseDto<List<GetCommentsByMemberRes>>> findBoardCommentListByMemberId(
         @RequestParam(value = "memberId") Long memberId, @RequestParam(value = "page") int page,
         @RequestParam(value = "size") int size, @CurrentMember Member member) {
         return ResponseEntity.ok(
-            boardCommentService.findBoardCommentListByMemberId(memberId, page, size, member));
+           commentService.findCommentsByMember());
     }
 
 }
