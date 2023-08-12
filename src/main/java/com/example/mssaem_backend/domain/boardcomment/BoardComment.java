@@ -47,11 +47,13 @@ public class BoardComment extends BaseTimeEntity {
         this.member = member;
         this.board = board;
         this.parentId = parentId;
+        this.board.increaseCommentCount();
     }
 
     public void deleteBoardComment() {
         this.content = "삭제된 댓글입니다.";
         this.likeCount = 0L;
+        this.board.decreaseCommentCount();
         this.state = false;
     }
 
@@ -63,7 +65,7 @@ public class BoardComment extends BaseTimeEntity {
         this.likeCount--;
     }
 
-   public Integer increaseReport(){
+    public Integer increaseReport() {
         return this.report++;
     }
 
