@@ -8,6 +8,7 @@ import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardHistory;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardList;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
@@ -292,6 +293,41 @@ public class BoardService {
             boardCommentRepository.countAllByStateIsTrueAndMember(member),
             boardRepository.sumLikeCountByMember(member)
         );
+    }
+
+    //게시판 별 게시글 개수 조회
+    public BoardList getBoardList() {
+        //BoardList 객체 생성
+        BoardList boardList = new BoardList();
+        //전체 게시글 개수
+        boardList.setBoardCount(boardRepository.countAllByStateIsTrue());
+        //MBTI별 게시글 개수
+        List<Object[]> boardCountList = boardRepository.countBoardsByMbtiAndStateIsTrue();
+        //조회한 데이터를 해당하는 MBTI에 할당
+        for (Object[] row : boardCountList) {
+            MbtiEnum mbti = (MbtiEnum) row[0];
+            Long count = (Long) row[1];
+
+            switch (mbti) {
+                case INFJ -> boardList.setINFJ(count);
+                case INFP -> boardList.setINFP(count);
+                case ISFJ -> boardList.setISFJ(count);
+                case ISFP -> boardList.setISFP(count);
+                case ISTP -> boardList.setISTP(count);
+                case ISTJ -> boardList.setISTJ(count);
+                case INTP -> boardList.setINTP(count);
+                case INTJ -> boardList.setINTJ(count);
+                case ENTP -> boardList.setENTP(count);
+                case ESTJ -> boardList.setESTJ(count);
+                case ESTP -> boardList.setESTP(count);
+                case ENFP -> boardList.setENFP(count);
+                case ESFJ -> boardList.setESFJ(count);
+                case ENTJ -> boardList.setENTJ(count);
+                case ENFJ -> boardList.setENFJ(count);
+                case ESFP -> boardList.setESFP(count);
+            }
+        }
+        return boardList;
     }
 
 }

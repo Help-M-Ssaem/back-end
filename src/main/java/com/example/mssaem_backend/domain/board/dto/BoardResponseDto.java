@@ -114,4 +114,96 @@ public class BoardResponseDto {
         private Long boardCommentCount;  // 전체 게시글 댓글 수
         private Long likeAllCount;       // 받은 좋아요의 수
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardList {
+
+        private Long INFJ;
+        private Long INFP;
+        private Long ISFJ;
+        private Long ISFP;
+        private Long ISTP;
+        private Long ISTJ;
+        private Long INTP;
+        private Long INTJ;
+        private Long ENTP;
+        private Long ESTJ;
+        private Long ESTP;
+        private Long ENFP;
+        private Long ESFJ;
+        private Long ENTJ;
+        private Long ENFJ;
+        private Long ESFP;
+        private Long boardCount; //전체 게시글 수
+
+        public void setINFJ(Long count) {
+            this.INFJ = count;
+        }
+
+        public void setINFP(Long count) {
+            this.INFP = count;
+        }
+
+        public void setISFJ(Long count) {
+            this.ISFJ = count;
+        }
+
+        public void setISFP(Long count) {
+            this.ISFP = count;
+        }
+
+        public void setISTP(Long count) {
+            this.ISTP = count;
+        }
+
+        public void setISTJ(Long count) {
+            this.ISTJ = count;
+        }
+
+        public void setINTP(Long count) {
+            this.INTP = count;
+        }
+
+        public void setINTJ(Long count) {
+            this.INTJ = count;
+        }
+
+        public void setENTP(Long count) {
+            this.ENTP = count;
+        }
+
+        public void setESTJ(Long count) {
+            this.ESTJ = count;
+        }
+
+        public void setESTP(Long count) {
+            this.ESTP = count;
+        }
+
+        public void setENFP(Long count) {
+            this.ENFP = count;
+        }
+
+        public void setESFJ(Long count) {
+            this.ESFJ = count;
+        }
+
+        public void setENTJ(Long count) {
+            this.ENTJ = count;
+        }
+
+        public void setENFJ(Long count) {
+            this.ENFJ = count;
+        }
+
+        public void setESFP(Long count) {
+            this.ESFP = count;
+        }
+
+        public void setBoardCount(Long count) {
+            this.boardCount = count;
+        }
+    }
 }
