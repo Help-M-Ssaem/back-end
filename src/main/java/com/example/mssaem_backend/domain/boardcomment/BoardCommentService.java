@@ -16,6 +16,7 @@ import com.example.mssaem_backend.domain.notification.NotificationService;
 import com.example.mssaem_backend.domain.notification.TypeEnum;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.config.exception.errorCode.BoardCommentErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import java.util.ArrayList;
@@ -99,13 +100,28 @@ public class BoardCommentService {
                     board,
                     commentId.intValue()));
 
-            // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
+            // 게시글 작성자와 대댓글 작성자가 일치하지 않을 때에만 알림 전송
             if (!board.getMember().getId().equals(member.getId())) {
+                // 대댓글이 달린 게시글을 작성한 유저에게 알림 전송
+                notificationService.createNotification(
+                    board.getId(),
+                    postBoardCommentReq.getContent(),
+                    TypeEnum.BOARD_COMMENT,
+                    board.getMember()
+                );
+            }
+            // 부모 댓글 조회
+            BoardComment parentComment = boardCommentRepository.findById(commentId)
+                .orElseThrow(() -> new BaseException(
+                    BoardCommentErrorCode.EMPTY_BOARD_COMMENT));
+            // 부모 댓글 작성자와 대댓글 작성자가 일치하지 않을 때에만 알림 전송
+            if (!parentComment.getMember().getId().equals(member.getId())) {
+                // 대댓글의 부모 댓글을 작성한 유저에게 알림 전송
                 notificationService.createNotification(
                     board.getId(),
                     postBoardCommentReq.getContent(),
                     TypeEnum.BOARD_REPLY_OF_COMMENT,
-                    board.getMember()
+                    parentComment.getMember()
                 );
             }
         } else { //존재하지 않다면 새로운 댓글
