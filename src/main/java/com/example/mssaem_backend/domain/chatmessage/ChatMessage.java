@@ -28,54 +28,54 @@ import org.hibernate.annotations.DynamicInsert;
 @Entity
 public class ChatMessage extends BaseTimeEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Enumerated(EnumType.STRING)
-  private MessageType type; // 메시지 타입
+    @Enumerated(EnumType.STRING)
+    private MessageType type; // 메시지 타입
 
-  private String sender; // 메시지 보낸사람
+    private String sender; // 메시지 보낸사람
 
-  private String message; // 메시지
+    private String message; // 메시지
 
-  private boolean state = false; //true : 확인, false : 확인 안함
+    private boolean state = false; //true : 확인, false : 확인 안함
 
-  private String imgUrl;
+    private String imgUrl;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "chatroom_id")
-  private ChatRoom chatRoom; // 방번호
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chatroom_id")
+    private ChatRoom chatRoom; // 방번호
 
-  public static ChatMessage createChatMessage(ChatRoom chatRoom, String sender, String message,
-      MessageType type) {
-    ChatMessage chatMessage = ChatMessage.builder()
-        .chatRoom(chatRoom)
-        .sender(sender)
-        .message(message)
-        .type(type)
-        .build();
-    return chatMessage;
-  }
+    public static ChatMessage createChatMessage(ChatRoom chatRoom, String sender, String message,
+        MessageType type) {
+        ChatMessage chatMessage = ChatMessage.builder()
+            .chatRoom(chatRoom)
+            .sender(sender)
+            .message(message)
+            .type(type)
+            .build();
+        return chatMessage;
+    }
 
-  public ChatMessage(MessageType type, String sender, ChatRoom chatRoom) {
-    this.type = type;
-    this.sender = sender;
-    this.chatRoom = chatRoom;
-  }
+    public ChatMessage(MessageType type, String sender, ChatRoom chatRoom) {
+        this.type = type;
+        this.sender = sender;
+        this.chatRoom = chatRoom;
+    }
 
-  public void setSender(String sender) {
-    this.sender = sender;
-  }
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
 
-  public void setMessage(String message) {
-    this.message = message;
-  }
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
-  // 메시지 타입 : 입장, 퇴장, 채팅
-  public enum MessageType {
-    ENTER, QUIT, TALK
-  }
+    // 메시지 타입 : 입장, 퇴장, 채팅
+    public enum MessageType {
+        ENTER, QUIT, TALK
+    }
 
 
 }
