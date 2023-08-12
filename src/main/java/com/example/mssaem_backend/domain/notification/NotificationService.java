@@ -26,11 +26,9 @@ public class NotificationService {
     @Transactional
     public void createNotification(Long resourceId, String previewContent,
         TypeEnum type, Member receiver) {
-        previewContent =
-            previewContent.length() >= 20 ? previewContent.substring(0, 20) : previewContent;
         notificationRepository.save(
             new Notification(resourceId,
-                type.getName() + "\n\"" + previewContent + "\"",
+                type.getName() + "\n\"" + previewContent,
                 type,
                 receiver
             )
@@ -41,13 +39,10 @@ public class NotificationService {
     @Transactional
     public void createChatNotification(Long resourceId, String previewContent, TypeEnum type,
         Member sender, Member receiver) {
-        previewContent =
-            previewContent.length() >= 20 ? previewContent.substring(0, 20) : previewContent;
         notificationRepository.save(
             new Notification(
                 resourceId,
-                "\"" + sender.getNickName() + "\"님이 " + type.getName() + "\n\"" + previewContent
-                    + "\"",
+                "\"" + sender.getNickName() + "\"님이 " + type.getName() + "\n\"" + previewContent,
                 type,
                 receiver)
         );
@@ -112,9 +107,12 @@ public class NotificationService {
             notificationInfos.add(
                 new NotificationInfo(
                     notification.getId(),
-                    notification.getContent(),
+                    notification.getContent().length() > 45 ?
+                        notification.getContent().substring(0, 45) + "\""
+                        : notification.getContent() + "\"",
                     calculateTime(notification.getCreatedAt(), 4),
-                    notification.isState()
+                    notification.isState(),
+                    notification.getType()
                 )
             );
         }

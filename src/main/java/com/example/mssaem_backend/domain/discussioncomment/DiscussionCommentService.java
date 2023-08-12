@@ -95,33 +95,35 @@ public class DiscussionCommentService {
 
         //만약 코멘트가 존재한다면 그 댓글에 대댓글
         if (discussionCommentRepository.existsDiscussionCommentById(commentId)) {
-            DiscussionComment newDiscussionComment = discussionCommentRepository.save(
+            discussionCommentRepository.save(
                 new DiscussionComment(
                     postDiscussionCommentReq.getContent(),
                     member,
                     discussion,
                     commentId.intValue()));
+
             // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
-            if (!discussion.getId().equals(member.getId())) {
+            if (!discussion.getMember().getId().equals(member.getId())) {
                 notificationService.createNotification(
-                    newDiscussionComment.getId(),
+                    discussion.getId(),
                     postDiscussionCommentReq.getContent(),
-                    TypeEnum.REPLY_OF_COMMENT,
+                    TypeEnum.DISCUSSION_REPLY_OF_COMMENT,
                     discussion.getMember()
                 );
             }
         } else { //존재하지 않다면 새로운 댓글
-            DiscussionComment newDiscussionComment = discussionCommentRepository.save(
+            discussionCommentRepository.save(
                 new DiscussionComment(
                     postDiscussionCommentReq.getContent(),
                     member,
                     discussion,
                     0)
             );
+
             // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
-            if (!discussion.getId().equals(member.getId())) {
+            if (!discussion.getMember().getId().equals(member.getId())) {
                 notificationService.createNotification(
-                    newDiscussionComment.getId(),
+                    discussion.getId(),
                     postDiscussionCommentReq.getContent(),
                     TypeEnum.DISCUSSION_COMMENT,
                     discussion.getMember()

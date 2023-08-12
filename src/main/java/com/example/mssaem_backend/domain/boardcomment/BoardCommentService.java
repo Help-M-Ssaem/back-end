@@ -92,33 +92,35 @@ public class BoardCommentService {
 
         //만약 코멘트가 존재한다면 그 댓글에 대댓글
         if (boardCommentRepository.existsBoardCommentById(commentId)) {
-            BoardComment newBoardComment = boardCommentRepository.save(
+            boardCommentRepository.save(
                 new BoardComment(
                     postBoardCommentReq.getContent(),
                     member,
                     board,
                     commentId.intValue()));
+
             // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
-            if (!board.getId().equals(member.getId())) {
+            if (!board.getMember().getId().equals(member.getId())) {
                 notificationService.createNotification(
-                    newBoardComment.getId(),
+                    board.getId(),
                     postBoardCommentReq.getContent(),
-                    TypeEnum.REPLY_OF_COMMENT,
+                    TypeEnum.BOARD_REPLY_OF_COMMENT,
                     board.getMember()
                 );
             }
         } else { //존재하지 않다면 새로운 댓글
-            BoardComment newBoardComment = boardCommentRepository.save(
+            boardCommentRepository.save(
                 new BoardComment(
                     postBoardCommentReq.getContent(),
                     member,
                     board,
                     0)
             );
+
             // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
-            if (!board.getId().equals(member.getId())) {
+            if (!board.getMember().getId().equals(member.getId())) {
                 notificationService.createNotification(
-                    newBoardComment.getId(),
+                    board.getId(),
                     postBoardCommentReq.getContent(),
                     TypeEnum.BOARD_COMMENT,
                     board.getMember()
