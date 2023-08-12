@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.board;
 
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,13 +14,13 @@ import org.springframework.data.repository.query.Param;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
     // HOT 게시글 조회
-    Page<Board> findBoardsByLikeCountGreaterThanEqualAndStateIsTrueOrderByCreatedAtDesc(Long likeCount,
+    Page<Board> findBoardsByLikeCountGreaterThanEqualAndStateIsTrueOrderByCreatedAtDesc(
+        Long likeCount,
         PageRequest pageRequest);
 
 
     //boardId가 입력되지 않으면 전체 게시글 조회, 입력되면 해당 게시글만 제외하고 전체 조회
     @Query("SELECT b FROM Board b WHERE b.state = true AND (:boardId IS NULL OR b.id <> :boardId) order by b.createdAt desc ")
-
     Page<Board> findAllByStateIsTrueAndIdOrderByCreatedAtDesc(@Param("boardId") Long boardId,
         Pageable pageable);
 
@@ -57,4 +58,9 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query(value = "SELECT SUM(b.likeCount) FROM Board b WHERE b.member = :member AND b.state = true")
     Long sumLikeCountByMember(@Param("member") Member member);
+
+    @Query("select b.mbti, count(b) from Board b where b.state = true group by b.mbti")
+    List<Object[]> countBoardsByMbtiAndStateIsTrue();
+
+    Long countAllByStateIsTrue();
 }
