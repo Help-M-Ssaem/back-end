@@ -51,6 +51,7 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
         this.content = content;
         this.member = member;
         this.discussion = discussion;
+        this.discussion.increaseCommentCount();
     }
 
     public Integer increaseReport() {
@@ -64,6 +65,7 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
     public void deleteComment() {
         this.content = "삭제된 댓글입니다.";
         this.likeCount = 0L;
+        this.discussion.decreaseCommentCount();
         this.state = false;
     }
 
