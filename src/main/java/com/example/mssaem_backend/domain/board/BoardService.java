@@ -13,7 +13,6 @@ import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleI
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardcomment.BoardCommentService;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionService;
@@ -24,6 +23,8 @@ import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimp
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
+import com.example.mssaem_backend.global.common.CommentService;
+import com.example.mssaem_backend.global.common.CommentTypeEnum;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
@@ -48,7 +49,7 @@ public class BoardService {
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
     private final WorryBoardRepository worryBoardRepository;
-    private final BoardCommentService boardCommentService;
+    private final CommentService commentService;
     private final DiscussionService discussionService;
 
     private static final Long likeCountStandard = 10L; // HOT 게시글 기준이 되는 좋아요수
@@ -175,14 +176,14 @@ public class BoardService {
         if (board.isState()) {
             //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
             match(member, board.getMember());
-            //게시글 Soft Delete
-            board.deleteBoard();
             //현재 저장된 이미지 삭제
             boardImageService.deleteBoardImage(board);
             //해당 게시글 좋아요 삭제
             likeRepository.deleteAllByBoard(board);
             //게시글 삭제 시 모든 댓글 삭제, 댓글 좋아요 삭제
-            boardCommentService.deleteAllBoardComment(board);
+            commentService.deleteAllComments(boardId, CommentTypeEnum.BOARD);
+            //게시글 Soft Delete
+            board.deleteBoard();
             return "게시글 삭제 완료";
         } else {
             throw new BaseException(BoardErrorCode.EMPTY_BOARD);

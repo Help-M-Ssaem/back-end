@@ -59,6 +59,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query(value = "SELECT SUM(b.likeCount) FROM Board b WHERE b.member = :member AND b.state = true")
     Long sumLikeCountByMember(@Param("member") Member member);
 
+    Optional<Object> findStateTrueById(Long postId);
+  
     @Query("select b.mbti, count(b) from Board b where b.state = true group by b.mbti")
     List<Object[]> countBoardsByMbtiAndStateIsTrue();
 
