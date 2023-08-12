@@ -9,7 +9,6 @@ import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.Di
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
-import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentService;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
@@ -23,6 +22,8 @@ import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimp
 import com.example.mssaem_backend.domain.notification.NotificationService;
 import com.example.mssaem_backend.domain.notification.TypeEnum;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
+import com.example.mssaem_backend.global.common.CommentService;
+import com.example.mssaem_backend.global.common.CommentTypeEnum;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
@@ -50,7 +51,7 @@ public class DiscussionService {
     private final BadgeRepository badgeRepository;
     private final NotificationService notificationService;
     private final MemberRepository memberRepository;
-    private final DiscussionCommentService discussionCommentService;
+    private final CommentService commentService;
 
     private static final Long participantCountStandard = 10L;
 
@@ -261,7 +262,7 @@ public class DiscussionService {
 
         discussionOptionService.deleteOption(discussion);
         //토론글 삭제 시 모든 댓글,댓글 좋아요 삭제
-        discussionCommentService.deleteAllDiscussionComment(discussion);
+        commentService.deleteAllComments(id, CommentTypeEnum.DISCUSSION);
         discussion.deleteDiscussion();
 
         return "토론글 삭제완료";
