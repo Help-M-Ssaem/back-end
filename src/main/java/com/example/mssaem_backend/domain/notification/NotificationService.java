@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private static final int lengthLimit = 45;
 
     // 알림 등록 (게시글 댓글, 토론 댓글, hot 게시글, hot 토론, 대댓글)
     @Transactional
@@ -107,8 +108,8 @@ public class NotificationService {
             notificationInfos.add(
                 new NotificationInfo(
                     notification.getId(),
-                    notification.getContent().length() > 45 ?
-                        notification.getContent().substring(0, 45) + "\""
+                    notification.getContent().length() > lengthLimit ?
+                        notification.getContent().substring(0, lengthLimit) + "\""
                         : notification.getContent() + "\"",
                     calculateTime(notification.getCreatedAt(), 4),
                     notification.isState(),
