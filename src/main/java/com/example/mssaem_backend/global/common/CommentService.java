@@ -53,7 +53,6 @@ public class CommentService {
         return switch (commentType) {
             case BOARD -> comment.getBoard().getId();
             case DISCUSSION -> comment.getDiscussion().getId();
-            default -> throw new IllegalArgumentException("올바르지 않은 댓글 타입: " + commentType);
         };
     }
 
@@ -67,12 +66,11 @@ public class CommentService {
             case DISCUSSION ->
                 discussionCommentLikeRepository.existsDiscussionCommentLikeByMemberAndStateIsTrueAndDiscussionCommentId(
                     viewer, comment.getId());
-            default -> throw new IllegalArgumentException("올바르지 않은 댓글 타입: " + commentType);
         };
     }
 
     //CommentRes dto 세터
-    public List<GetCommentsRes> setCommentsRes(Member viewer, List<Comment> comments,
+    private List<GetCommentsRes> setCommentsRes(Member viewer, List<Comment> comments,
         CommentTypeEnum commentType) {
 
         return comments.stream().map(comment -> {
@@ -90,7 +88,7 @@ public class CommentService {
     }
 
     //CommentByMemberRes dto 세터
-    public List<GetCommentsByMemberRes> setCommentsByMemberRes(Member viewer,
+    private List<GetCommentsByMemberRes> setCommentsByMemberRes(Member viewer,
         List<Comment> comments, CommentTypeEnum commentType) {
 
         return comments.stream().map(comment -> {
@@ -119,7 +117,6 @@ public class CommentService {
         Page<? extends Comment> comments = switch (commentType) {
             case BOARD -> boardCommentRepository.findAllByBoardId(postId, pageable);
             case DISCUSSION -> discussionCommentRepository.findAllByDiscussionId(postId, pageable);
-            default -> throw new IllegalArgumentException("올바르지 않은 댓글 타입: " + commentType);
         };
 
         List<GetCommentsRes> commentResList = setCommentsRes(viewer,
@@ -134,10 +131,9 @@ public class CommentService {
         PageRequest pageRequest = PageRequest.of(0, 3);
 
         Page<? extends Comment> comments = switch (commentType) {
-            case BOARD -> boardCommentRepository.findAllByBoardId(postId, pageRequest);
+            case BOARD -> boardCommentLikeRepository.findBoardCommentsByBoardIdWithMoreThanTenBoardCommentLikeAndStateTrue(pageRequest, postId);
             case DISCUSSION ->
-                discussionCommentRepository.findAllByDiscussionId(postId, pageRequest);
-            default -> throw new IllegalArgumentException("올바르지 않은 댓글 타입: " + commentType);
+                discussionCommentLikeRepository.findDiscussionCommentsByDiscussionIdWithMoreThanTenDiscussionCommentLikeAndStateTrue(pageRequest, postId);
         };
 
         return setCommentsRes(viewer,
@@ -154,7 +150,6 @@ public class CommentService {
                 pageable);
             case DISCUSSION ->
                 discussionCommentRepository.findAllByDiscussionId(memberId, pageable);
-            default -> throw new IllegalArgumentException("올바르지 않은 댓글 타입: " + commentType);
         };
 
         List<GetCommentsByMemberRes> commentsByMemberResList = setCommentsByMemberRes(viewer,

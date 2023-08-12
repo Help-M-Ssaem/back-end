@@ -1,12 +1,11 @@
 package com.example.mssaem_backend.domain.discussioncomment;
 
-import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentRequestDto.PostDiscussionCommentReq;
-import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfo;
-import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.CommentService;
 import com.example.mssaem_backend.global.common.CommentTypeEnum;
+import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsByMemberRes;
 import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsRes;
+import com.example.mssaem_backend.global.common.dto.CommentDto.PostCommentReq;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DiscussionCommentController {
 
-    private final DiscussionCommentService discussionCommentService;
     private final CommentService commentService;
 
     //토론글 상세 조회시 댓글 조회
@@ -33,47 +31,45 @@ public class DiscussionCommentController {
         @CurrentMember Member member, @PathVariable Long discussionId, @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            commentService.findCommentsByPostId(member, discussionId,
-                page, size, CommentTypeEnum.DISCUSSION));
+            commentService.findCommentsByPostId(member, discussionId, page, size,
+                CommentTypeEnum.DISCUSSION));
     }
 
     //토론글 상세 조회시 베스트 댓글 3개 조회
     @GetMapping("/discussions/{discussionId}/comments/best")
-    public ResponseEntity<List<DiscussionCommentSimpleInfo>> findDiscussionCommentBestListByDiscussionId(
+    public ResponseEntity<List<GetCommentsRes>> findDiscussionCommentBestListByDiscussionId(
         @CurrentMember Member member, @PathVariable(value = "discussionId") Long discussionId) {
-        return ResponseEntity.ok(
-            discussionCommentService.findDiscussionCommentBestListByDiscussionId(member,
-                discussionId));
+        return ResponseEntity.ok(commentService.findBestCommentsByPostId(member, discussionId,
+            CommentTypeEnum.DISCUSSION));
     }
 
     //댓글 작성, 댓글 작성 시 @RequestParam 으로 commentId 값 받으면 대댓글 작성
     @PostMapping("/member/discussions/{discussionId}/comments")
-    public ResponseEntity<Boolean> createDiscussionComment(@CurrentMember Member member,
+    public ResponseEntity<String> createDiscussionComment(@CurrentMember Member member,
         @PathVariable(value = "discussionId") Long discussionId,
-        @RequestPart(value = "postDiscussionCommentReq") PostDiscussionCommentReq postDiscussionCommentReq,
+        @RequestPart(value = "postDiscussionCommentReq") PostCommentReq postCommentReq,
         @RequestParam(value = "commentId", required = false) Long commentId) {
         return ResponseEntity.ok(
-            discussionCommentService.createDiscussionComment(member, discussionId,
-                postDiscussionCommentReq,
-                commentId));
+            commentService.createComment(member, discussionId,
+                postCommentReq, commentId, CommentTypeEnum.DISCUSSION));
     }
 
     //댓글 삭제
     @DeleteMapping("/member/discussions/{discussionId}/comments/{commentId}")
-    public ResponseEntity<Boolean> deleteDiscussionComment(@CurrentMember Member member,
+    public ResponseEntity<String> deleteDiscussionComment(@CurrentMember Member member,
         @PathVariable(value = "discussionId") Long discussionId,
         @PathVariable(value = "commentId") Long commentId) {
         return ResponseEntity.ok(
-            discussionCommentService.deleteDiscussionComment(member, discussionId, commentId));
+            commentService.deleteComment(member, discussionId, commentId, CommentTypeEnum.DISCUSSION));
     }
 
     //특정 멤버별 토론글 댓글 보기
     @GetMapping("/discussions/comments")
-    public ResponseEntity<PageResponseDto<List<DiscussionCommentSimpleInfoByMember>>> findDiscussionCommentListByMemberId(
+    public ResponseEntity<PageResponseDto<List<GetCommentsByMemberRes>>> findDiscussionCommentListByMemberId(
         @RequestParam(value = "memberId") Long memberId, @RequestParam(value = "page") int page,
         @RequestParam(value = "size") int size, @CurrentMember Member member) {
         return ResponseEntity.ok(
-            discussionCommentService.findDiscussionCommentListByMemberId(memberId, page, size,
-                member));
+            commentService.findCommentsByMember(memberId, page, size,
+                member, CommentTypeEnum.DISCUSSION));
     }
 }

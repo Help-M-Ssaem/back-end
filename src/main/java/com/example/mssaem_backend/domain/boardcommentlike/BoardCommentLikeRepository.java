@@ -2,7 +2,6 @@ package com.example.mssaem_backend.domain.boardcommentlike;
 
 import com.example.mssaem_backend.domain.boardcomment.BoardComment;
 import com.example.mssaem_backend.domain.member.Member;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;

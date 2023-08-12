@@ -1,13 +1,11 @@
 package com.example.mssaem_backend.domain.boardcomment;
 
-import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentRequestDto.PostBoardCommentReq;
-import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
-import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.PostBoardCommentRes;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.CommentService;
 import com.example.mssaem_backend.global.common.CommentTypeEnum;
 import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsByMemberRes;
 import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsRes;
+import com.example.mssaem_backend.global.common.dto.CommentDto.PostCommentReq;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
@@ -25,16 +23,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BoardCommentController {
 
-    private final BoardCommentService boardCommentService;
     private final CommentService commentService;
 
     //특정 게시글 상세 조회시 댓글 전체 조회
     @GetMapping("/boards/{boardId}/comments")
-    public ResponseEntity<PageResponseDto<List<BoardCommentSimpleInfo>>> findBoardCommentListByBoardId(
+    public ResponseEntity<PageResponseDto<List<GetCommentsRes>>> findBoardCommentListByBoardId(
         @CurrentMember Member member, @PathVariable(value = "boardId") Long boardId,
         @RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
         return ResponseEntity.ok(
-            boardCommentService.findBoardCommentListByBoardId(member, boardId, page, size));
+            commentService.findCommentsByPostId(member, boardId, page, size, CommentTypeEnum.BOARD));
     }
 
     //게시글 상세 조회시 베스트 댓글 3개 조회
@@ -42,7 +39,6 @@ public class BoardCommentController {
     public ResponseEntity<List<GetCommentsRes>> findBoardCommentBestListByBoardId(
         @CurrentMember Member member, @PathVariable(value = "boardId") Long boardId) {
         return ResponseEntity.ok(
-            //boardCommentService.findBoardCommentBestListByBoardId(member, boardId));
             commentService.findBestCommentsByPostId(member, boardId, CommentTypeEnum.BOARD));
     }
 
@@ -50,24 +46,24 @@ public class BoardCommentController {
      * 댓글 작성, 댓글 작성 시 @RequestParam 으로 commentId 값 받으면 대댓글 작성
      */
     @PostMapping("/member/boards/{boardId}/comments")
-    public ResponseEntity<PostBoardCommentRes> createBoardComment(@CurrentMember Member member,
+    public ResponseEntity<String> createBoardComment(@CurrentMember Member member,
         @PathVariable(value = "boardId") Long boardId,
-        @RequestPart(value = "postBoardCommentReq") PostBoardCommentReq postBoardCommentReq,
+        @RequestPart(value = "postBoardCommentReq") PostCommentReq postCommentReq,
         @RequestParam(value = "commentId", required = false) Long commentId) {
         return ResponseEntity.ok(
-            boardCommentService.createBoardComment(member, boardId, postBoardCommentReq,
-                commentId));
+            commentService.createComment(member, boardId, postCommentReq,
+                commentId, CommentTypeEnum.BOARD));
     }
 
     /**
      * 댓글 삭제
      */
     @DeleteMapping("/member/boards/{boardId}/comments/{commentId}")
-    public ResponseEntity<Boolean> deleteBoardComment(@CurrentMember Member member,
+    public ResponseEntity<String> deleteBoardComment(@CurrentMember Member member,
         @PathVariable(value = "boardId") Long boardId,
         @PathVariable(value = "commentId") Long commentId) {
         return ResponseEntity.ok(
-            boardCommentService.deleteBoardComment(member, boardId, commentId));
+            commentService.deleteComment(member, boardId, commentId, CommentTypeEnum.BOARD));
     }
 
     //특정 멤버별 게시글 댓글 전체 조회
@@ -78,5 +74,4 @@ public class BoardCommentController {
         return ResponseEntity.ok(
            commentService.findCommentsByMember(memberId, page, size, member,CommentTypeEnum.BOARD));
     }
-
 }
