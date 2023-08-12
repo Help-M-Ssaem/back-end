@@ -15,6 +15,7 @@ import com.example.mssaem_backend.domain.notification.NotificationService;
 import com.example.mssaem_backend.domain.notification.TypeEnum;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
+import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionCommentErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import java.util.ArrayList;
@@ -95,33 +96,50 @@ public class DiscussionCommentService {
 
         //만약 코멘트가 존재한다면 그 댓글에 대댓글
         if (discussionCommentRepository.existsDiscussionCommentById(commentId)) {
-            DiscussionComment newDiscussionComment = discussionCommentRepository.save(
+            discussionCommentRepository.save(
                 new DiscussionComment(
                     postDiscussionCommentReq.getContent(),
                     member,
                     discussion,
                     commentId.intValue()));
-            // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
-            if (!discussion.getId().equals(member.getId())) {
+
+            // 토론 작성자와 대댓글 작성자가 일치하지 않을 때에만 알림 전송
+            if (!discussion.getMember().getId().equals(member.getId())) {
+                // 대댓글이 달린 토론을 작성한 유저에게 알림 전송
                 notificationService.createNotification(
-                    newDiscussionComment.getId(),
+                    discussion.getId(),
                     postDiscussionCommentReq.getContent(),
-                    TypeEnum.REPLY_OF_COMMENT,
+                    TypeEnum.DISCUSSION_COMMENT,
                     discussion.getMember()
                 );
             }
+            // 부모 댓글 조회
+            DiscussionComment parentComment = discussionCommentRepository.findById(commentId)
+                .orElseThrow(() -> new BaseException(
+                    DiscussionCommentErrorCode.EMPTY_DISCUSSION_COMMENT));
+            // 부모 댓글 작성자와 대댓글 작성자가 일치하지 않을 때에만 알림 전송
+            if (!parentComment.getMember().getId().equals(member.getId())) {
+                // 대댓글의 부모 댓글을 작성한 유저에게 알림 전송
+                notificationService.createNotification(
+                    discussion.getId(),
+                    postDiscussionCommentReq.getContent(),
+                    TypeEnum.DISCUSSION_REPLY_OF_COMMENT,
+                    parentComment.getMember()
+                );
+            }
         } else { //존재하지 않다면 새로운 댓글
-            DiscussionComment newDiscussionComment = discussionCommentRepository.save(
+            discussionCommentRepository.save(
                 new DiscussionComment(
                     postDiscussionCommentReq.getContent(),
                     member,
                     discussion,
                     0)
             );
-            // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
-            if (!discussion.getId().equals(member.getId())) {
+
+            // 토론 작성자와 댓글 작성자가 일치하지 않을 때에만 알림 전송
+            if (!discussion.getMember().getId().equals(member.getId())) {
                 notificationService.createNotification(
-                    newDiscussionComment.getId(),
+                    discussion.getId(),
                     postDiscussionCommentReq.getContent(),
                     TypeEnum.DISCUSSION_COMMENT,
                     discussion.getMember()

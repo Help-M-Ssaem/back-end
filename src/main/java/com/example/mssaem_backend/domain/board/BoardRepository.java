@@ -44,9 +44,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Long countAllByStateIsTrueAndMember(@Param("member") Member member);
 
-    Board findByMemberAndIdAndStateIsTrue(Member member, Long id);
-
-
     //내용, 제목, 닉네임 별 검색어 한 번에 조회
     @Query(value = "select b from Board b join fetch b.member"
         + " where (lower(b.title) like lower(concat('%', :keyword, '%'))) "
