@@ -35,7 +35,7 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
     private Integer report;
 
     @ColumnDefault("0")
-    private Integer parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
+    private Long parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
 
     @ColumnDefault("0")
     private Integer orders; //대댓글의 순서
@@ -80,7 +80,7 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
         return null;
     }
 
-    public void setParentComment(Integer id) {
+    public void setParentComment(Long id) {
         this.parentId = id;
     }
 }

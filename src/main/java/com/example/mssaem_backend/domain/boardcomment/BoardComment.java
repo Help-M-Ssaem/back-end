@@ -41,7 +41,7 @@ public class BoardComment extends BaseTimeEntity implements Comment {
 
     @ColumnDefault("0")
 
-    private Integer parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
+    private Long parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
 
     private boolean state = true; //true : 존재, false : 삭제
 
@@ -83,7 +83,7 @@ public class BoardComment extends BaseTimeEntity implements Comment {
         return null;
     }
 
-    public void setParentComment(Integer id) {
+    public void setParentComment(Long id) {
         this.parentId = id;
     }
 }

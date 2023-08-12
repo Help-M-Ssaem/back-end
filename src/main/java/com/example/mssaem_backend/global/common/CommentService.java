@@ -172,7 +172,7 @@ public class CommentService {
                 BoardComment boardComment = new BoardComment(content, member, board);
                 //만약 대댓글이면 부모 설정
                 if (isReply) {
-                    boardComment.setParentComment(commentId.intValue());
+                    boardComment.setParentComment(commentId);
                     //알림에 사용할 부모 댓글 가져오기
                     parentComment = boardCommentRepository.findByIdAndBoardIdAndStateIsTrue(
                         commentId,
@@ -201,7 +201,7 @@ public class CommentService {
                     discussion);
                 //대댓글이면 부모 설정
                 if (isReply) {
-                    discussionComment.setParentComment(commentId.intValue());
+                    discussionComment.setParentComment(commentId);
                     //알림을 위해 부모 댓글 가져오기
                     parentComment = discussionCommentRepository.findByIdAndDiscussionIdAndStateIsTrue(
                         commentId, objectId);
@@ -257,7 +257,7 @@ public class CommentService {
 
     //글 삭제 시 해당 글 댓글 전체 삭제
     @Transactional
-    public String deleteAllComments(Long postId, CommentTypeEnum commentType) {
+    public void deleteAllComments(Long postId, CommentTypeEnum commentType) {
 
         //Board 처리
         if (commentType == CommentTypeEnum.BOARD) {
@@ -290,7 +290,5 @@ public class CommentService {
 
             discussionCommentRepository.deleteAllByDiscussion(discussion);
         }
-
-        return "댓글 전체 삭제에 성공";
     }
 }

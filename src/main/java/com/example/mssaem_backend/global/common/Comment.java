@@ -15,7 +15,7 @@ public interface Comment {
     Discussion getDiscussion();
     Board getBoard();
 
-    void setParentComment(Integer commentId);
+    void setParentComment(Long commentId);
 
     void deleteComment();
 }
