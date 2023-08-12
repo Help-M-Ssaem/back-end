@@ -12,7 +12,6 @@ import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionComment;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
-import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentService;
 import com.example.mssaem_backend.domain.discussioncommentlike.DiscussionCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
