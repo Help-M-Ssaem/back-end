@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public interface Comment {
     Long getId();
-    Integer getParentId();
+    Long getParentId();
     String getContent();
     Long getLikeCount();
     LocalDateTime getCreatedAt();
