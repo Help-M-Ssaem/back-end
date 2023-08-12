@@ -63,4 +63,8 @@ public class ChatRoomCustomRepository implements Serializable {
     hashOpsEnterInfo.delete(ENTER_INFO, sessionId);
   }
 
+  public void removeChatRoomInfo(Long roomId){
+    opsHashChatRoom.delete(CHAT_ROOMS, roomId);
+  }
+
 }
