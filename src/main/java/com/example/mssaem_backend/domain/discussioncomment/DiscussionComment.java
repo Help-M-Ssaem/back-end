@@ -62,7 +62,7 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
         this.state = false;
     }
 
-    public void deleteDiscussionComment() {
+    public void deleteComment() {
         this.content = "삭제된 댓글입니다.";
         this.likeCount = 0L;
         this.state = false;
@@ -79,5 +79,9 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
     @Override
     public Board getBoard() {
         return null;
+    }
+
+    public void setParentComment(Integer id) {
+        this.parentId = id;
     }
 }

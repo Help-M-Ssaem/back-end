@@ -139,7 +139,7 @@ public class DiscussionCommentService {
         //현재 로그인한 멤버와 댓글 작성자가 같은지 확인
         if (isMatch(member, discussionComment.getMember())) {
             //같다면 삭제(삭제된 댓글입니다. 로 표시)
-            discussionComment.deleteDiscussionComment();
+            discussionComment.deleteComment();
             discussionCommentLikeRepository.deleteAllByDiscussionComment(discussionComment);
 
         } else {

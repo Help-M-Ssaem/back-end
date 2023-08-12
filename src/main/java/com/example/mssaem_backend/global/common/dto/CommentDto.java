@@ -1,6 +1,5 @@
 package com.example.mssaem_backend.global.common.dto;
 
-import com.example.mssaem_backend.domain.discussioncomment.DiscussionComment;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.global.common.Comment;
 import lombok.AllArgsConstructor;

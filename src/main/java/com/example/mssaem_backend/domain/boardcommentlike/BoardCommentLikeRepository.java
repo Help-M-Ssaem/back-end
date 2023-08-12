@@ -25,5 +25,5 @@ public interface BoardCommentLikeRepository extends JpaRepository<BoardCommentLi
 
     Boolean existsBoardCommentLikeByMemberAndBoardCommentId(Member member, Long bardCommentId);
 
-    List<BoardCommentLike> deleteAllByBoardComment(BoardComment boardComment);
+    void deleteAllByBoardComment(BoardComment boardComment);
 }

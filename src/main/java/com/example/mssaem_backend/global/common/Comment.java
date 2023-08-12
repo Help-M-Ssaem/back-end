@@ -6,12 +6,16 @@ import com.example.mssaem_backend.domain.member.Member;
 import java.time.LocalDateTime;
 
 public interface Comment {
-    public Long getId();
-    public Integer getParentId();
-    public String getContent();
-    public Long getLikeCount();
-    public LocalDateTime getCreatedAt();
-    public Member getMember();
-    public Discussion getDiscussion();
-    public Board getBoard();
+    Long getId();
+    Integer getParentId();
+    String getContent();
+    Long getLikeCount();
+    LocalDateTime getCreatedAt();
+    Member getMember();
+    Discussion getDiscussion();
+    Board getBoard();
+
+    void setParentComment(Integer commentId);
+
+    void deleteComment();
 }

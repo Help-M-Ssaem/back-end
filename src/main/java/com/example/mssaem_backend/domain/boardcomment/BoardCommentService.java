@@ -91,7 +91,7 @@ public class BoardCommentService {
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
 
         //만약 코멘트가 존재한다면 그 댓글에 대댓글
-        if (boardCommentRepository.existsBoardCommentById(commentId)) {
+        if (boardCommentRepository.existsByStateTrueAndId(commentId)) {
             BoardComment newBoardComment = boardCommentRepository.save(
                 new BoardComment(
                     postBoardCommentReq.getContent(),
@@ -126,11 +126,7 @@ public class BoardCommentService {
             }
         }
         //댓글 작성 시 parentId 와 content 반환
-        return PostBoardCommentRes.builder()
-            .parentId(
-                boardCommentRepository.existsBoardCommentById(commentId) ? commentId.intValue() : 0)
-            .content(postBoardCommentReq.getContent())
-            .build();
+        return null;
     }
 
     //댓글 삭제
@@ -141,7 +137,7 @@ public class BoardCommentService {
         //현재 로그인한 멤버와 댓글 작성자가 같은지 확인
         if (isMatch(member, boardComment.getMember())) {
             //같다면 삭제(삭제된 댓글입니다. 로 표시)
-            boardComment.deleteBoardComment();
+            boardComment.deleteComment();
             //댓글 삭제시 해당 댓글에 달린 좋아요 삭제
             boardCommentLikeRepository.deleteAllByBoardComment(boardComment);
         } else {

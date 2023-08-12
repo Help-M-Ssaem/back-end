@@ -5,6 +5,7 @@ import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionComment
 import com.example.mssaem_backend.domain.discussioncomment.dto.DiscussionCommentResponseDto.DiscussionCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.CommentService;
+import com.example.mssaem_backend.global.common.CommentTypeEnum;
 import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsRes;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
@@ -33,7 +34,7 @@ public class DiscussionCommentController {
         @RequestParam int size) {
         return ResponseEntity.ok(
             commentService.findCommentsByPostId(member, discussionId,
-                page, size, "DISCUSSION"));
+                page, size, CommentTypeEnum.DISCUSSION));
     }
 
     //토론글 상세 조회시 베스트 댓글 3개 조회
@@ -44,7 +45,6 @@ public class DiscussionCommentController {
             discussionCommentService.findDiscussionCommentBestListByDiscussionId(member,
                 discussionId));
     }
-
 
     //댓글 작성, 댓글 작성 시 @RequestParam 으로 commentId 값 받으면 대댓글 작성
     @PostMapping("/member/discussions/{discussionId}/comments")

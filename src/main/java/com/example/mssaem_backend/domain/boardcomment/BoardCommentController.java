@@ -3,9 +3,9 @@ package com.example.mssaem_backend.domain.boardcomment;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentRequestDto.PostBoardCommentReq;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfo;
 import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.PostBoardCommentRes;
-import com.example.mssaem_backend.domain.boardcomment.dto.BoardCommentResponseDto.BoardCommentSimpleInfoByMember;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.CommentService;
+import com.example.mssaem_backend.global.common.CommentTypeEnum;
 import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsByMemberRes;
 import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsRes;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -43,7 +43,7 @@ public class BoardCommentController {
         @CurrentMember Member member, @PathVariable(value = "boardId") Long boardId) {
         return ResponseEntity.ok(
             //boardCommentService.findBoardCommentBestListByBoardId(member, boardId));
-            commentService.findBestCommentsByPostId(member, boardId, "BOARD"));
+            commentService.findBestCommentsByPostId(member, boardId, CommentTypeEnum.BOARD));
     }
 
     /**
@@ -76,7 +76,7 @@ public class BoardCommentController {
         @RequestParam(value = "memberId") Long memberId, @RequestParam(value = "page") int page,
         @RequestParam(value = "size") int size, @CurrentMember Member member) {
         return ResponseEntity.ok(
-           commentService.findCommentsByMember());
+           commentService.findCommentsByMember(memberId, page, size, member,CommentTypeEnum.BOARD));
     }
 
 }
