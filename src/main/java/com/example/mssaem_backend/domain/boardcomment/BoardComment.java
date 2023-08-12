@@ -46,11 +46,10 @@ public class BoardComment extends BaseTimeEntity implements Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public BoardComment(String content, Member member, Board board, @Nullable Integer parentId) {
+    public BoardComment(String content, Member member, Board board) {
         this.content = content;
         this.member = member;
         this.board = board;
-        this.parentId = parentId;
     }
 
     public void deleteComment() {

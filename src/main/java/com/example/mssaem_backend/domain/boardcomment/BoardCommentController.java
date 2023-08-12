@@ -52,7 +52,7 @@ public class BoardCommentController {
         @RequestParam(value = "commentId", required = false) Long commentId) {
         return ResponseEntity.ok(
             commentService.createComment(member, boardId, postCommentReq,
-                commentId, CommentTypeEnum.BOARD));
+                commentId, CommentTypeEnum.BOARD, commentId!=null));
     }
 
     /**

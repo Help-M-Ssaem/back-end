@@ -97,8 +97,7 @@ public class BoardCommentService {
                 new BoardComment(
                     postBoardCommentReq.getContent(),
                     member,
-                    board,
-                    commentId.intValue()));
+                    board));
 
             // 게시글 작성자와 대댓글 작성자가 일치하지 않을 때에만 알림 전송
             if (!board.getMember().getId().equals(member.getId())) {
@@ -129,8 +128,7 @@ public class BoardCommentService {
                 new BoardComment(
                     postBoardCommentReq.getContent(),
                     member,
-                    board,
-                    0)
+                    board)
             );
 
             // 글을 쓴 멤버가 아닌 멤버가 댓글을 달 때만 알림 등록
@@ -144,11 +142,7 @@ public class BoardCommentService {
             }
         }
         //댓글 작성 시 parentId 와 content 반환
-        return PostBoardCommentRes.builder()
-            .parentId(
-                boardCommentRepository.existsBoardCommentById(commentId) ? commentId.intValue() : 0)
-            .content(postBoardCommentReq.getContent())
-            .build();
+        return null;
     }
 
     //댓글 삭제

@@ -51,7 +51,7 @@ public class DiscussionCommentController {
         @RequestParam(value = "commentId", required = false) Long commentId) {
         return ResponseEntity.ok(
             commentService.createComment(member, discussionId,
-                postCommentReq, commentId, CommentTypeEnum.DISCUSSION));
+                postCommentReq, commentId, CommentTypeEnum.DISCUSSION, commentId!=null));
     }
 
     //댓글 삭제

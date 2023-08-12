@@ -100,8 +100,8 @@ public class DiscussionCommentService {
                 new DiscussionComment(
                     postDiscussionCommentReq.getContent(),
                     member,
-                    discussion,
-                    commentId.intValue()));
+                    discussion
+                 ));
 
             // 토론 작성자와 대댓글 작성자가 일치하지 않을 때에만 알림 전송
             if (!discussion.getMember().getId().equals(member.getId())) {
@@ -132,8 +132,7 @@ public class DiscussionCommentService {
                 new DiscussionComment(
                     postDiscussionCommentReq.getContent(),
                     member,
-                    discussion,
-                    0)
+                    discussion)
             );
 
             // 토론 작성자와 댓글 작성자가 일치하지 않을 때에만 알림 전송

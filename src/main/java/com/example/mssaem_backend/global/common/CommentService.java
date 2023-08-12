@@ -12,6 +12,7 @@ import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionRepository;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionComment;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
+import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentService;
 import com.example.mssaem_backend.domain.discussioncommentlike.DiscussionCommentLikeRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
@@ -57,8 +58,7 @@ public class CommentService {
     }
 
     //해당 댓글에 현재 뷰어가 좋아요를 눌렀는지 확인
-    private boolean isCommentLiked(Member viewer, Comment comment,
-        CommentTypeEnum commentType) {
+    private boolean isCommentLiked(Member viewer, Comment comment, CommentTypeEnum commentType) {
         return switch (commentType) {
             case BOARD ->
                 boardCommentLikeRepository.existsBoardCommentLikeByMemberAndStateIsTrueAndBoardCommentId(
@@ -95,17 +95,13 @@ public class CommentService {
             Long postId = getPostId(comment, commentType);
             boolean isLiked = isCommentLiked(viewer, comment, commentType);
 
-            return GetCommentsByMemberRes.builder()
-                .postId(postId)
-                .comment(comment).isLiked(isLiked)
+            return GetCommentsByMemberRes.builder().postId(postId).comment(comment).isLiked(isLiked)
                 .createdAt(calculateTime(comment.getCreatedAt(), 3))
-                .isEditAllowed(isMatch(viewer, comment.getMember()))
-                .memberSimpleInfo(
+                .isEditAllowed(isMatch(viewer, comment.getMember())).memberSimpleInfo(
                     new MemberSimpleInfo(comment.getMember().getId(),
                         comment.getMember().getNickName(), comment.getMember().getDetailMbti(),
                         comment.getMember().getBadgeName(),
-                        comment.getMember().getProfileImageUrl())
-                ).build();
+                        comment.getMember().getProfileImageUrl())).build();
         }).collect(Collectors.toList());
     }
 
@@ -131,23 +127,25 @@ public class CommentService {
         PageRequest pageRequest = PageRequest.of(0, 3);
 
         Page<? extends Comment> comments = switch (commentType) {
-            case BOARD -> boardCommentLikeRepository.findBoardCommentsByBoardIdWithMoreThanTenBoardCommentLikeAndStateTrue(pageRequest, postId);
+            case BOARD ->
+                boardCommentLikeRepository.findBoardCommentsByBoardIdWithMoreThanTenBoardCommentLikeAndStateTrue(
+                    pageRequest, postId);
             case DISCUSSION ->
-                discussionCommentLikeRepository.findDiscussionCommentsByDiscussionIdWithMoreThanTenDiscussionCommentLikeAndStateTrue(pageRequest, postId);
+                discussionCommentLikeRepository.findDiscussionCommentsByDiscussionIdWithMoreThanTenDiscussionCommentLikeAndStateTrue(
+                    pageRequest, postId);
         };
 
-        return setCommentsRes(viewer,
-            comments.stream().collect(Collectors.toList()), commentType);
+        return setCommentsRes(viewer, comments.stream().collect(Collectors.toList()), commentType);
     }
 
     //멤버별 댓글 조회
-    public PageResponseDto<List<GetCommentsByMemberRes>> findCommentsByMember(
-        Long memberId, int page, int size, Member viewer, CommentTypeEnum commentType) {
+    public PageResponseDto<List<GetCommentsByMemberRes>> findCommentsByMember(Long memberId,
+        int page, int size, Member viewer, CommentTypeEnum commentType) {
         Pageable pageable = PageRequest.of(page, size);
 
         Page<? extends Comment> comments = switch (commentType) {
-            case BOARD -> boardCommentRepository.findAllByMemberIdAndStateIsTrue(memberId,
-                pageable);
+            case BOARD ->
+                boardCommentRepository.findAllByMemberIdAndStateIsTrue(memberId, pageable);
             case DISCUSSION ->
                 discussionCommentRepository.findAllByDiscussionId(memberId, pageable);
         };
@@ -161,36 +159,69 @@ public class CommentService {
     // 댓글 작성
     @Transactional
     public String createComment(Member member, Long objectId, PostCommentReq postCommentReq,
-        Long commentId, CommentTypeEnum commentType) {
+        Long commentId, CommentTypeEnum commentType, boolean isReply) {
 
-        Comment comment;
+        Comment parentComment = null;
+        String content = postCommentReq.getContent();
 
-        if (commentType == CommentTypeEnum.BOARD) {
-            Board board = boardRepository.findById(objectId)
-                .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
-            comment = new BoardComment(postCommentReq.getContent(), member, board, null);
-        } else {
-            Discussion discussion = discussionRepository.findById(objectId)
-                .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
-            comment = new DiscussionComment(postCommentReq.getContent(), member, discussion, null);
+        switch (commentType) {
+            case BOARD -> {
+                Board board = boardRepository.findById(objectId)
+                    .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
+
+                //BoardComment 엔티티 생성
+                BoardComment boardComment = new BoardComment(content, member, board);
+                //만약 대댓글이면 부모 설정
+                if (isReply) {
+                    boardComment.setParentComment(commentId.intValue());
+                    //알림에 사용할 부모 댓글 가져오기
+                    parentComment = boardCommentRepository.findByIdAndBoardIdAndStateIsTrue(
+                        commentId,
+                        objectId);
+                }
+                boardCommentRepository.save(boardComment);
+
+                //board 알림
+                //일반 댓글인 경우
+                if (!isMatch(board.getMember(), member)) {
+                    notificationService.createNotification(objectId, content,
+                        TypeEnum.BOARD_COMMENT, board.getMember());
+                }
+                //대댓글인 경우
+                if (isReply && !isMatch(parentComment.getMember(), member)) {
+                    notificationService.createNotification(objectId, content,
+                        TypeEnum.BOARD_REPLY_OF_COMMENT, board.getMember());
+                }
+            }
+            case DISCUSSION -> {
+                Discussion discussion = discussionRepository.findById(objectId)
+                    .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+
+                //DiscussionComment 엔티티 생성
+                DiscussionComment discussionComment = new DiscussionComment(content, member,
+                    discussion);
+                //대댓글이면 부모 설정
+                if (isReply) {
+                    discussionComment.setParentComment(commentId.intValue());
+                    //알림을 위해 부모 댓글 가져오기
+                    parentComment = discussionCommentRepository.findByIdAndDiscussionIdAndStateIsTrue(
+                        commentId, objectId);
+                }
+                discussionCommentRepository.save(discussionComment);
+
+                //discussion 알림
+                //일반 댓글인 경우
+                if (!isMatch(discussion.getMember(), member)) {
+                    notificationService.createNotification(objectId, content,
+                        TypeEnum.DISCUSSION_COMMENT, discussion.getMember());
+                }
+                //대댓글인 경우
+                if (isReply && !isMatch(parentComment.getMember(), member)) {
+                    notificationService.createNotification(objectId, content,
+                        TypeEnum.DISCUSSION_REPLY_OF_COMMENT, discussion.getMember());
+                }
+            }
         }
-
-        if (commentId == null) {
-            // 메인 댓글인 경우 알림 처리
-            TypeEnum type = (commentType == CommentTypeEnum.BOARD) ? TypeEnum.BOARD_COMMENT
-                : TypeEnum.DISCUSSION_COMMENT;
-        } else {
-            // 대댓글인 경우 알림 처리
-            comment.setParentComment(commentId.intValue());
-            TypeEnum type = TypeEnum.REPLY_OF_COMMENT;
-        }
-
-        if (comment instanceof BoardComment) {
-            boardCommentRepository.save((BoardComment) comment);
-        } else {
-            discussionCommentRepository.save((DiscussionComment) comment);
-        }
-
         return "댓글 작성에 성공";
     }
 

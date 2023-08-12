@@ -47,11 +47,10 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public DiscussionComment(String content, Member member, Discussion discussion, Integer parentId) {
+    public DiscussionComment(String content, Member member, Discussion discussion) {
         this.content = content;
         this.member = member;
         this.discussion = discussion;
-        this.parentId = parentId;
     }
 
     public Integer increaseReport() {
