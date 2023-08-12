@@ -8,11 +8,11 @@ import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardHistory;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardList;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.boardcomment.BoardCommentRepository;
-import com.example.mssaem_backend.domain.boardcomment.BoardCommentService;
 import com.example.mssaem_backend.domain.boardimage.BoardImageService;
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.DiscussionService;
@@ -23,6 +23,8 @@ import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimp
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
+import com.example.mssaem_backend.global.common.CommentService;
+import com.example.mssaem_backend.global.common.CommentTypeEnum;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
@@ -47,7 +49,7 @@ public class BoardService {
     private final BoardCommentRepository boardCommentRepository;
     private final BadgeRepository badgeRepository;
     private final WorryBoardRepository worryBoardRepository;
-    private final BoardCommentService boardCommentService;
+    private final CommentService commentService;
     private final DiscussionService discussionService;
 
     private static final Long likeCountStandard = 10L; // HOT 게시글 기준이 되는 좋아요수
@@ -174,14 +176,14 @@ public class BoardService {
         if (board.isState()) {
             //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
             match(member, board.getMember());
-            //게시글 Soft Delete
-            board.deleteBoard();
             //현재 저장된 이미지 삭제
             boardImageService.deleteBoardImage(board);
             //해당 게시글 좋아요 삭제
             likeRepository.deleteAllByBoard(board);
             //게시글 삭제 시 모든 댓글 삭제, 댓글 좋아요 삭제
-            boardCommentService.deleteAllBoardComment(board);
+            commentService.deleteAllComments(boardId, CommentTypeEnum.BOARD);
+            //게시글 Soft Delete
+            board.deleteBoard();
             return "게시글 삭제 완료";
         } else {
             throw new BaseException(BoardErrorCode.EMPTY_BOARD);
@@ -291,6 +293,41 @@ public class BoardService {
             boardCommentRepository.countAllByStateIsTrueAndMember(member),
             boardRepository.sumLikeCountByMember(member)
         );
+    }
+
+    //게시판 별 게시글 개수 조회
+    public BoardList getBoardList() {
+        //BoardList 객체 생성
+        BoardList boardList = new BoardList();
+        //전체 게시글 개수
+        boardList.setBoardCount(boardRepository.countAllByStateIsTrue());
+        //MBTI별 게시글 개수
+        List<Object[]> boardCountList = boardRepository.countBoardsByMbtiAndStateIsTrue();
+        //조회한 데이터를 해당하는 MBTI에 할당
+        for (Object[] row : boardCountList) {
+            MbtiEnum mbti = (MbtiEnum) row[0];
+            Long count = (Long) row[1];
+
+            switch (mbti) {
+                case INFJ -> boardList.setINFJ(count);
+                case INFP -> boardList.setINFP(count);
+                case ISFJ -> boardList.setISFJ(count);
+                case ISFP -> boardList.setISFP(count);
+                case ISTP -> boardList.setISTP(count);
+                case ISTJ -> boardList.setISTJ(count);
+                case INTP -> boardList.setINTP(count);
+                case INTJ -> boardList.setINTJ(count);
+                case ENTP -> boardList.setENTP(count);
+                case ESTJ -> boardList.setESTJ(count);
+                case ESTP -> boardList.setESTP(count);
+                case ENFP -> boardList.setENFP(count);
+                case ESFJ -> boardList.setESFJ(count);
+                case ENTJ -> boardList.setENTJ(count);
+                case ENFJ -> boardList.setENFJ(count);
+                case ESFP -> boardList.setESFP(count);
+            }
+        }
+        return boardList;
     }
 
 }

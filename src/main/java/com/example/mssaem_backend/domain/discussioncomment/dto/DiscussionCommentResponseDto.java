@@ -16,7 +16,7 @@ public class DiscussionCommentResponseDto {
         private Long commentId;
         private String content;
         private Long likeCount;
-        private Integer parentId;
+        private Long parentId;
         private String createdAt;
         private Boolean isLiked; // 댓글 좋아요 눌렀는지 확인
         private Boolean isEditAllowed; //댓글 또는 신고를 위한 내 댓글인지 확인
@@ -44,7 +44,7 @@ public class DiscussionCommentResponseDto {
         private Long commentId;
         private String Content;
         private Long likeCount;
-        private Integer parentId;
+        private Long parentId;
         private String createdAt;
         private Boolean isLiked; // 댓글 좋아요 눌렀는지 확인
         private Boolean isAllowed; //삭제 또는 신고를 위한 내 댓글인지 확인

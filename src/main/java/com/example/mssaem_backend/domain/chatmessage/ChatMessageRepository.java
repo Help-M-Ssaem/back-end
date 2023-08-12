@@ -14,6 +14,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
   @Modifying
   void deleteAllByChatRoom(ChatRoom chatRoom);
 
-  @Query("select chm from ChatMessage chm join fetch chm.chatRoom where chm.chatRoom = :chatRoom order by chm.createdAt desc")
+  @Query("select chm from ChatMessage chm join fetch chm.chatRoom where chm.chatRoom = :chatRoom")
   List<ChatMessage> selectAllChatMessage(@Param("chatRoom") ChatRoom chatRoom);
 }

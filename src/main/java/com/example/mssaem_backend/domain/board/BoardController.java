@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.board;
 
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
+import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardList;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
@@ -138,4 +139,9 @@ public class BoardController {
             boardService.findBoardListByKeywordAndMbti(searchReq, strMbti, page, size));
     }
 
+    //게시판 별 게시글 개수 조회
+    @GetMapping("/boards/list")
+    public ResponseEntity<BoardList> findBoardsList() {
+        return ResponseEntity.ok(boardService.getBoardList());
+    }
 }
