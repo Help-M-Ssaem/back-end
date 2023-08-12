@@ -175,14 +175,14 @@ public class BoardService {
         if (board.isState()) {
             //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
             match(member, board.getMember());
-            //게시글 Soft Delete
-            board.deleteBoard();
             //현재 저장된 이미지 삭제
             boardImageService.deleteBoardImage(board);
             //해당 게시글 좋아요 삭제
             likeRepository.deleteAllByBoard(board);
             //게시글 삭제 시 모든 댓글 삭제, 댓글 좋아요 삭제
             commentService.deleteAllComments(boardId, CommentTypeEnum.BOARD);
+            //게시글 Soft Delete
+            board.deleteBoard();
             return "게시글 삭제 완료";
         } else {
             throw new BaseException(BoardErrorCode.EMPTY_BOARD);

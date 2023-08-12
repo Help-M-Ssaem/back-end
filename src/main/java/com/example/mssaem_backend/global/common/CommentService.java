@@ -258,37 +258,23 @@ public class CommentService {
     //글 삭제 시 해당 글 댓글 전체 삭제
     @Transactional
     public void deleteAllComments(Long postId, CommentTypeEnum commentType) {
-
         //Board 처리
         if (commentType == CommentTypeEnum.BOARD) {
-            Board board = boardRepository.findByIdAndStateIsTrue(postId)
-                .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
-
             List<BoardComment> boardComments = boardCommentRepository.findAllByBoardId(
-                board.getId());
-
+                postId);
             for (BoardComment boardComment : boardComments) {
                 boardCommentLikeRepository.deleteAllByBoardComment(boardComment);
             }
-
-            boardCommentRepository.deleteAllByBoard(board);
-
+            boardCommentRepository.deleteAllByBoardId(postId);
         } else { //discussion 처리
             Discussion discussion = discussionRepository.findByIdAndStateIsTrue(postId)
-                .orElse(null);
-
-            if (discussion == null) {
-                throw new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION);
-            }
-
+                .orElseThrow(()-> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
             List<DiscussionComment> discussionComments = discussionCommentRepository.findAllByDiscussion(
                 discussion);
-
             for (DiscussionComment discussionComment : discussionComments) {
                 discussionCommentLikeRepository.deleteAllByDiscussionComment(discussionComment);
             }
-
-            discussionCommentRepository.deleteAllByDiscussion(discussion);
+            discussionCommentRepository.deleteAllByDiscussionId(postId);
         }
     }
 }

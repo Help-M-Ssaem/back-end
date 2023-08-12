@@ -31,4 +31,5 @@ public interface DiscussionCommentRepository extends JpaRepository<DiscussionCom
 
     void deleteAllByDiscussion(Discussion discussion);
 
+    void deleteAllByDiscussionId(Long postId);
 }
