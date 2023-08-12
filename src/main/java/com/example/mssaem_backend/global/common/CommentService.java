@@ -165,7 +165,7 @@ public class CommentService {
 
         switch (commentType) {
             case BOARD -> {
-                Board board = boardRepository.findById(objectId)
+                Board board = boardRepository.findByIdAndStateIsTrue(objectId)
                     .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
 
                 //BoardComment 엔티티 생성
@@ -193,7 +193,7 @@ public class CommentService {
                 }
             }
             case DISCUSSION -> {
-                Discussion discussion = discussionRepository.findById(objectId)
+                Discussion discussion = discussionRepository.findByIdAndStateIsTrue(objectId)
                     .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
 
                 //DiscussionComment 엔티티 생성

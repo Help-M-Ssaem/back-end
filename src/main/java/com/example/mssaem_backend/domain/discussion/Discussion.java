@@ -78,4 +78,11 @@ public class Discussion extends BaseTimeEntity {
     public void increaseCount() {
         this.participantCount +=1;
     }
+    public void increaseCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        this.commentCount--;
+    }
 }

@@ -40,7 +40,6 @@ public class BoardComment extends BaseTimeEntity implements Comment {
     private Integer report;
 
     @ColumnDefault("0")
-
     private Long parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
 
     private boolean state = true; //true : 존재, false : 삭제
@@ -54,11 +53,13 @@ public class BoardComment extends BaseTimeEntity implements Comment {
         this.content = content;
         this.member = member;
         this.board = board;
+        this.board.increaseCommentCount();
     }
 
     public void deleteComment() {
         this.content = "삭제된 댓글입니다.";
         this.likeCount = 0L;
+        this.board.decreaseCommentCount();
         this.state = false;
     }
 
@@ -70,7 +71,7 @@ public class BoardComment extends BaseTimeEntity implements Comment {
         this.likeCount--;
     }
 
-   public Integer increaseReport(){
+    public Integer increaseReport() {
         return this.report++;
     }
 
