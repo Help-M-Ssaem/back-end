@@ -15,6 +15,7 @@ import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.Pat
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorryBoardId;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorryRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.PatchWorrySolvedRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.WorryBoardHistory;
@@ -170,7 +171,7 @@ public class WorryBoardService {
 
     //고민글 생성
     @Transactional
-    public String createWorryBoard(Member currentMember, PostWorryReq postWorryReq,
+    public GetWorryBoardId createWorryBoard(Member currentMember, PostWorryReq postWorryReq,
         List<String> imgUrls) {
         //고민글 내용 저장
         WorryBoard worryBoard = WorryBoard.builder()
@@ -186,8 +187,8 @@ public class WorryBoardService {
             String thumbnail = worryBoardImageService.uploadWorryBoardImageUrl(worryBoard, imgUrls);
             worryBoard.changeThumbnail(thumbnail);
         }
-        worryBoardRepository.save(worryBoard);
-        return "고민글 생성 완료";
+        WorryBoard worryboard = worryBoardRepository.save(worryBoard);
+        return new GetWorryBoardId(worryboard.getId());
     }
 
     //고민글 수정
