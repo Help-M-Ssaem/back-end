@@ -50,4 +50,11 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatRoomService.deleteChatRoom(roomId));
     }
 
+    /**
+     * 고민 게시글 채팅방 유무 조사
+     */
+    @GetMapping("member/chat/rooms/state/{worryBoardId}")
+    public ResponseEntity<Boolean> selectChatRoomState(@PathVariable("worryBoardId") Long worryBoardId) {
+        return ResponseEntity.ok(chatRoomService.selectChatRoomStateByWorryBoard(worryBoardId));
+    }
 }
