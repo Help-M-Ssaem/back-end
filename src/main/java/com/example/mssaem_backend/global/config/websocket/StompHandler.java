@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.global.config.websocket;
 
 import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomParticipateErrorCode.FULL_CHATROOM;
+import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomParticipateErrorCode.FULL_PARTICIPATE;
 
 import com.example.mssaem_backend.domain.chat.ChatService;
 import com.example.mssaem_backend.domain.chatmessage.ChatMessage;
@@ -52,10 +53,14 @@ public class StompHandler implements ChannelInterceptor {
       ChatInfo chatInfo = new ChatInfo();
       chatInfo.setSender(member.getNickName());
 
-      chatRoomCustomRepository.setUserEnterInfo(sessionId, chatInfo);
+      if(chatRoomCustomRepository.getUserEnterRoomId(sessionId) != null) {
+        throw new BaseException(FULL_PARTICIPATE);
+      };
 
+      chatRoomCustomRepository.setUserEnterInfo(sessionId, chatInfo);
       jwtTokenProvider.validateToken(token);
       log.info("CONNECT {}", token);
+
     } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
       String sessionId = (String) message.getHeaders().get("simpSessionId");
 
