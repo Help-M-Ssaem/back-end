@@ -1,18 +1,20 @@
 package com.example.mssaem_backend.domain.chatparticipate;
 
+import com.example.mssaem_backend.domain.chatmessage.ChatMessage;
 import com.example.mssaem_backend.domain.chatmessage.ChatMessageRepository;
 import com.example.mssaem_backend.domain.chatparticipate.dto.ChatParticipateResponseDto.ChatParticipateRes;
 import com.example.mssaem_backend.domain.chatroom.ChatRoom;
+import com.example.mssaem_backend.domain.chatroom.ChatRoomRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.notification.NotificationService;
 import com.example.mssaem_backend.domain.notification.TypeEnum;
+import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomParticipateErrorCode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class ChatParticipateService {
     private final MemberRepository memberRepository;
     private final NotificationService notificationService;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
 
     @Transactional
@@ -49,8 +52,11 @@ public class ChatParticipateService {
     }
 
     public List<ChatParticipateRes> selectChatRooms(Member member) {
+        // 자신이 참여한 모든 채팅방 ID 조회
         List<Long> participateRoomId = chatParticipateRepository.findAllByMemberParticipateRoomId(
             member);
+
+        // 자신이 참여한 모든 채팅방의 상대 조회
         List<ChatParticipate> allParticipateRoom = chatParticipateRepository.findAllParticipateRoom(
             member, participateRoomId);
 
@@ -58,18 +64,43 @@ public class ChatParticipateService {
             throw new BaseException(ChatRoomParticipateErrorCode.EMPTY_CHATPARTICIPATE);
         }
 
-        //로그인한 멤버의 참여한 채팅방 조회
+        // 로그인한 멤버의 참여한 채팅방 ID 리스트
         List<Long> participateChatRoomIds = new ArrayList<>();
         for (ChatParticipate chatParticipate : allParticipateRoom) {
-            Long id = chatParticipate.getId();
+            Long id = chatParticipate.getChatRoom().getId();
             participateChatRoomIds.add(id);
         }
 
-        return allParticipateRoom.stream()
-            .map(r -> new ChatParticipateRes(r,
-                new MemberSimpleInfo(r.getMember()),
-                chatMessageRepository.selectByChatRoom(r.getChatRoom())))
-            .collect(Collectors.toList());
+        // 각 채팅방에 맞는 고민 게시글 조회
+        List<WorryBoard> worryBoardAllByChatRoom = chatRoomRepository.findWorryBoardAllByChatRoom(
+            participateChatRoomIds);
+
+        List<ChatMessage> chatMessages = chatMessageRepository.selectByChatRoom(
+            participateChatRoomIds);
+
+        List<ChatParticipateRes> result = new ArrayList<>();
+        int chatMessagesIdx = 0;
+        for (int i = 0; i < allParticipateRoom.size(); ++i) {
+            ChatParticipate nowChatParticipate = allParticipateRoom.get(i);
+            ChatMessage nowChatMessage = null;
+            WorryBoard nowWorryBoard = worryBoardAllByChatRoom.get(i);
+
+            if (chatMessagesIdx < chatMessages.size()) {
+                nowChatMessage = chatMessages.get(chatMessagesIdx);
+                if (nowChatMessage.getChatRoom().getId() != nowChatParticipate.getChatRoom()
+                    .getId()) {
+                    nowChatMessage = null;
+                } else {
+                    chatMessagesIdx++;
+                }
+            }
+
+            result.add(new ChatParticipateRes(nowChatParticipate,
+                new MemberSimpleInfo(nowChatParticipate.getMember()),
+                nowChatMessage, nowWorryBoard));
+        }
+
+        return result;
     }
 
     @Transactional
@@ -78,7 +109,7 @@ public class ChatParticipateService {
         chatParticipateRepository.delete(chatParticipate);
     }
 
-    public Integer countChatParticipate(Long roomId){
+    public Integer countChatParticipate(Long roomId) {
         return chatParticipateRepository.countByChatRoomId(roomId);
     }
 

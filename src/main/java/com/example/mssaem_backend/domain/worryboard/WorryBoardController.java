@@ -6,6 +6,7 @@ import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.Pat
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesRes;
+import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorryBoardId;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorryRes;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.PatchWorrySolvedRes;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
@@ -100,7 +101,7 @@ public class WorryBoardController {
 
     //고민글 생성
     @PostMapping("/member/worry-board")
-    public ResponseEntity<String> createWorryBoard(@CurrentMember Member currentMember,
+    public ResponseEntity<GetWorryBoardId> createWorryBoard(@CurrentMember Member currentMember,
         @RequestPart(value = "postWorryReq") PostWorryReq postWorryReq,
         @RequestPart(value = "image", required = false) List<String> imgUrls) {
         return ResponseEntity.ok(

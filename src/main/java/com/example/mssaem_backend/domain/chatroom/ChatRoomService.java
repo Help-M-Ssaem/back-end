@@ -2,7 +2,7 @@ package com.example.mssaem_backend.domain.chatroom;
 
 import com.example.mssaem_backend.domain.chatmessage.ChatMessageService;
 import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatInfo;
-import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatRoomInfo;
+import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomResponseDto.ChatRoomRes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,9 +16,9 @@ public class ChatRoomService {
   private final ChatRoomRepository chatRoomRepository;
   private final ChatMessageService chatMessageService;
 
-  public String createRoom(ChatRoomInfo chatRoomInfo) {
-    chatRoomCustomRepository.createChatRoom(chatRoomInfo);
-    return "채팅방 생성 완료";
+  public ChatRoomRes createRoom(Long worryBoardId) {
+    ChatRoom chatRoom = chatRoomCustomRepository.createChatRoom(worryBoardId);
+    return new ChatRoomRes(chatRoom);
   }
 
   /**
