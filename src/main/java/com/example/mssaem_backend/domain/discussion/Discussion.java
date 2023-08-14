@@ -67,17 +67,18 @@ public class Discussion extends BaseTimeEntity {
         this.state = false;
     }
 
-    public Integer increaseReport() {
-        return this.report++;
+    public void increaseReport() {
+        this.report++;
     }
 
     public void updateState() {
         this.state = false;
     }
-      
+
     public void increaseCount() {
-        this.participantCount +=1;
+        this.participantCount += 1;
     }
+
     public void increaseCommentCount() {
         this.commentCount++;
     }

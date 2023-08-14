@@ -1,6 +1,7 @@
 package com.example.mssaem_backend.domain.report.dto;
 
-import com.example.mssaem_backend.domain.report.ReportType;
+import com.example.mssaem_backend.domain.report.ReportReason;
+import com.example.mssaem_backend.domain.report.ReportTarget;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,8 @@ public class ReportRequestDto {
     public static class ReportReq {
 
         Long resourceId; // 신고 대상 id
-        ReportType reportType; // 신고 대상 타입
-        String content; // 신고 사유
+        ReportTarget reportTarget; // 신고 대상 타입
+        ReportReason reportReason; // 신고 사유
+        String content; // 기타 내용
     }
 }

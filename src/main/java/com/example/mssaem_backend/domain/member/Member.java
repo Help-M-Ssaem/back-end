@@ -84,7 +84,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void modifyMember(String nickName, String introduction, String profileImageUrl,
-                             MbtiEnum mbti, String caseSensitivity, String badgeName) {
+        MbtiEnum mbti, String caseSensitivity, String badgeName) {
         // MBTI 변경 시 프로필 사진이 디폴트라면 프로필 사진도 같이 변경
         if (mbti != null) {
             this.mbti = mbti;
@@ -99,8 +99,8 @@ public class Member extends BaseTimeEntity {
         this.badgeName = badgeName != null ? badgeName : this.badgeName;
     }
 
-    public Integer increaseReport() {
-        return this.report++;
+    public void increaseReport() {
+        this.report++;
     }
 
     public void updateStatus() {
