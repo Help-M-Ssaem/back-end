@@ -13,6 +13,7 @@ public enum MemberErrorCode implements ErrorCode {
     DUPLICATE_MEMBER("MEMBER_003", "중복된 사용자입니다.", HttpStatus.CONFLICT),
     DUPLICATE_NICKNAME("MEMBER_004", "중복된 닉네임입니다.", HttpStatus.CONFLICT),
     INVALID_MEMBER("MEMBER_005", "올바르지 않은 사용자입니다.", HttpStatus.BAD_REQUEST),
+    DEFAULT_PROFILE("MEMBER_006", "기본 이미지는 삭제할 수 없습니다.", HttpStatus.CONFLICT)
             ;
 
     private final String errorCode;

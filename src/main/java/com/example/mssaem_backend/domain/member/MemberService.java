@@ -183,8 +183,9 @@ public class MemberService {
             member.deleteProfile();
             save(member);
             return "삭제 완료";
+        } else {
+            throw new BaseException(MemberErrorCode.DEFAULT_PROFILE);
         }
-        return "기본 이미지는 삭제할 수 없습니다.";
     }
 
     public String uploadFile(Member member, MultipartFile multipartFile) {
