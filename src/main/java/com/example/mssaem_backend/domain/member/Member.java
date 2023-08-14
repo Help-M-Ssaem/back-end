@@ -77,14 +77,13 @@ public class Member extends BaseTimeEntity {
         this.mbti = mbti;
         this.caseSensitivity = caseSensitivity;
         this.profileImageUrl = mbti.getProfileUrl();
-        System.out.println("프로필 이미지는 " + this.profileImageUrl);
         this.refreshToken = "";
         this.report = 0;
         this.role = Role.ROLE_MEMBER;
     }
 
-    public void modifyMember(String nickName, String introduction, String profileImageUrl,
-                             MbtiEnum mbti, String caseSensitivity, String badgeName) {
+    public void modifyMember(String nickName, String introduction, MbtiEnum mbti,
+                             String caseSensitivity, String badgeName) {
         // MBTI 변경 시 프로필 사진이 디폴트라면 프로필 사진도 같이 변경
         if (mbti != null) {
             this.mbti = mbti;
@@ -94,7 +93,6 @@ public class Member extends BaseTimeEntity {
         }
         this.nickName = nickName != null ? nickName : this.nickName;
         this.introduction = introduction != null ? introduction : this.introduction;
-        this.profileImageUrl = profileImageUrl != null ? profileImageUrl : this.profileImageUrl;
         this.caseSensitivity = caseSensitivity != null ? caseSensitivity : this.caseSensitivity;
         this.badgeName = badgeName != null ? badgeName : this.badgeName;
     }
@@ -107,7 +105,8 @@ public class Member extends BaseTimeEntity {
         this.status = false;
     }
 
-    public void changeFalseDefaultProfile() {
+    public void changeProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
         this.defaultProfile = false;
     }
 

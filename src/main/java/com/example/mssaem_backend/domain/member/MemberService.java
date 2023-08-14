@@ -143,18 +143,14 @@ public class MemberService {
         return teacherInfos;
     }
 
-    public String modifyProfile(Member member, ModifyProfile modifyProfile, MultipartFile multipartFile) {
-        // 프로필 사진 변경
-        String profileImageUrl = uploadFile(member, multipartFile);
+    public String modifyProfile(Member member, ModifyProfile modifyProfile) {
         // 대표 뱃지 변경
         String badgeName = badgeService.changeRepresentativeBadge(member, modifyProfile.getBadgeId());
         // 수정
         member.modifyMember(modifyProfile.getNickName(), modifyProfile.getIntroduction(),
-                profileImageUrl, modifyProfile.getMbti(), modifyProfile.getCaseSensitivity(),
-                badgeName);
+                modifyProfile.getMbti(), modifyProfile.getCaseSensitivity(), badgeName);
 
         save(member);
-        System.out.println("프로필 이미지는 " + member.getProfileImageUrl() + " 이고 디폴트 값은 " + member.isDefaultProfile());
         return "수정 성공";
     }
 
@@ -183,20 +179,24 @@ public class MemberService {
     }
 
     public String deleteProfileImage(Member member) {
-        member.deleteProfile();
-        save(member);
-        return "삭제 완료";
+        if(!member.isDefaultProfile()) {
+            member.deleteProfile();
+            save(member);
+            return "삭제 완료";
+        }
+        return "기본 이미지는 삭제할 수 없습니다.";
     }
 
-    private String uploadFile(Member member, MultipartFile multipartFile) {
+    public String uploadFile(Member member, MultipartFile multipartFile) {
         if (multipartFile != null) {
             // 기본 이미지가 아니라면 기존 이미지 삭제 후 새로운 이미지 업로드, 기본 이미지가 삭제 되지 않기 위함
             if(!member.isDefaultProfile()) {
                 s3Service.deleteFile(s3Service.parseFileName(member.getProfileImageUrl()));
             }
-            member.changeFalseDefaultProfile();
+            String newProfileUrl = s3Service.uploadImage(multipartFile);
+            member.changeProfileImageUrl(newProfileUrl);
             save(member);
-            return s3Service.uploadImage(multipartFile);
+            return "프로필 사진 수정 완료";
         }
         return null;
     }
