@@ -30,7 +30,8 @@ public class LikeService {
             //존재한다면 해당 Like 상태 변경
             likeRepository.findByMemberAndBoardId(member, boardId).updateBoardLike();
             //해당 게시물의 like 수가 10개 이상이면 HOT 게시글이 됨
-            Board board = boardRepository.findByMemberAndIdAndStateIsTrue(member, boardId);
+            Board board = boardRepository.findByIdAndStateIsTrue(boardId)
+                .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
             if (board.getLikeCount() == 10) {
                 // 해당 게시물의 like 수가 10개 이상이면 HOT 게시글이 됨
                 notificationService.createNotification(
@@ -42,8 +43,10 @@ public class LikeService {
             }
         } else {
             //존재하지 않는다면 새로운 Like 추가
-            Board board = boardRepository.findByMemberAndIdAndStateIsTrue(member, boardId);
-            if (likeRepository.save(new Like(board, member)).getBoard().getLikeCount() == 10) {
+            Board board = boardRepository.findByIdAndStateIsTrue(boardId)
+                .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
+            likeRepository.save(new Like(board, member));
+            if (board.getLikeCount() == 10) {
                 // 해당 게시물의 like 수가 10개 이상이면 HOT 게시글이 됨
                 notificationService.createNotification(
                     boardId,

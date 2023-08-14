@@ -1,8 +1,10 @@
 package com.example.mssaem_backend.domain.discussioncomment;
 
+import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
+import com.example.mssaem_backend.global.common.Comment;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -17,7 +19,7 @@ import org.hibernate.annotations.DynamicInsert;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class DiscussionComment extends BaseTimeEntity {
+public class DiscussionComment extends BaseTimeEntity implements Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +35,7 @@ public class DiscussionComment extends BaseTimeEntity {
     private Integer report;
 
     @ColumnDefault("0")
-    private Integer parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
+    private Long parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
 
     @ColumnDefault("0")
     private Integer orders; //대댓글의 순서
@@ -45,11 +47,11 @@ public class DiscussionComment extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public DiscussionComment(String content, Member member, Discussion discussion, Integer parentId) {
+    public DiscussionComment(String content, Member member, Discussion discussion) {
         this.content = content;
         this.member = member;
         this.discussion = discussion;
-        this.parentId = parentId;
+        this.discussion.increaseCommentCount();
     }
 
     public Integer increaseReport() {
@@ -60,9 +62,10 @@ public class DiscussionComment extends BaseTimeEntity {
         this.state = false;
     }
 
-    public void deleteDiscussionComment() {
+    public void deleteComment() {
         this.content = "삭제된 댓글입니다.";
         this.likeCount = 0L;
+        this.discussion.decreaseCommentCount();
         this.state = false;
     }
 
@@ -72,5 +75,14 @@ public class DiscussionComment extends BaseTimeEntity {
 
     public void decreaseLikeCount() {
         this.likeCount--;
+    }
+
+    @Override
+    public Board getBoard() {
+        return null;
+    }
+
+    public void setParentComment(Long id) {
+        this.parentId = id;
     }
 }

@@ -30,7 +30,7 @@ public class BoardCommentResponseDto {
             this.commentId = boardComment.getId();
             this.Content = boardComment.getContent();
             this.likeCount = boardComment.getLikeCount();
-            this.parentId = boardComment.getParentId();
+            //this.parentId = boardComment.getParentId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.createdAt = createdAt;
             this.isAllowed = isAllowed;
@@ -61,7 +61,7 @@ public class BoardCommentResponseDto {
             this.commentId = boardComment.getId();
             this.Content = boardComment.getContent();
             this.likeCount = boardComment.getLikeCount();
-            this.parentId = boardComment.getParentId();
+            //this.parentId = boardComment.getParentId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.createdAt = createdAt;
             this.isAllowed = isAllowed;
