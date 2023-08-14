@@ -16,7 +16,6 @@ public class ChatParticipateResponseDto {
   public static class ChatParticipateRes {
 
     private Long chatRoomId;
-    private String chatRoomTitle;
     private boolean state;
     private String lastMessage;
     private String lastSendAt;
@@ -24,7 +23,6 @@ public class ChatParticipateResponseDto {
 
     public ChatParticipateRes(ChatParticipate chatParticipate, MemberSimpleInfo memberSimpleInfo, ChatMessage message) {
       this.chatRoomId = chatParticipate.getChatRoom().getId();
-      this.chatRoomTitle = chatParticipate.getChatRoom().getTitle();
       this.state = chatParticipate.getChatRoom().isState();
       this.lastMessage = message == null ? "" : message.getMessage();
       this.lastSendAt = message == null ? "" : Time.calculateTime(message.getCreatedAt(), 3);

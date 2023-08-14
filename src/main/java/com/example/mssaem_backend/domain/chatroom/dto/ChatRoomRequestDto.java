@@ -8,21 +8,20 @@ import lombok.NoArgsConstructor;
 
 public class ChatRoomRequestDto {
 
-  @Getter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class ChatRoomInfo {
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChatRoomInfo {
 
-    private String title;
-    private Long worryBoardId;
-  }
+        private Long worryBoardId;
+    }
 
-  @Data
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class ChatInfo implements Serializable {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChatInfo implements Serializable {
 
-    private Long chatRoomId;
-    private String sender;
-  }
+        private Long chatRoomId;
+        private String sender;
+    }
 }

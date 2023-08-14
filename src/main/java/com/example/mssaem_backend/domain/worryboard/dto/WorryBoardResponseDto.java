@@ -118,5 +118,12 @@ public class WorryBoardResponseDto {
         }
     }
 
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    public static class GetWorryBoardId {
+        private Long worryBoardId;
+    }
+
 }
 
