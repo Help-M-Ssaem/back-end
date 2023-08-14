@@ -1,6 +1,5 @@
 package com.example.mssaem_backend.global.config.websocket;
 
-import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomParticipateErrorCode.FULL_CHATROOM;
 import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomParticipateErrorCode.FULL_PARTICIPATE;
 
 import com.example.mssaem_backend.domain.chat.ChatService;
@@ -69,7 +68,7 @@ public class StompHandler implements ChannelInterceptor {
                     .orElse("InvalidRoom"));
 
             if (chatParticipateService.countChatParticipate(Long.valueOf(roomId)) >= 2) {
-                throw new BaseException(FULL_CHATROOM);
+                throw new BaseException(FULL_PARTICIPATE);
             }
             //roomId 다시 저장 (Redis)
             chatRoomCustomRepository.setRoomEnterInfo(sessionId, Long.valueOf(roomId));
