@@ -71,8 +71,8 @@ public class BoardComment extends BaseTimeEntity implements Comment {
         this.likeCount--;
     }
 
-    public Integer increaseReport() {
-        return this.report++;
+    public void increaseReport() {
+        this.report++;
     }
 
     public void updateState() {

@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    Report findTopByResourceIdAndReportTypeAndMemberOrderByIdDesc(Long resourceId,
-        ReportType reportType, Member member);
+    Report findTopByResourceIdAndReportTargetAndMemberOrderByIdDesc(Long resourceId,
+        ReportTarget reportTarget, Member member);
 
-    List<Report> findByResourceIdAndReportType(Long resourceId, ReportType reportType);
+    List<Report> findByResourceIdAndReportTarget(Long resourceId, ReportTarget reportTarget);
 }

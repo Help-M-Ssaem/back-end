@@ -97,8 +97,8 @@ public class Member extends BaseTimeEntity {
         this.badgeName = badgeName != null ? badgeName : this.badgeName;
     }
 
-    public Integer increaseReport() {
-        return this.report++;
+    public void increaseReport() {
+        this.report++;
     }
 
     public void updateStatus() {

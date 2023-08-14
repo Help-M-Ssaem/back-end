@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 @Getter
 @AllArgsConstructor
@@ -28,21 +29,27 @@ public class Report extends BaseTimeEntity {
     private Long id;
 
     @NotNull
-    private Long resourceId;
+    private Long resourceId; // 신고 대상 id
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private ReportType reportType;
+    private ReportTarget reportTarget; // 신고 대상 type
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private ReportReason reportReason; // 신고 사유
+
+    @Nullable
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @Builder
-    public Report(Long resourceId, ReportType reportType, String content, Member member) {
+    public Report(Long resourceId, ReportTarget reportTarget, ReportReason reportReason, String content, Member member) {
         this.resourceId = resourceId;
-        this.reportType = reportType;
+        this.reportTarget = reportTarget;
+        this.reportReason = reportReason;
         this.content = content;
         this.member = member;
     }

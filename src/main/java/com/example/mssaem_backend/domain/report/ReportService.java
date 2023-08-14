@@ -45,12 +45,15 @@ public class ReportService {
     private final WorryBoardRepository worryBoardRepository;
     private final MemberRepository memberRepository;
 
-    private static final int reportStandard = 10;
+    private static final Integer REPORT_STANDARD = 10;
+    private static final int REASON_SIZE = 6;
 
     @Transactional
     public String report(Member member, ReportReq reportReq) throws MessagingException {
-        Report prevReport = reportRepository.findTopByResourceIdAndReportTypeAndMemberOrderByIdDesc(
-            reportReq.getResourceId(), reportReq.getReportType(), member);
+        Report prevReport = reportRepository.findTopByResourceIdAndReportTargetAndMemberOrderByIdDesc(
+            reportReq.getResourceId(),
+            reportReq.getReportTarget(),
+            member);
 
         //  신고 테이블에 이미 같은 신고가 있고, 일주일 이내인 경우 신고 못함
         if (prevReport != null && LocalDateTime.now().minusWeeks(1)
@@ -58,16 +61,24 @@ public class ReportService {
             throw new BaseException(ReportError.DUPLICATE_REPORT);
         }
 
-        reportRepository.save(Report.builder().resourceId(reportReq.getResourceId())
-            .reportType(reportReq.getReportType()).content(reportReq.getContent()).member(member)
-            .build());
+        reportRepository.save(
+            Report.builder()
+                .resourceId(reportReq.getResourceId())
+                .reportTarget(reportReq.getReportTarget())
+                .reportReason(reportReq.getReportReason())
+                .content(reportReq.getContent())
+                .member(member)
+                .build()
+        );
 
         // 각 타입별로 신고 대상의 report 수를 +1해주고, 누적 신고 수가 reportStandard인 경우 state를 false로 처리후 안내 메일 전송
-        switch (reportReq.getReportType()) {
+        switch (reportReq.getReportTarget()) {
             case BOARD -> {
                 Board board = boardRepository.findByIdAndStateIsTrue(reportReq.getResourceId())
                     .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
-                if (board.increaseReport() >= reportStandard) {
+
+                board.increaseReport();
+                if (board.getReport().equals(REPORT_STANDARD)) {
                     board.updateState();
                     sendReportEmail(board.getMember().getEmail(), reportReq);
                 }
@@ -76,7 +87,9 @@ public class ReportService {
                 Discussion discussion = discussionRepository.findByIdAndStateIsTrue(
                         reportReq.getResourceId())
                     .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
-                if (discussion.increaseReport() >= reportStandard) {
+
+                discussion.increaseReport();
+                if (discussion.getReport().equals(REPORT_STANDARD)) {
                     discussion.updateState();
                     sendReportEmail(discussion.getMember().getEmail(), reportReq);
                 }
@@ -85,7 +98,9 @@ public class ReportService {
                 WorryBoard worryBoard = worryBoardRepository.findByIdAndStateIsTrue(
                         reportReq.getResourceId())
                     .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
-                if (worryBoard.increaseReport() >= reportStandard) {
+
+                worryBoard.increaseReport();
+                if (worryBoard.getReport().equals(REPORT_STANDARD)) {
                     worryBoard.updateState();
                     sendReportEmail(worryBoard.getMember().getEmail(), reportReq);
                 }
@@ -94,7 +109,9 @@ public class ReportService {
                 BoardComment boardComment = boardCommentRepository.findByIdAndStateIsTrue(
                     reportReq.getResourceId()).orElseThrow(
                     () -> new BaseException(BoardCommentErrorCode.EMPTY_BOARD_COMMENT));
-                if (boardComment.increaseReport() >= reportStandard) {
+
+                boardComment.increaseReport();
+                if (boardComment.getReport().equals(REPORT_STANDARD)) {
                     boardComment.updateState();
                     sendReportEmail(boardComment.getMember().getEmail(), reportReq);
                 }
@@ -103,7 +120,9 @@ public class ReportService {
                 DiscussionComment discussionComment = discussionCommentRepository.findByIdAndStateIsTrue(
                     reportReq.getResourceId()).orElseThrow(
                     () -> new BaseException(DiscussionCommentErrorCode.EMPTY_DISCUSSION_COMMENT));
-                if (discussionComment.increaseReport() >= reportStandard) {
+
+                discussionComment.increaseReport();
+                if (discussionComment.getReport().equals(REPORT_STANDARD)) {
                     discussionComment.updateState();
                     sendReportEmail(discussionComment.getMember().getEmail(), reportReq);
                 }
@@ -112,7 +131,9 @@ public class ReportService {
                 Member targetMember = memberRepository.findByIdAndStatusIsTrue(
                         reportReq.getResourceId())
                     .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
-                if (targetMember.increaseReport() >= reportStandard) {
+
+                targetMember.increaseReport();
+                if (targetMember.getReport().equals(REPORT_STANDARD)) {
                     targetMember.updateStatus();
                     sendReportEmail(targetMember.getEmail(), reportReq);
                 }
@@ -130,7 +151,7 @@ public class ReportService {
         // 메일 제목 지정
         mail.setSubject("[도와줘요, M쌤] 회원님의 신고 누적으로 인한 임시 정지/삭제에 관해 안내드립니다.", "utf-8");
         // 메일 내용 지정
-        mail.setText(createReportEmailContent(reportReq.getReportType(), count), "utf-8", "html");
+        mail.setText(createReportEmailContent(reportReq.getReportTarget(), count), "utf-8", "html");
 
         // 파라미터로 받은 email을 전송할 email 주소로 설정
         mail.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
@@ -140,32 +161,37 @@ public class ReportService {
 
     // 각 신고 내용 별 개수 반환
     private int[] getReportCount(ReportReq reportReq) {
-        int[] count = new int[6];
-        List<Report> reports = reportRepository.findByResourceIdAndReportType(
-            reportReq.getResourceId(), reportReq.getReportType());
+        int[] count = new int[REASON_SIZE];
+        List<Report> reports = reportRepository.findByResourceIdAndReportTarget(
+            reportReq.getResourceId(), reportReq.getReportTarget());
 
+        ReportReason[] reasons = ReportReason.values();
         reports.forEach(report -> {
-            if (report.getContent().equals(ReportContent.PROMOTIONAL_POST.toString())) {
-                count[0]++;
-            } else if (report.getContent().equals(ReportContent.LEWDNESS.toString())) {
-                count[1]++;
-            } else if (report.getContent().equals(ReportContent.HATRED.toString())) {
-                count[2]++;
-            } else if (report.getContent().equals(ReportContent.TORMENT.toString())) {
-                count[3]++;
-            } else if (report.getContent().equals(ReportContent.INFRINGEMENT.toString())) {
-                count[4]++;
-            } else {
-                count[5]++;
+            for (int i = 0; i < count.length; i++) {
+                if (report.getReportReason().equals(reasons[i])) {
+                    count[i]++;
+                    break;
+                }
             }
         });
         return count;
     }
 
     // 이메일 내용에 신고 내역과 타입, 정지 or 삭제 단어 선택
-    private String createReportEmailContent(ReportType reportType, int[] count) {
-        String strType = reportType == ReportType.MEMBER ? "계정" : reportType.getName();
-        String strDelete = reportType == ReportType.MEMBER ? "정지" : "삭제";
+    private String createReportEmailContent(ReportTarget reportTarget, int[] count) {
+        String reportTargetName =
+            reportTarget == ReportTarget.MEMBER ? "계정" : reportTarget.getName();
+        String processType = reportTarget == ReportTarget.MEMBER ? "정지" : "삭제";
+        String reportHistory = "";
+        ReportReason[] reasons = ReportReason.values();
+        for (int i = 0; i < count.length; i++) {
+            reportHistory +=
+                "<p style =\"line-height: 140%;\"><span\n style=\"font-size: 14px; line-height: 19.6px;\">"
+                    + reasons[i].getName()
+                    + " "
+                    + count[i]
+                    + "회</span>\n </p>\n";
+        }
 
         return "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional //EN\"\n"
             + "    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
@@ -399,34 +425,14 @@ public class ReportService {
             + "                          <p style=\"line-height: 140%;\"> </p>\n"
             + "                          <p style=\"line-height: 140%;\"><span\n"
             + "                              style=\"font-size: 16px; line-height: 22.4px;\">회원님의 "
-            + strType + "이 누적 신고 10회 이상으로 </span><span\n"
+            + reportTargetName + "이 누적 신고 10회 이상으로 </span><span\n"
             + "                              style=\"font-size: 16px; line-height: 22.4px;\">임시 "
-            + strDelete + "되었음을 알려드립니다.</span>\n"
+            + processType + "되었음을 알려드립니다.</span>\n"
             + "                          </p>\n"
             + "                          <p style=\"line-height: 140%;\"> </p>\n"
             + "                          <p style=\"line-height: 140%;\"><span\n"
             + "                              style=\"font-size: 16px; line-height: 22.4px;\">신고 내역</span></p>\n"
-            + "                          <p style=\"line-height: 140%;\"><span\n"
-            + "                              style=\"font-size: 14px; line-height: 19.6px;\">부적절한 홍보 게시글 "
-            + count[0] + "회</span>\n"
-            + "                          </p>\n"
-            + "                          <p style=\"line-height: 140%;\"><span\n"
-            + "                              style=\"font-size: 14px; line-height: 19.6px;\">음란성 또는 청소년에게 부적합한 내용 "
-            + count[1] + "회</span>\n"
-            + "                          </p>\n"
-            + "                          <p style=\"line-height: 140%;\"><span\n"
-            + "                              style=\"font-size: 14px; line-height: 19.6px;\">증오 또는 악의적인 콘텐츠 "
-            + count[2] + "회</span>\n"
-            + "                          </p>\n"
-            + "                          <p style=\"line-height: 140%;\"><span\n"
-            + "                              style=\"font-size: 14px; line-height: 19.6px;\">괴롭힘 또는 폭력 "
-            + count[3] + "회</span></p>\n"
-            + "                          <p style=\"line-height: 140%;\"><span\n"
-            + "                              style=\"font-size: 14px; line-height: 19.6px;\">권리 침해 "
-            + count[4] + "회</span></p>\n"
-            + "                          <p style=\"line-height: 140%;\"><span\n"
-            + "                              style=\"font-size: 14px; line-height: 19.6px;\">기타 "
-            + count[5] + "회</span></p>\n"
+            + reportHistory
             + "                          <p style=\"line-height: 140%;\"> </p>\n"
             + "                          <p style=\"line-height: 140%;\"><span\n"
             + "                              style=\"font-size: 16px; line-height: 22.4px;\">문의사항은 도와줘요 M쌤의 이메일을 통해 연락 바랍니다.</span>\n"
