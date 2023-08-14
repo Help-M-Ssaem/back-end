@@ -98,4 +98,12 @@ public class Board extends BaseTimeEntity {
     public void updateState() {
         this.state = false;
     }
+
+    public void increaseCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        this.commentCount--;
+    }
 }

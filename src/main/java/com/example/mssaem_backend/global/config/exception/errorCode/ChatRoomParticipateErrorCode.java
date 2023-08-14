@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ChatRoomParticipateErrorCode implements ErrorCode {
 
-  EMPTY_CHATPARTICIPATE("CHATROOM_001", "참여한 채팅방이 없습니다.", HttpStatus.NOT_FOUND);
+  EMPTY_CHATPARTICIPATE("CHATROOM_001", "참여한 채팅방이 없습니다.", HttpStatus.NOT_FOUND),
+  FULL_CHATROOM("CHATROOM_002", "채팅방이 가득 찼습니다", HttpStatus.FORBIDDEN);
   private final String errorCode;
   private final String message;
   private final HttpStatus status;

@@ -9,7 +9,6 @@ import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.Di
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentRepository;
-import com.example.mssaem_backend.domain.discussioncomment.DiscussionCommentService;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOption;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionRepository;
 import com.example.mssaem_backend.domain.discussionoption.DiscussionOptionService;
@@ -23,12 +22,13 @@ import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimp
 import com.example.mssaem_backend.domain.notification.NotificationService;
 import com.example.mssaem_backend.domain.notification.TypeEnum;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
+import com.example.mssaem_backend.global.common.CommentService;
+import com.example.mssaem_backend.global.common.CommentTypeEnum;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,37 +51,38 @@ public class DiscussionService {
     private final BadgeRepository badgeRepository;
     private final NotificationService notificationService;
     private final MemberRepository memberRepository;
-    private final DiscussionCommentService discussionCommentService;
+    private final CommentService commentService;
 
+    private static final Long participantCountStandard = 10L;
+
+    // HOT 토론글 조회
+    public Page<Discussion> findHotDiscussions(PageRequest pageRequest) {
+        return discussionRepository.findDiscussionByParticipantCountGreaterThanEqualAndStateIsTrueOrderByCreatedAtDesc(
+            participantCountStandard,
+            pageRequest);
+    }
 
     // HOT 토론글 더보기 조회
-    public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionList(Member member,
+    public PageResponseDto<List<DiscussionSimpleInfo>> findHotDiscussionsMore(Member member,
         int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
-            LocalDateTime.now().minusDays(3)
-            , pageRequest);
+        Page<Discussion> discussions = findHotDiscussions(pageRequest);
 
         return new PageResponseDto<>(
             discussions.getNumber(),
             discussions.getTotalPages(),
             setDiscussionSimpleInfo(
                 member,
-                discussions
-                    .stream()
-                    .collect(Collectors.toList()),
+                discussions.stream().collect(Collectors.toList()),
                 3)
         );
     }
 
     // 홈 화면 - 최상위 제외한 HOT 토론글 2개만 조회
-    public List<DiscussionSimpleInfo> findHotDiscussionListForHome(Member member) {
+    public List<DiscussionSimpleInfo> findHotDiscussionsForHome(Member member) {
         PageRequest pageRequest = PageRequest.of(0, 3);
-        List<Discussion> discussions = discussionRepository.findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
-                LocalDateTime.now().minusDays(3)
-                , pageRequest)
-            .stream()
-            .collect(Collectors.toList());
+        List<Discussion> discussions = findHotDiscussions(pageRequest)
+            .stream().collect(Collectors.toList());
 
         if (!discussions.isEmpty()) {
             discussions.remove(0);
@@ -261,7 +262,7 @@ public class DiscussionService {
 
         discussionOptionService.deleteOption(discussion);
         //토론글 삭제 시 모든 댓글,댓글 좋아요 삭제
-        discussionCommentService.deleteAllDiscussionComment(discussion);
+        commentService.deleteAllComments(id, CommentTypeEnum.DISCUSSION);
         discussion.deleteDiscussion();
 
         return "토론글 삭제완료";

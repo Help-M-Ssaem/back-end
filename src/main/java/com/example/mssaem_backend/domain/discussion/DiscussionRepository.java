@@ -1,7 +1,6 @@
 package com.example.mssaem_backend.domain.discussion;
 
 import com.example.mssaem_backend.domain.member.Member;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,11 +11,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
 
-    // 생성된지 3일 이내이고, 참여자수가 10명 이상인 토론글들을 참여자수를 기준으로 내림차순 정렬
-    @Query(value = "SELECT d FROM Discussion d WHERE d.createdAt >= :threeDaysAgo AND d.participantCount >= 1 AND d.state = true ORDER BY d.participantCount DESC")
-    Page<Discussion> findDiscussionWithMoreThanTenParticipantsInLastThreeDaysAndStateTrue(
-        @Param("threeDaysAgo") LocalDateTime threeDaysAgo, PageRequest pageRequest);
-
+    // HOT 토론 조회
+    Page<Discussion> findDiscussionByParticipantCountGreaterThanEqualAndStateIsTrueOrderByCreatedAtDesc(
+        Long participantCount, PageRequest pageRequest);
 
     @Query("SELECT d FROM Discussion d WHERE"
         + "(    (:type = 0 AND (LOWER(d.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(d.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
@@ -44,7 +41,9 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
 
     @Query(value = "SELECT SUM(d.participantCount) FROM Discussion d WHERE d.member = :member AND d.state = true")
     Long sumParticipantCountByMember(@Param("member") Member member);
+
     Page<Discussion> findByStateTrueOrderByCreatedAtDesc(PageRequest pageRequest);
 
-    Page<Discussion> findAllByMemberAndStateIsTrueOrderByCreatedAtDesc(Member member, Pageable pageable);
+    Page<Discussion> findAllByMemberAndStateIsTrueOrderByCreatedAtDesc(Member member,
+        Pageable pageable);
 }

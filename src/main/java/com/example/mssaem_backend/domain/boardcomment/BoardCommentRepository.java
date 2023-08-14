@@ -23,12 +23,9 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
 
     Optional<BoardComment> findByIdAndStateIsTrue(Long id);
 
-    Boolean existsBoardCommentById(Long id);
-
     BoardComment findByIdAndBoardIdAndStateIsTrue(Long id, Long boardId);
 
     Page<BoardComment> findAllByMemberIdAndStateIsTrue(Long memberId, Pageable pageable);
 
-    List<BoardComment> deleteAllByBoard(Board board);
-
+    void deleteAllByBoardId(Long postId);
 }
