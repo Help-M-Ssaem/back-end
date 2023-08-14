@@ -1,8 +1,10 @@
 package com.example.mssaem_backend.domain.chatroom;
 
+import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomErrorCode.EMPTY_CHATROOM;
 import static com.example.mssaem_backend.global.config.exception.errorCode.WorryBoardErrorCode.EMPTY_WORRY_BOARD;
 
 import com.example.mssaem_backend.domain.chatmessage.ChatMessageService;
+import com.example.mssaem_backend.domain.chatparticipate.ChatParticipateRepository;
 import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatInfo;
 import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomResponseDto.ChatRoomRes;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
@@ -21,6 +23,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageService chatMessageService;
     private final WorryBoardRepository worryBoardRepository;
+    private final ChatParticipateRepository chatParticipateRepository;
 
     public ChatRoomRes createRoom(Long worryBoardId) {
         ChatRoom chatRoom = chatRoomCustomRepository.createChatRoom(worryBoardId);
@@ -54,6 +57,11 @@ public class ChatRoomService {
     public Boolean selectChatRoomStateByWorryBoard(Long worryBoardId) {
         WorryBoard worryBoard = worryBoardRepository.findById(worryBoardId)
             .orElseThrow(() -> new BaseException(EMPTY_WORRY_BOARD));
-        return chatRoomRepository.existsByWorryBoardId(worryBoardId);
+        ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(worryBoardId)
+            .orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
+
+        Integer count = chatParticipateRepository.countByChatRoomId(chatRoom.getId());
+        if(count == 1) return true;
+        else return false;
     }
 }
