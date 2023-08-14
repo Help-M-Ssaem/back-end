@@ -108,6 +108,7 @@ public class NotificationService {
             notificationInfos.add(
                 new NotificationInfo(
                     notification.getId(),
+                    notification.getResourceId(),
                     notification.getContent().length() > lengthLimit ?
                         notification.getContent().substring(0, lengthLimit) + "\""
                         : notification.getContent() + "\"",

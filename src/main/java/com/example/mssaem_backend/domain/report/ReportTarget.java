@@ -2,7 +2,7 @@ package com.example.mssaem_backend.domain.report;
 
 import lombok.Getter;
 
-public enum ReportType {
+public enum ReportTarget {
     BOARD("게시물"),
     DISCUSSION("토론글"),
     WORRY("고민글"),
@@ -13,7 +13,7 @@ public enum ReportType {
     @Getter
     private final String name;
 
-    ReportType(String name) {
+    ReportTarget(String name) {
         this.name = name;
     }
 }

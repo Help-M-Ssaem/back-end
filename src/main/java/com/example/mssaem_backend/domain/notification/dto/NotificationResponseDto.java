@@ -12,6 +12,7 @@ public class NotificationResponseDto {
     @AllArgsConstructor
     public static class NotificationInfo {
 
+        private Long id; // 알림 id
         private Long resourceId; // 알림 대상 id
         private String content; // 알림 내용
         private String createdAt; // 오늘 알림 : 오전/오후 시간, 오늘 이전 알림 : 0월 0일
