@@ -6,7 +6,6 @@ import com.example.mssaem_backend.domain.chatmessage.dto.ChatMessageResourceDto.
 import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.chatroom.ChatRoomRepository;
 import com.example.mssaem_backend.domain.member.Member;
-import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
-    private final MemberRepository memberRepository;
 
     public void insertChatMessage(ChatMessage chatMessage) {
         chatMessageRepository.save(chatMessage);
