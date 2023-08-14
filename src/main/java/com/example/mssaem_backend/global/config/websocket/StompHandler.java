@@ -1,6 +1,6 @@
 package com.example.mssaem_backend.global.config.websocket;
 
-import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomParticipateErrorCode.FULL_CHATROOM;
+import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomParticipateErrorCode.FULL_PARTICIPATE;
 
 import com.example.mssaem_backend.domain.chat.ChatService;
 import com.example.mssaem_backend.domain.chatmessage.ChatMessage;
@@ -29,76 +29,83 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
 
-  private final JwtTokenProvider jwtTokenProvider;
-  private final ChatService chatService;
-  private final ChatRoomRepository chatRoomRepository;
-  private final ChatRoomCustomRepository chatRoomCustomRepository;
-  private final MemberRepository memberRepository;
-  private final ChatParticipateService chatParticipateService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final ChatService chatService;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomCustomRepository chatRoomCustomRepository;
+    private final MemberRepository memberRepository;
+    private final ChatParticipateService chatParticipateService;
 
-  // websocket을 통해 들어온 요청이 처리 되기전 실행된다.
-  @Override
-  public Message<?> preSend(Message<?> message, MessageChannel channel) {
-    StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-    // websocket 연결시 헤더의 jwt token 검증
-    if (StompCommand.CONNECT == accessor.getCommand()) {
-      String sessionId = (String) message.getHeaders().get("simpSessionId");
-      // 멤버 검사
-      String token = accessor.getFirstNativeHeader("token");
-      String memberIdByToken = jwtTokenProvider.getMemberIdByToken(token);
-      Member member = memberRepository.findById(Long.valueOf(memberIdByToken)).orElseThrow();
+    // websocket을 통해 들어온 요청이 처리 되기전 실행된다.
+    @Override
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        // websocket 연결시 헤더의 jwt token 검증
+        if (StompCommand.CONNECT == accessor.getCommand()) {
+            String sessionId = (String) message.getHeaders().get("simpSessionId");
+            // 멤버 검사
+            String token = accessor.getFirstNativeHeader("token");
+            String memberIdByToken = jwtTokenProvider.getMemberIdByToken(token);
+            Member member = memberRepository.findById(Long.valueOf(memberIdByToken)).orElseThrow();
 
-      // 멤버 저장 (Redis)
-      ChatInfo chatInfo = new ChatInfo();
-      chatInfo.setSender(member.getNickName());
+            // 멤버 저장 (Redis)
+            ChatInfo chatInfo = new ChatInfo();
+            chatInfo.setSender(member.getNickName());
 
-      chatRoomCustomRepository.setUserEnterInfo(sessionId, chatInfo);
+            if (chatRoomCustomRepository.getUserEnterRoomId(sessionId) != null) {
+                throw new BaseException(FULL_PARTICIPATE);
+            }
 
-      jwtTokenProvider.validateToken(token);
-      log.info("CONNECT {}", token);
-    } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
-      String sessionId = (String) message.getHeaders().get("simpSessionId");
+            chatRoomCustomRepository.setUserEnterInfo(sessionId, chatInfo);
+            jwtTokenProvider.validateToken(token);
+            log.info("CONNECT {}", token);
+        } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
+            String sessionId = (String) message.getHeaders().get("simpSessionId");
 
-      //roomId 뽑아오기
-      String roomId = chatService.getRoomId(
-          Optional.ofNullable((String) message.getHeaders().get("simpDestination"))
-              .orElse("InvalidRoom"));
+            //roomId 뽑아오기
+            String roomId = chatService.getRoomId(
+                Optional.ofNullable((String) message.getHeaders().get("simpDestination"))
+                    .orElse("InvalidRoom"));
 
-      if(chatParticipateService.countChatParticipate(Long.valueOf(roomId)) >= 2){
-        throw new BaseException(FULL_CHATROOM);
-      }
-      //roomId 다시 저장 (Redis)
-      chatRoomCustomRepository.setRoomEnterInfo(sessionId, Long.valueOf(roomId));
+            if (chatParticipateService.countChatParticipate(Long.valueOf(roomId)) >= 2) {
+                throw new BaseException(FULL_PARTICIPATE);
+            }
+            //roomId 다시 저장 (Redis)
+            chatRoomCustomRepository.setRoomEnterInfo(sessionId, Long.valueOf(roomId));
 
-      ChatInfo chatInfo = chatRoomCustomRepository.getUserEnterRoomId(sessionId);
+            ChatInfo chatInfo = chatRoomCustomRepository.getUserEnterRoomId(sessionId);
 
-      ChatRoom chatRoom = chatRoomRepository.findById(Long.valueOf(roomId)).orElseThrow();
-      ChatMessage chatMessage = new ChatMessage(MessageType.ENTER, chatInfo.getSender(), chatRoom);
+            ChatRoom chatRoom = chatRoomRepository.findById(Long.valueOf(roomId)).orElseThrow();
+            ChatMessage chatMessage = new ChatMessage(MessageType.ENTER, chatInfo.getSender(),
+                chatRoom);
+            chatParticipateService.insertChatParticipate(sessionId, chatRoom, chatInfo.getSender());
 
-      chatParticipateService.insertChatParticipate(sessionId, chatRoom, chatInfo.getSender());
+            chatService.sendChatMessage(chatMessage);
+            log.info("SUBSCRIBED {}, {}", sessionId, roomId);
+        } else if (StompCommand.DISCONNECT == accessor.getCommand()) {
+            String sessionId = (String) message.getHeaders().get("simpSessionId");
 
-      chatService.sendChatMessage(chatMessage);
-      log.info("SUBSCRIBED {}, {}", sessionId, roomId);
-    } else if (StompCommand.DISCONNECT == accessor.getCommand()) {
-      String sessionId = (String) message.getHeaders().get("simpSessionId");
+            ChatInfo chatInfo = chatRoomCustomRepository.getUserEnterRoomId(sessionId);
 
-      ChatInfo chatInfo = chatRoomCustomRepository.getUserEnterRoomId(sessionId);
+            if (chatInfo == null) {
+                return message;
+            }
 
-      if (chatInfo.getChatRoomId() == null) {
+            if (chatInfo.getChatRoomId() == null) {
+                return message;
+            }
+
+            ChatRoom chatRoom = chatRoomRepository.findById(chatInfo.getChatRoomId()).orElseThrow();
+
+            ChatMessage chatMessage = new ChatMessage(MessageType.QUIT, chatInfo.getSender(),
+                chatRoom);
+            chatService.sendChatMessage(chatMessage);
+
+            // 채팅 참여 기록 삭제
+            chatRoomCustomRepository.removeUserEnterInfo(sessionId);
+            chatParticipateService.deleteChatParticipate(sessionId);
+            log.info("DISCONNECTED {}, {}", sessionId, chatInfo.getChatRoomId());
+        }
         return message;
-      }
-
-      ChatRoom chatRoom = chatRoomRepository.findById(chatInfo.getChatRoomId()).orElseThrow();
-
-      ChatMessage chatMessage = new ChatMessage(MessageType.QUIT, chatInfo.getSender(), chatRoom);
-      chatService.sendChatMessage(chatMessage);
-
-      // 채팅 참여 기록 삭제
-
-      chatRoomCustomRepository.removeUserEnterInfo(sessionId);
-      chatParticipateService.deleteChatParticipate(sessionId);
-      log.info("DISCONNECTED {}, {}", sessionId, chatInfo.getChatRoomId());
     }
-    return message;
-  }
 }
