@@ -154,7 +154,7 @@ public class ReportService {
         mail.setText(createReportEmailContent(reportReq.getReportTarget(), count), "utf-8", "html");
 
         // 파라미터로 받은 email을 전송할 email 주소로 설정
-        mail.addRecipient(Message.RecipientType.TO, new InternetAddress("dbfl0461@gmail.com"));
+        mail.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
         // 이메일 전송
         javaMailSender.send(mail);
     }
