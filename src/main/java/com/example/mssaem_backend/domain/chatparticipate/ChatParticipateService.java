@@ -79,19 +79,16 @@ public class ChatParticipateService {
             participateChatRoomIds);
 
         List<ChatParticipateRes> result = new ArrayList<>();
-        int chatMessagesIdx = 0;
+
         for (int i = 0; i < allParticipateRoom.size(); ++i) {
             ChatParticipate nowChatParticipate = allParticipateRoom.get(i);
             ChatMessage nowChatMessage = null;
             WorryBoard nowWorryBoard = worryBoardAllByChatRoom.get(i);
 
-            if (chatMessagesIdx < chatMessages.size()) {
-                nowChatMessage = chatMessages.get(chatMessagesIdx);
-                if (nowChatMessage.getChatRoom().getId() != nowChatParticipate.getChatRoom()
-                    .getId()) {
-                    nowChatMessage = null;
-                } else {
-                    chatMessagesIdx++;
+            for(ChatMessage chm : chatMessages){
+                if(chm.getChatRoom().getId() == nowChatParticipate.getChatRoom().getId()) {
+                    nowChatMessage = chm;
+                    break;
                 }
             }
 
