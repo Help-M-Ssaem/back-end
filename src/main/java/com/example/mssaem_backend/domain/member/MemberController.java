@@ -52,11 +52,6 @@ public class MemberController {
                 memberService.socialLogin(socialLoginType, socialLoginToken), HttpStatus.OK);
     }
 
-    @PostMapping("/test")
-    public ResponseEntity<String> test(@RequestBody SocialLoginToken socialLoginToken) {
-        return ResponseEntity.ok(java.net.URLDecoder.decode(socialLoginToken.getIdToken(), StandardCharsets.UTF_8));
-    }
-
     /**
      * [POST] 닉네임 중복 확인
      */
