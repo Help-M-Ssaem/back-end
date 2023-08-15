@@ -5,7 +5,12 @@ import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
 import com.example.mssaem_backend.global.common.Comment;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -42,6 +47,7 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
 
     private boolean state = true; //true : 존재, false : 삭제
 
+    private Boolean best; //베스트 댓글 : True , 일반 댓글 : False
     @ManyToOne(fetch = FetchType.LAZY)
     private Discussion discussion;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -84,5 +90,13 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
 
     public void setParentComment(Long id) {
         this.parentId = id;
+    }
+
+    public void updateBestStateTrue() {
+        this.best = true;
+    }
+
+    public void updateBestStateFalse() {
+        this.best = false;
     }
 }

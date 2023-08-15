@@ -44,6 +44,7 @@ public class BoardComment extends BaseTimeEntity implements Comment {
 
     private boolean state = true; //true : 존재, false : 삭제
 
+    private Boolean best; //베스트 댓글 : True , 일반 댓글 : False
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -87,4 +88,13 @@ public class BoardComment extends BaseTimeEntity implements Comment {
     public void setParentComment(Long id) {
         this.parentId = id;
     }
+
+    public void updateBestStateTrue() {
+        this.best = true;
+    }
+
+    public void updateBestStateFalse() {
+        this.best = false;
+    }
+
 }

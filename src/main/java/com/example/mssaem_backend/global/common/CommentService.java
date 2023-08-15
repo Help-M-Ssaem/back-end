@@ -25,10 +25,12 @@ import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.DiscussionErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -105,17 +107,45 @@ public class CommentService {
     }
 
     //댓글 목록 조회
+    @Transactional
     public PageResponseDto<List<GetCommentsRes>> findCommentsByPostId(Member viewer, Long postId,
         int page, int size, CommentTypeEnum commentType) {
         Pageable pageable = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(0, 3);
 
         Page<? extends Comment> comments = switch (commentType) {
             case BOARD -> boardCommentRepository.findAllByBoardId(postId, pageable);
             case DISCUSSION -> discussionCommentRepository.findAllByDiscussionId(postId, pageable);
         };
 
+        Page<? extends Comment> bestCommets = switch (commentType) {
+            case BOARD ->
+                boardCommentLikeRepository.findBoardCommentsByBoardIdWithMoreThanTenBoardCommentLikeAndStateTrue(
+                    pageRequest, postId);
+            case DISCUSSION ->
+                discussionCommentLikeRepository.findDiscussionCommentsByDiscussionIdWithMoreThanTenDiscussionCommentLikeAndStateTrue(
+                    pageRequest, postId);
+        };
+
+        //베스트 댓글 리스트와 전체 댓글 리스트 합친 List 생성
+        List<Comment> combinedList = new ArrayList<>();
+        combinedList.addAll(bestCommets.getContent());
+        combinedList.addAll(comments.getContent());
+
+        //모든 댓글 Best 값 False로 변경 - LikeCount 달라질 때 마다 베스트 댓글 변경 위함
+        for (int i = 0; i < combinedList.size(); i++) {
+            combinedList.get(i).updateBestStateFalse();
+        }
+        //베스트 댓글만 Best 값 True로 변경
+        for (int i = 0; i < bestCommets.getSize(); i++) {
+            combinedList.get(i).updateBestStateTrue();
+        }
+
+        long totalElements = bestCommets.getTotalElements() + comments.getTotalElements();
+        Page<Comment> commentList = new PageImpl<>(combinedList, pageable, totalElements);
+
         List<GetCommentsRes> commentResList = setCommentsRes(viewer,
-            comments.stream().collect(Collectors.toList()), commentType);
+            commentList.stream().collect(Collectors.toList()), commentType);
         return new PageResponseDto<>(comments.getNumber(), comments.getTotalPages(),
             commentResList);
     }
@@ -268,7 +298,7 @@ public class CommentService {
             boardCommentRepository.deleteAllByBoardId(postId);
         } else { //discussion 처리
             Discussion discussion = discussionRepository.findByIdAndStateIsTrue(postId)
-                .orElseThrow(()-> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
+                .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
             List<DiscussionComment> discussionComments = discussionCommentRepository.findAllByDiscussion(
                 discussion);
             for (DiscussionComment discussionComment : discussionComments) {
