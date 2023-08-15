@@ -137,8 +137,10 @@ public class CommentService {
             combinedList.get(i).updateBestStateFalse();
         }
         //베스트 댓글만 Best 값 True로 변경
-        for (int i = 0; i < bestCommets.getSize(); i++) {
-            combinedList.get(i).updateBestStateTrue();
+        if(!bestCommets.isEmpty()) {
+            for (int i = 0; i < bestCommets.getNumberOfElements(); i++) {
+                combinedList.get(i).updateBestStateTrue();
+            }
         }
 
         long totalElements = bestCommets.getTotalElements() + comments.getTotalElements();
