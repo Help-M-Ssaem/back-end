@@ -3,8 +3,11 @@ package com.example.mssaem_backend.domain.worryboard;
 import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.CheckWriter.match;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
+import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomErrorCode.EMPTY_CHATROOM;
 
 import com.example.mssaem_backend.domain.badge.BadgeService;
+import com.example.mssaem_backend.domain.chatroom.ChatRoom;
+import com.example.mssaem_backend.domain.chatroom.ChatRoomRepository;
 import com.example.mssaem_backend.domain.evaluation.EvaluationRepository;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
@@ -41,11 +44,12 @@ public class WorryBoardService {
     private final MemberRepository memberRepository;
     private final BadgeService badgeService;
     private final EvaluationRepository evaluationRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     //List<WorryBoard>를 받아서 List<GetWorriesRes> 리스트를 반환하는 함수
     private List<GetWorriesRes> makeGetWorriesResForm(Page<WorryBoard> result) {
         return result.stream().map(worryBoard -> GetWorriesRes.builder().worryBoard(worryBoard)
-            .imgUrl(worryBoardImageService.getImgUrl(worryBoard))
+            .imgUrl(worryBoard.getThumbnail())
             .createdAt(calculateTime(worryBoard.getCreatedAt(), 3))
             .build()).toList();
     }
@@ -73,16 +77,21 @@ public class WorryBoardService {
         Boolean isChatAllowed = (viewer != null && viewer.getMbti()
             .equals(worryBoard.getTargetMbti()));
 
+        //채팅방 Id 조회
+        ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(
+            worryBoard.getId()).orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
+
         return GetWorryRes.builder()
             .worryBoard(worryBoard)
             .imgList(worryBoardImageService.getImgUrls(worryBoard))
             .createdAt(calculateTime(worryBoard.getCreatedAt(), 2))
             .memberSimpleInfo(
                 new MemberSimpleInfo(member.getId(), member.getNickName(), member.getDetailMbti(),
-                    badgeService.findRepresentativeBadgeByMember(member),
+                    member.getBadgeName(),
                     member.getProfileImageUrl()))
             .isEditAllowed(isEditAllowed)
             .isChatAllowed(isChatAllowed)
+            .chatRoomId(chatRoom.getId())
             .build();
     }
 
@@ -139,7 +148,7 @@ public class WorryBoardService {
         return worryBoards.stream()
             .map(worryBoard -> GetWorriesRes.builder()
                 .worryBoard(worryBoard)
-                .imgUrl(worryBoardImageService.getImgUrl(worryBoard))
+                .imgUrl(worryBoard.getThumbnail())
                 .createdAt(calculateTime(worryBoard.getCreatedAt(), 2))
                 .build())
             .toList();
@@ -163,7 +172,7 @@ public class WorryBoardService {
                 new MemberSimpleInfo(
                     solveMember.getId(), solveMember.getNickName(),
                     solveMember.getDetailMbti(),
-                    badgeService.findRepresentativeBadgeByMember(solveMember),
+                    solveMember.getBadgeName(),
                     solveMember.getProfileImageUrl())
             )
             .worryBoardId(id).build();
