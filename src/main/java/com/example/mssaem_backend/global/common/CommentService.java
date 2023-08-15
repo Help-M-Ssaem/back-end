@@ -150,23 +150,6 @@ public class CommentService {
             commentResList);
     }
 
-    //베스트 댓글 3개 조회
-    public List<GetCommentsRes> findBestCommentsByPostId(Member viewer, Long postId,
-        CommentTypeEnum commentType) {
-        PageRequest pageRequest = PageRequest.of(0, 3);
-
-        Page<? extends Comment> comments = switch (commentType) {
-            case BOARD ->
-                boardCommentLikeRepository.findBoardCommentsByBoardIdWithMoreThanTenBoardCommentLikeAndStateTrue(
-                    pageRequest, postId);
-            case DISCUSSION ->
-                discussionCommentLikeRepository.findDiscussionCommentsByDiscussionIdWithMoreThanTenDiscussionCommentLikeAndStateTrue(
-                    pageRequest, postId);
-        };
-
-        return setCommentsRes(viewer, comments.stream().collect(Collectors.toList()), commentType);
-    }
-
     //멤버별 댓글 조회
     public PageResponseDto<List<GetCommentsByMemberRes>> findCommentsByMember(Long memberId,
         int page, int size, Member viewer, CommentTypeEnum commentType) {

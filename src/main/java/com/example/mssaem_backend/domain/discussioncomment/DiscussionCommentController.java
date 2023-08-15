@@ -35,14 +35,6 @@ public class DiscussionCommentController {
                 CommentTypeEnum.DISCUSSION));
     }
 
-    //토론글 상세 조회시 베스트 댓글 3개 조회
-    @GetMapping("/discussions/{discussionId}/comments/best")
-    public ResponseEntity<List<GetCommentsRes>> findDiscussionCommentBestListByDiscussionId(
-        @CurrentMember Member member, @PathVariable(value = "discussionId") Long discussionId) {
-        return ResponseEntity.ok(commentService.findBestCommentsByPostId(member, discussionId,
-            CommentTypeEnum.DISCUSSION));
-    }
-
     //댓글 작성, 댓글 작성 시 @RequestParam 으로 commentId 값 받으면 대댓글 작성
     @PostMapping("/member/discussions/{discussionId}/comments")
     public ResponseEntity<String> createDiscussionComment(@CurrentMember Member member,
