@@ -30,7 +30,7 @@ public class ChatParticipateResponseDto {
       this.state = chatParticipate.getChatRoom().isState();
       this.lastMessage = message == null ? "" : message.getMessage();
       this.lastSendAt = message == null ? "" : Time.calculateTime(message.getCreatedAt(), 3);
-      this.chatRoomTitle = chatParticipate.getChatRoom().getTitle();
+      this.chatRoomTitle = worryBoard.getTitle();
       this.memberMbti = chatParticipate.getMember().getDetailMbti();
       this.targetMbti = worryBoard.getTargetMbti().toString();
       this.memberSimpleInfo = memberSimpleInfo;
