@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.HttpHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
@@ -50,13 +52,34 @@ public class SocialLoginService {
     public String getGoogleAccessToken(String idToken) throws IOException {
         String reqUrl = "https://oauth2.googleapis.com/token";
         String parameter = "grant_type=" + grantType +
-                "&client_id=" + googleClientId + // REST_API_KEY
-                "&client_secret=" + googleClientSecret +
-                "&redirect_uri=" + googleRedirectUrl + // REDIRECT_URI
-                "&code=" + idToken;
+                "&client_id=" + googleClientId +            // REST_API_KEY
+                "&client_secret=" + googleClientSecret +    // SECRET_KEY
+                "&redirect_uri=" + googleRedirectUrl +      // REDIRECT_URI
+                "&code=" + java.net.URLDecoder.decode(idToken, StandardCharsets.UTF_8);
         return getAccessToken(idToken, reqUrl, parameter);
     }
 
+    public String TestGetGoogleAccessToken(String idToken) throws IOException {
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://oauth2.googleapis.com/token")
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .build();
+
+        JSONObject response = webClient.post()
+                //.uri("token")
+                .body(BodyInserters
+                        .fromFormData("client_id", googleClientId)
+                                .with("client_secret", googleClientSecret)
+                                .with("grant_type", grantType)
+                                .with("redirect_uri", googleRedirectUrl)
+                                .with("code", java.net.URLDecoder.decode(idToken, StandardCharsets.UTF_8)))
+                .retrieve()
+                .bodyToFlux(JSONObject.class)
+                //.onErrorMap(e -> new BaseException(AuthErrorCode.INVALID_ID_TOKEN))
+                .blockLast();
+
+        return (String) response.get("access_token");
+    }
     public String getKaKaoAccessToken(String idToken) throws IOException {
         String reqUrl = "https://kauth.kakao.com/oauth/token";
         String parameter = "grant_type=" + grantType +
@@ -156,7 +179,9 @@ public class SocialLoginService {
     }
 
     public String getGoogleEmail(String accessToken) throws IOException {
-        String requestUrl = "https://oauth2.googleapis.com/token";
+        // String requestUrl = "https://oauth2.googleapis.com/token";
+
+        String requestUrl = "https://www.googleapis.com/oauth2/v2/userinfo";
         StringBuilder result = getEmail(accessToken, requestUrl);
         return new JsonParser().parse(result.toString()).getAsJsonObject().get("email").getAsString();
     }

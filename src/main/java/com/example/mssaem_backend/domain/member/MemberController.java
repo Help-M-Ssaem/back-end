@@ -14,6 +14,7 @@ import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -49,6 +50,11 @@ public class MemberController {
             @Valid @RequestBody SocialLoginToken socialLoginToken) throws IOException {
         return new ResponseEntity<>(
                 memberService.socialLogin(socialLoginType, socialLoginToken), HttpStatus.OK);
+    }
+
+    @PostMapping("/test")
+    public ResponseEntity<String> test(@RequestBody SocialLoginToken socialLoginToken) {
+        return ResponseEntity.ok(java.net.URLDecoder.decode(socialLoginToken.getIdToken(), StandardCharsets.UTF_8));
     }
 
     /**
