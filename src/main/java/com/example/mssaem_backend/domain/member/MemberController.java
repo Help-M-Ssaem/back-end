@@ -74,9 +74,8 @@ public class MemberController {
      */
     @PatchMapping("/member/profile")
     public ResponseEntity<String> modifyProfile(
-            @CurrentMember Member member, @RequestPart(value = "modifyProfile") ModifyProfile modifyProfile,
-            @RequestPart(value = "image", required = false) MultipartFile multipartFile) {
-        return new ResponseEntity<>(memberService.modifyProfile(member, modifyProfile, multipartFile), HttpStatus.OK);
+            @CurrentMember Member member, @RequestBody ModifyProfile modifyProfile) {
+        return new ResponseEntity<>(memberService.modifyProfile(member, modifyProfile), HttpStatus.OK);
     }
 
     /**
@@ -102,6 +101,15 @@ public class MemberController {
     @GetMapping("/member/info")
     public ResponseEntity<MemberSimpleInfo> getCurrentMemberInfo(@CurrentMember Member member) {
         return new ResponseEntity<>(memberService.getMemberInfo(member), HttpStatus.OK);
+    }
+
+    /**
+     * [POST] 프로필 이미지 등록
+     */
+    @PostMapping("/member/profile/file")
+    public ResponseEntity<String> uploadFiles(@CurrentMember Member member,
+            @RequestPart(value = "image", required = false) MultipartFile multipartFile) {
+        return new ResponseEntity<>(memberService.uploadFile(member, multipartFile), HttpStatus.OK);
     }
 
     /**

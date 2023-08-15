@@ -91,8 +91,8 @@ public class Board extends BaseTimeEntity {
         this.likeCount--;
     }
 
-    public Integer increaseReport() {
-        return this.report++;
+    public void increaseReport() {
+        this.report++;
     }
 
     public void updateState() {

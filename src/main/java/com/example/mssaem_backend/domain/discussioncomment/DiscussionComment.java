@@ -54,8 +54,8 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
         this.discussion.increaseCommentCount();
     }
 
-    public Integer increaseReport() {
-        return this.report++;
+    public void increaseReport() {
+        this.report++;
     }
 
     public void updateState() {

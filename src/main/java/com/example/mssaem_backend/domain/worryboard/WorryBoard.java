@@ -88,8 +88,8 @@ public class WorryBoard extends BaseTimeEntity {
         this.state = false;
     }
 
-    public Integer increaseReport() {
-        return this.report++;
+    public void increaseReport() {
+        this.report++;
     }
 
     public void updateState() {
