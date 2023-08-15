@@ -26,11 +26,12 @@ public class WorryBoardResponseDto {
         private List<String> imgList;
         private Boolean isEditAllowed;
         private Boolean isChatAllowed;
+        public Long chatRoomId;
 
         @Builder
         public GetWorryRes(WorryBoard worryBoard, List<String> imgList,
             MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed,
-            Boolean isChatAllowed) {
+            Boolean isChatAllowed, Long chatRoomId) {
             this.worryBoardId = worryBoard.getId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.targetMbti = worryBoard.getTargetMbti();
@@ -40,6 +41,7 @@ public class WorryBoardResponseDto {
             this.imgList = imgList;
             this.isEditAllowed = isEditAllowed;
             this.isChatAllowed = isChatAllowed;
+            this.chatRoomId = chatRoomId;
         }
     }
 
