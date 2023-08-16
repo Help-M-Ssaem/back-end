@@ -20,8 +20,7 @@ import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.notification.NotificationService;
-import com.example.mssaem_backend.domain.notification.TypeEnum;
-import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
+import com.example.mssaem_backend.domain.notification.NotificationType;
 import com.example.mssaem_backend.global.common.CommentService;
 import com.example.mssaem_backend.global.common.CommentTypeEnum;
 import com.example.mssaem_backend.global.common.Time;
@@ -196,10 +195,10 @@ public class DiscussionService {
     }
 
     public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussionListByKeyword(Member member,
-        SearchReq searchReq, int page, int size) {
+        int searchType, String keyword, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Discussion> discussions = discussionRepository.searchByType(searchReq.getType(),
-            searchReq.getKeyword(), pageRequest);
+        Page<Discussion> discussions = discussionRepository.searchByType(searchType,
+            keyword, pageRequest);
 
         return new PageResponseDto<>(
             discussions.getNumber(),
@@ -313,7 +312,7 @@ public class DiscussionService {
                 notificationService.createNotification(
                     discussionId,
                     discussion.getTitle(),
-                    TypeEnum.HOT_DISCUSSION,
+                    NotificationType.HOT_DISCUSSION,
                     discussion.getMember()
                 );
             }

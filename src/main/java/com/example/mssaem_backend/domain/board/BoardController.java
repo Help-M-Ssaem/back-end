@@ -8,7 +8,6 @@ import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.GetBoardRes;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.ThreeHotInfo;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
-import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -131,12 +129,13 @@ public class BoardController {
      */
     @GetMapping("/boards/search")
     public ResponseEntity<PageResponseDto<List<BoardSimpleInfo>>> findBoardListByKeywordAndMbti(
-        @RequestBody SearchReq searchReq,
+        @RequestParam int searchType,
+        @RequestParam String keyword,
         @RequestParam String strMbti,
         @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            boardService.findBoardListByKeywordAndMbti(searchReq, strMbti, page, size));
+            boardService.findBoardListByKeywordAndMbti(searchType, keyword, strMbti, page, size));
     }
 
     //게시판 별 게시글 개수 조회
