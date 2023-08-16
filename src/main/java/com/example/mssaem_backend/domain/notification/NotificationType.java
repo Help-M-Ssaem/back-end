@@ -12,7 +12,7 @@ public enum NotificationType {
     DISCUSSION_REPLY_OF_COMMENT("내 댓글에 대댓글이 달렸어요."),
     HOT_TEACHER("내가 인기 M쌤이 되었어요."),
     CHAT("새로운 채팅이 시작됐어요."),
-    NEW_BADGE("새로운 칭호를 획득했어요");
+    BADGE("새로운 칭호를 획득했어요");
 
     @Getter
     private final String name;
