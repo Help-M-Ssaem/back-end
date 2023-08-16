@@ -106,4 +106,8 @@ public class Board extends BaseTimeEntity {
     public void decreaseCommentCount() {
         this.commentCount--;
     }
+
+    public void increaseHits() {
+        this.hits++;
+    }
 }

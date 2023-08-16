@@ -63,6 +63,7 @@ public class WorryBoardService {
     }
 
     //고민 게시판 - 고민글 상세 조회
+    @Transactional
     public GetWorryRes findWorryById(Member viewer, Long id) {
         WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
@@ -78,6 +79,9 @@ public class WorryBoardService {
         //채팅방 Id 조회
         ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(
             worryBoard.getId()).orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
+
+        //고민글 상세 조회 시 조회수 상승
+        worryBoard.increaseHits();
 
         return GetWorryRes.builder()
             .worryBoard(worryBoard)
