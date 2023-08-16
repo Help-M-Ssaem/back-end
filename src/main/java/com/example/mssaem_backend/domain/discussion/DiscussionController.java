@@ -5,7 +5,6 @@ import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.Di
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionSimpleInfo;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionResponseDto.DiscussionOptionLoginInfo;
 import com.example.mssaem_backend.domain.member.Member;
-import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,10 +48,10 @@ public class DiscussionController {
      */
     @GetMapping("/discussions/search")
     public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findDiscussionListByKeyword(
-        @CurrentMember Member member, @RequestBody SearchReq searchReq, @RequestParam int page,
+        @CurrentMember Member member, @RequestParam int searchType, @RequestParam String keyword, @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            discussionService.findDiscussionListByKeyword(member, searchReq, page, size));
+            discussionService.findDiscussionListByKeyword(member, searchType, keyword, page, size));
     }
 
     /**

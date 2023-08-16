@@ -20,7 +20,6 @@ import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
-import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.common.CommentService;
@@ -268,13 +267,13 @@ public class BoardService {
 
     // Mbti 카테고리 별 검색하기
     public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeywordAndMbti(
-        SearchReq searchReq, String strMbti, int page, int size) {
+        int searchType, String keyword, String strMbti, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
         MbtiEnum mbti = strMbti.equals("ALL") ? null : MbtiEnum.valueOf(strMbti);
 
-        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchReq.getType(),
-            searchReq.getKeyword(), mbti, pageRequest);
+        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchType,
+            keyword, mbti, pageRequest);
 
         return new PageResponseDto<>(
             boards.getNumber(),
