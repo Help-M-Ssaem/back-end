@@ -149,7 +149,6 @@ public class MemberService {
         // 수정
         member.modifyMember(modifyProfile.getNickName(), modifyProfile.getIntroduction(),
                 modifyProfile.getMbti(), modifyProfile.getCaseSensitivity(), badgeName);
-
         save(member);
         return "수정 성공";
     }
