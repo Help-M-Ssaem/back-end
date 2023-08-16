@@ -210,6 +210,7 @@ public class WorryBoardService {
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
         match(currentMember, worryBoard.getMember());
 
+
         if (!patchWorryReq.getTitle().equals(worryBoard.getTitle())) {
             ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(
                 worryBoard.getId()).orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
