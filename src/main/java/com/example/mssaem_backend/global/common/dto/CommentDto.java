@@ -13,6 +13,7 @@ public class CommentDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PostCommentReq {
+
         private String content;
     }
 
@@ -24,19 +25,19 @@ public class CommentDto {
         private Long commentId;
         private String content;
         private Long likeCount;
-        private Integer parentId;
+        private Long parentId;
         private String createdAt;
         private Boolean isLiked; // 댓글 좋아요 눌렀는지 확인
         private Boolean isEditAllowed; //댓글 또는 신고를 위한 내 댓글인지 확인
         private MemberSimpleInfo memberSimpleInfo;
 
         @Builder
-        public GetCommentsRes(Comment comment, MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed,
-            Boolean isLiked) {
+        public GetCommentsRes(Comment comment, MemberSimpleInfo memberSimpleInfo, String createdAt,
+            Boolean isEditAllowed, Boolean isLiked) {
             this.commentId = comment.getId();
             this.content = comment.getContent();
             this.likeCount = comment.getLikeCount();
-            this.parentId = getParentId();
+            this.parentId = comment.getParentId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.createdAt = createdAt;
             this.isEditAllowed = isEditAllowed;
@@ -53,20 +54,21 @@ public class CommentDto {
         private Long commentId;
         private String content;
         private Long likeCount;
-        private Integer parentId;
+        private Long parentId;
         private String createdAt;
         private Boolean isLiked; // 댓글 좋아요 눌렀는지 확인
         private Boolean isEditAllowed; //삭제 또는 신고를 위한 내 댓글인지 확인
         private MemberSimpleInfo memberSimpleInfo;
 
         @Builder
-        public GetCommentsByMemberRes(Long postId, Comment comment, MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed,
+        public GetCommentsByMemberRes(Long postId, Comment comment,
+            MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed,
             Boolean isLiked) {
             this.PostId = postId;
             this.commentId = comment.getId();
             this.content = comment.getContent();
             this.likeCount = comment.getLikeCount();
-            this.parentId = getParentId();
+            this.parentId = comment.getParentId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.createdAt = createdAt;
             this.isEditAllowed = isEditAllowed;
