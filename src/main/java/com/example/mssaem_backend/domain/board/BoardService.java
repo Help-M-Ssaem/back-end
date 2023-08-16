@@ -238,6 +238,7 @@ public class BoardService {
     }
 
     //게시글 상세 조회
+    @Transactional
     public GetBoardRes findBoardById(Member viewer, Long id) {
         Board board = boardRepository.findById(id)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
@@ -246,6 +247,8 @@ public class BoardService {
         Boolean isAllowed = (isMatch(viewer, member));
         //게시글 좋아요 눌렀는지 확인
         Boolean isLiked = likeRepository.existsLikeByMemberAndStateIsTrueAndBoard(viewer, board);
+        //게시글 상세 조회 시 조회수 상승
+        board.increaseHits();
 
         return GetBoardRes.builder()
             .memberSimpleInfo(

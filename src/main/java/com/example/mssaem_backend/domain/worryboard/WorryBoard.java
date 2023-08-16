@@ -99,4 +99,8 @@ public class WorryBoard extends BaseTimeEntity {
     public void changeThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
     }
+
+    public void increaseHits() {
+        this.hits++;
+    }
 }
