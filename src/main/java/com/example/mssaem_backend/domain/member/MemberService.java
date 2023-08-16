@@ -1,9 +1,7 @@
 package com.example.mssaem_backend.domain.member;
 
-import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.badge.BadgeService;
-import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.board.BoardService;
 import com.example.mssaem_backend.domain.discussion.DiscussionService;
 import com.example.mssaem_backend.domain.evaluation.EvaluationService;
@@ -19,27 +17,21 @@ import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardService;
 import com.example.mssaem_backend.global.config.exception.BaseException;
-import com.example.mssaem_backend.global.config.exception.errorCode.BadgeErrorCode;
 import com.example.mssaem_backend.global.config.exception.errorCode.MemberErrorCode;
 import com.example.mssaem_backend.global.config.security.jwt.JwtTokenProvider;
-import com.example.mssaem_backend.global.config.security.oauth.SocialLoginService;
-import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
+import com.example.mssaem_backend.global.config.security.oauth.*;
 import com.example.mssaem_backend.global.s3.S3Service;
-import com.example.mssaem_backend.global.s3.dto.S3Result;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 
 @RequiredArgsConstructor
 @Service
@@ -57,6 +49,9 @@ public class MemberService {
     private final BoardService boardService;
     private final DiscussionService discussionService;
     private final WorryBoardService worryBoardService;
+    private final KaKaoSocialLoginService kaKaoSocialLoginService;
+    private final GoogleSocialLoginService googleSocialLoginService;
+    private final NaverSocialLoginService naverSocialLoginService;
 
     public void save(Member member) {
         memberRepository.save(member);
@@ -69,7 +64,6 @@ public class MemberService {
                 registerMember.getMbti(),
                 registerMember.getCaseSensitivity());
         save(member);
-        System.out.println("프로필 이미지는 " + member.getProfileImageUrl() + " 이고 디폴트 값은 " + member.isDefaultProfile());
         return member;
     }
 
@@ -86,9 +80,9 @@ public class MemberService {
         String idToken = socialLoginToken.getIdToken();
         String email = "";
         switch (socialLoginType) {
-            case KAKAO -> email = socialLoginService.getKaKaoEmail(socialLoginService.getKaKaoAccessToken(idToken));
-            case GOOGLE -> email = socialLoginService.getGoogleEmail(socialLoginService.getGoogleAccessToken(idToken));
-            case NAVER -> email = socialLoginService.getNaverEmail(socialLoginService.getNaverAccessToken(idToken));
+            case KAKAO -> email = kaKaoSocialLoginService.kakaoSocialLogin(idToken);
+            case GOOGLE -> email = googleSocialLoginService.googleSocialLogin(idToken);
+            case NAVER -> email = naverSocialLoginService.naverSocialLogin(idToken);
         }
 
         Member member = memberRepository.findByEmail(email).orElse(null);
