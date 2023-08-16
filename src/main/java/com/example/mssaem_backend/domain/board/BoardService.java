@@ -4,7 +4,6 @@ import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.CheckWriter.match;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 
-import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PatchBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardRequestDto.PostBoardReq;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardHistory;
@@ -46,7 +45,6 @@ public class BoardService {
     private final BoardImageService boardImageService;
     private final LikeRepository likeRepository;
     private final BoardCommentRepository boardCommentRepository;
-    private final BadgeRepository badgeRepository;
     private final WorryBoardRepository worryBoardRepository;
     private final CommentService commentService;
     private final DiscussionService discussionService;
@@ -255,7 +253,7 @@ public class BoardService {
                     board.getMember().getId(),
                     board.getMember().getNickName(),
                     board.getMember().getDetailMbti(),
-                    badgeRepository.findNameMemberAndStateTrue(board.getMember()).orElse(null),
+                    board.getMember().getBadgeName(),
                     board.getMember().getProfileImageUrl()
                 )
             )
