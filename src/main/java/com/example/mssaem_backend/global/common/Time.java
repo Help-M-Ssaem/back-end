@@ -16,7 +16,9 @@ public class Time {
         } else if (displayTimeWay == 2) { //날짜와 시간 표시 (게시판 상세 조회, 고민글 상세 조회)
             return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         } else if (displayTimeWay == 3) { //실시간 반영 시간 표시 (게시판 전체 조회, 고민 전체 조회, 댓글 전체 조회)
-            if (minutes < 60) {
+            if (minutes == 0) {
+                return "방금";
+            } else if (minutes < 60) {
                 return minutes + "분 전";
             } else if (hours < 24) {
                 return hours + "시간 전";
