@@ -42,7 +42,8 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
     @Query(value = "SELECT SUM(d.participantCount) FROM Discussion d WHERE d.member = :member AND d.state = true")
     Long sumParticipantCountByMember(@Param("member") Member member);
 
-    Page<Discussion> findByStateTrueOrderByCreatedAtDesc(PageRequest pageRequest);
+    @Query("SELECT d FROM Discussion d WHERE d.state = true AND (:discussionId IS NULL OR d.id <> :discussionId) order by d.createdAt desc ")
+    Page<Discussion> findByStateTrueOrderByCreatedAtDesc(@Param("discussionId") Long discussionId,  PageRequest pageRequest);
 
     Page<Discussion> findAllByMemberAndStateIsTrueOrderByCreatedAtDesc(Member member,
         Pageable pageable);
