@@ -5,7 +5,12 @@ import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
 import com.example.mssaem_backend.global.common.Comment;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -36,9 +41,6 @@ public class DiscussionComment extends BaseTimeEntity implements Comment {
 
     @ColumnDefault("0")
     private Long parentId; //댓글 : 0, 대 댓글 : 자신의 부모 댓글 id
-
-    @ColumnDefault("0")
-    private Integer orders; //대댓글의 순서
 
     private boolean state = true; //true : 존재, false : 삭제
 

@@ -14,6 +14,7 @@ import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
