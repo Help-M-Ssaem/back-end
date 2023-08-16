@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
-  @Query("select chm from ChatMessage chm where chm.chatRoom.id in (:chatRoomIds) order by chm.createdAt desc limit 1")
+  @Query("select chm from ChatMessage chm where (chm.chatRoom.id, chm.createdAt) in "
+      + "(select chm2.chatRoom.id, MAX(chm2.createdAt) from ChatMessage chm2"
+      + " where chm2.chatRoom.id in :chatRoomIds group by chm2.chatRoom.id)")
   List<ChatMessage> selectByChatRoom(@Param("chatRoomIds") List<Long> chatRoomIds);
 
   @Modifying
