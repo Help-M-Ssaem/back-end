@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ChatParticipateController {
 
-  private final ChatParticipateService chatParticipateService;
+    private final ChatParticipateService chatParticipateService;
 
-  /**
-   * 현재 로그인 한 member의 채팅방 모두 조회
-   */
-  @GetMapping("/member/chatRooms")
-  public ResponseEntity<List<ChatParticipateRes>> selectChatRooms(@CurrentMember Member member) {
-    return ResponseEntity.ok(chatParticipateService.selectChatRooms(member));
-  }
+    /**
+     * 현재 로그인 한 member의 채팅방 모두 조회
+     */
+    @GetMapping("/member/chatRooms")
+    public ResponseEntity<List<ChatParticipateRes>> selectChatRooms(@CurrentMember Member member) {
+        return ResponseEntity.ok(chatParticipateService.selectChatRooms(member));
+    }
 
 }

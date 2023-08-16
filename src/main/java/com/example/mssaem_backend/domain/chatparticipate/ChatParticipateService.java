@@ -85,8 +85,8 @@ public class ChatParticipateService {
             ChatMessage nowChatMessage = null;
             WorryBoard nowWorryBoard = worryBoardAllByChatRoom.get(i);
 
-            for(ChatMessage chm : chatMessages){
-                if(chm.getChatRoom().getId() == nowChatParticipate.getChatRoom().getId()) {
+            for (ChatMessage chm : chatMessages) {
+                if (chm.getChatRoom().getId() == nowChatParticipate.getChatRoom().getId()) {
                     nowChatMessage = chm;
                     break;
                 }

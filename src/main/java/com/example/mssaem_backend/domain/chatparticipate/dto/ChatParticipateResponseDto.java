@@ -11,30 +11,33 @@ import lombok.NoArgsConstructor;
 
 public class ChatParticipateResponseDto {
 
-  @Getter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class ChatParticipateRes {
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChatParticipateRes {
 
-    private Long chatRoomId;
-    private boolean state;
-    private String lastMessage;
-    private String lastSendAt;
-    private String chatRoomTitle;
-    private String memberMbti;
-    private String targetMbti;
-    private MemberSimpleInfo memberSimpleInfo;
+        private Long chatRoomId;
+        private boolean state;
+        private String lastMessage;
+        private String lastSendAt;
+        private String chatRoomTitle;
+        private String memberMbti;
+        private String targetMbti;
+        private MemberSimpleInfo memberSimpleInfo;
+        private Long worryBoardId;
 
-    public ChatParticipateRes(ChatParticipate chatParticipate, MemberSimpleInfo memberSimpleInfo, ChatMessage message, WorryBoard worryBoard) {
-      this.chatRoomId = chatParticipate.getChatRoom().getId();
-      this.state = chatParticipate.getChatRoom().isState();
-      this.lastMessage = message == null ? "" : message.getMessage();
-      this.lastSendAt = message == null ? "" : Time.calculateTime(message.getCreatedAt(), 3);
-      this.chatRoomTitle = worryBoard.getTitle();
-      this.memberMbti = chatParticipate.getMember().getDetailMbti();
-      this.targetMbti = worryBoard.getTargetMbti().toString();
-      this.memberSimpleInfo = memberSimpleInfo;
+        public ChatParticipateRes(ChatParticipate chatParticipate,
+            MemberSimpleInfo memberSimpleInfo, ChatMessage message, WorryBoard worryBoard) {
+            this.chatRoomId = chatParticipate.getChatRoom().getId();
+            this.state = chatParticipate.getChatRoom().isState();
+            this.lastMessage = message == null ? "" : message.getMessage();
+            this.lastSendAt = message == null ? "" : Time.calculateTime(message.getCreatedAt(), 3);
+            this.chatRoomTitle = worryBoard.getTitle();
+            this.memberMbti = chatParticipate.getMember().getDetailMbti();
+            this.targetMbti = worryBoard.getTargetMbti().toString();
+            this.memberSimpleInfo = memberSimpleInfo;
+            this.worryBoardId = worryBoard.getId();
+        }
+
     }
-
-  }
 }
