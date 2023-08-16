@@ -33,15 +33,15 @@ public class WorryBoardController {
     //고민글 조회 (해결 X)
     @GetMapping("/worry-board/waiting")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesWaiting(
-        @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(false, page, size));
+        @RequestParam(required = false) Long worryBoardId, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(false, worryBoardId, page, size));
     }
 
     //고민글 조회 (해결 O)
     @GetMapping("/worry-board/solved")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesSolved(
-        @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(true, page, size));
+        @RequestParam(required = false) Long worryBoardId, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(true, worryBoardId, page, size));
     }
 
     //고민글 상세 조회
