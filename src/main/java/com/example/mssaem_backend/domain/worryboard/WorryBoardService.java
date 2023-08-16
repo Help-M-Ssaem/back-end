@@ -5,7 +5,6 @@ import static com.example.mssaem_backend.global.common.CheckWriter.match;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
 import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomErrorCode.EMPTY_CHATROOM;
 
-import com.example.mssaem_backend.domain.badge.BadgeService;
 import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.chatroom.ChatRoomRepository;
 import com.example.mssaem_backend.domain.evaluation.EvaluationRepository;
@@ -42,7 +41,6 @@ public class WorryBoardService {
     private final WorryBoardRepository worryBoardRepository;
     private final WorryBoardImageService worryBoardImageService;
     private final MemberRepository memberRepository;
-    private final BadgeService badgeService;
     private final EvaluationRepository evaluationRepository;
     private final ChatRoomRepository chatRoomRepository;
 
@@ -208,6 +206,12 @@ public class WorryBoardService {
         WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
         match(currentMember, worryBoard.getMember());
+
+        if(!patchWorryReq.getTitle().equals(worryBoard.getTitle())){
+            ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(
+                worryBoard.getId()).orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
+            chatRoom.setChatRoomTitle(patchWorryReq.getTitle());
+        }
 
         //worryBoard 수정하기
         worryBoard.modifyWorryBoard(
