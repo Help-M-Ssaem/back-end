@@ -52,7 +52,6 @@ public class Member extends BaseTimeEntity {
 
     private String badgeName;
 
-    @Transient
     private boolean defaultProfile = true;
 
     public void changeRefreshToken(String refreshToken) {
