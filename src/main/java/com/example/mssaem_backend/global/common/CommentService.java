@@ -16,7 +16,7 @@ import com.example.mssaem_backend.domain.discussioncommentlike.DiscussionComment
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.notification.NotificationService;
-import com.example.mssaem_backend.domain.notification.TypeEnum;
+import com.example.mssaem_backend.domain.notification.NotificationType;
 import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsByMemberRes;
 import com.example.mssaem_backend.global.common.dto.CommentDto.GetCommentsRes;
 import com.example.mssaem_backend.global.common.dto.CommentDto.PostCommentReq;
@@ -184,12 +184,12 @@ public class CommentService {
                 //일반 댓글인 경우
                 if (!isMatch(board.getMember(), member)) {
                     notificationService.createNotification(objectId, content,
-                        TypeEnum.BOARD_COMMENT, board.getMember());
+                        NotificationType.BOARD_COMMENT, board.getMember());
                 }
                 //대댓글인 경우
                 if (isReply && !isMatch(parentComment.getMember(), member)) {
                     notificationService.createNotification(objectId, content,
-                        TypeEnum.BOARD_REPLY_OF_COMMENT, board.getMember());
+                        NotificationType.BOARD_REPLY_OF_COMMENT, board.getMember());
                 }
             }
             case DISCUSSION -> {
@@ -212,12 +212,12 @@ public class CommentService {
                 //일반 댓글인 경우
                 if (!isMatch(discussion.getMember(), member)) {
                     notificationService.createNotification(objectId, content,
-                        TypeEnum.DISCUSSION_COMMENT, discussion.getMember());
+                        NotificationType.DISCUSSION_COMMENT, discussion.getMember());
                 }
                 //대댓글인 경우
                 if (isReply && !isMatch(parentComment.getMember(), member)) {
                     notificationService.createNotification(objectId, content,
-                        TypeEnum.DISCUSSION_REPLY_OF_COMMENT, discussion.getMember());
+                        NotificationType.DISCUSSION_REPLY_OF_COMMENT, discussion.getMember());
                 }
             }
         }
