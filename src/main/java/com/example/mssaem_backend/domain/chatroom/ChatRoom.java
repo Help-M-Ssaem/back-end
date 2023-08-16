@@ -34,4 +34,8 @@ public class ChatRoom extends BaseTimeEntity implements Serializable {
         chatRoom.worryBoardId = worryBoardId;
         return chatRoom;
     }
+
+    public void setChatRoomTitle(String title){
+        this.title = title;
+    }
 }

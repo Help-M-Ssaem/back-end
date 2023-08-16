@@ -17,21 +17,21 @@ import org.hibernate.annotations.DynamicInsert;
 @Entity
 public class ChatParticipate extends BaseTimeEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  private String sessionId;
+    private String sessionId;
 
-  @OneToOne(fetch = FetchType.LAZY)
-  private ChatRoom chatRoom;
+    @OneToOne(fetch = FetchType.LAZY)
+    private ChatRoom chatRoom;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 
-  public ChatParticipate(String sessionId, ChatRoom chatRoom, Member member) {
-    this.sessionId = sessionId;
-    this.chatRoom = chatRoom;
-    this.member = member;
-  }
+    public ChatParticipate(String sessionId, ChatRoom chatRoom, Member member) {
+        this.sessionId = sessionId;
+        this.chatRoom = chatRoom;
+        this.member = member;
+    }
 }
