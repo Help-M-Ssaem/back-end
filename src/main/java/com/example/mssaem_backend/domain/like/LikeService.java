@@ -4,7 +4,7 @@ import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.board.BoardRepository;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.notification.NotificationService;
-import com.example.mssaem_backend.domain.notification.TypeEnum;
+import com.example.mssaem_backend.domain.notification.NotificationType;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class LikeService {
                 notificationService.createNotification(
                     boardId,
                     board.getTitle(),
-                    TypeEnum.HOT_BOARD,
+                    NotificationType.HOT_BOARD,
                     board.getMember()
                 );
             }
@@ -51,7 +51,7 @@ public class LikeService {
                 notificationService.createNotification(
                     boardId,
                     board.getTitle(),
-                    TypeEnum.HOT_BOARD,
+                    NotificationType.HOT_BOARD,
                     board.getMember()
                 );
             }

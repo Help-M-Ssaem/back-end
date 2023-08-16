@@ -21,31 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private static final int lengthLimit = 45;
+    private static final int CONTENT_LENGTH_LIMIT = 25;
 
     // 알림 등록 (게시글 댓글, 토론 댓글, hot 게시글, hot 토론, 대댓글)
     @Transactional
     public void createNotification(Long resourceId, String previewContent,
-        TypeEnum type, Member receiver) {
+        NotificationType notificationType, Member receiver) {
         notificationRepository.save(
             new Notification(resourceId,
-                type.getName() + "\n\"" + previewContent,
-                type,
+                previewContent,
+                notificationType,
                 receiver
             )
-        );
-    }
-
-    // 채팅 시작시 알림 등록
-    @Transactional
-    public void createChatNotification(Long resourceId, String previewContent, TypeEnum type,
-        Member sender, Member receiver) {
-        notificationRepository.save(
-            new Notification(
-                resourceId,
-                "\"" + sender.getNickName() + "\"님이 " + type.getName() + "\n\"" + previewContent,
-                type,
-                receiver)
         );
     }
 
@@ -109,12 +96,13 @@ public class NotificationService {
                 new NotificationInfo(
                     notification.getId(),
                     notification.getResourceId(),
-                    notification.getContent().length() > lengthLimit ?
-                        notification.getContent().substring(0, lengthLimit) + "\""
-                        : notification.getContent() + "\"",
+                    notification.getNotificationType().getName(),
+                    notification.getContent().length() > CONTENT_LENGTH_LIMIT ?
+                        notification.getContent().substring(0, CONTENT_LENGTH_LIMIT)
+                        : notification.getContent(),
                     calculateTime(notification.getCreatedAt(), 4),
                     notification.isState(),
-                    notification.getType()
+                    notification.getNotificationType()
                 )
             );
         }
