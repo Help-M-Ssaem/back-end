@@ -14,7 +14,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
 
-    Page<WorryBoard> findByIsSolvedAndStateTrueOrderByCreatedAtDesc(boolean isSolved, Pageable pageable);
+    @Query("SELECT wb FROM WorryBoard wb WHERE wb.state = true AND wb.isSolved = :isSolved AND ( :worryBoardId IS NULL OR wb.id <> :worryBoardId) order by wb.createdAt desc")
+    Page<WorryBoard> findByIsSolvedAndStateTrueOrderByCreatedAtDesc(@Param("isSolved") boolean isSolved , @Param("worryBoardId") Long worryBoardId, Pageable pageable);
 
     Page<WorryBoard> findByMemberIdAndStateTrueOrderByCreatedAtDesc(Long memberId, Pageable pageable);
 

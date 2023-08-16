@@ -371,10 +371,10 @@ public class DiscussionService {
     }
 
     //토론글 전체 조회하기
-    public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussions(Member member, int page,
+    public PageResponseDto<List<DiscussionSimpleInfo>> findDiscussions(Member member, Long discussionId, int page,
         int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Discussion> discussions = discussionRepository.findByStateTrueOrderByCreatedAtDesc(
+        Page<Discussion> discussions = discussionRepository.findByStateTrueOrderByCreatedAtDesc(discussionId,
             pageRequest);
         List<Discussion> discussionList = discussions.stream().toList();
         return new PageResponseDto<>(discussions.getNumber(), discussions.getTotalPages(),

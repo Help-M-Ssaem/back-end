@@ -53,11 +53,11 @@ public class WorryBoardService {
     }
 
     //고민게시판 - 고민 목록 조회
-    public PageResponseDto<List<GetWorriesRes>> findWorriesBySolved(boolean isSolved, int page,
+    public PageResponseDto<List<GetWorriesRes>> findWorriesBySolved(boolean isSolved, Long worryBoardId,int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<WorryBoard> result = worryBoardRepository.findByIsSolvedAndStateTrueOrderByCreatedAtDesc(
-            isSolved, pageable);
+            isSolved, worryBoardId, pageable);
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
             makeGetWorriesResForm(result));
     }

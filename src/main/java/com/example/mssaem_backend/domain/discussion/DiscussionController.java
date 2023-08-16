@@ -108,9 +108,10 @@ public class DiscussionController {
     @GetMapping("/discussions")
     public ResponseEntity<PageResponseDto<List<DiscussionSimpleInfo>>> findDiscussions(
         @CurrentMember Member member,
+        @RequestParam(value = "discussionId", required = false) Long discussionId,
         @RequestParam int page,
         @RequestParam int size) {
-        return ResponseEntity.ok(discussionService.findDiscussions(member, page, size));
+        return ResponseEntity.ok(discussionService.findDiscussions(member, discussionId, page, size));
     }
 
     /**
