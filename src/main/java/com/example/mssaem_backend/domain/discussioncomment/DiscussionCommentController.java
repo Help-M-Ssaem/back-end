@@ -28,8 +28,8 @@ public class DiscussionCommentController {
     //토론글 상세 조회시 댓글 조회
     @GetMapping("/discussions/{discussionId}/comments")
     public ResponseEntity<PageResponseDto<List<GetCommentsRes>>> findDiscussionComments(
-        @CurrentMember Member member, @PathVariable Long discussionId, @RequestParam int page,
-        @RequestParam int size) {
+        @CurrentMember Member member, @PathVariable(value = "discussionId") Long discussionId,
+        @RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
         return ResponseEntity.ok(
             commentService.findCommentsByPostId(member, discussionId, page, size,
                 CommentTypeEnum.DISCUSSION));
@@ -51,7 +51,7 @@ public class DiscussionCommentController {
         @RequestParam(value = "commentId", required = false) Long commentId) {
         return ResponseEntity.ok(
             commentService.createComment(member, discussionId,
-                postCommentReq, commentId, CommentTypeEnum.DISCUSSION, commentId!=null));
+                postCommentReq, commentId, CommentTypeEnum.DISCUSSION, commentId != null));
     }
 
     //댓글 삭제
@@ -60,7 +60,8 @@ public class DiscussionCommentController {
         @PathVariable(value = "discussionId") Long discussionId,
         @PathVariable(value = "commentId") Long commentId) {
         return ResponseEntity.ok(
-            commentService.deleteComment(member, discussionId, commentId, CommentTypeEnum.DISCUSSION));
+            commentService.deleteComment(member, discussionId, commentId,
+                CommentTypeEnum.DISCUSSION));
     }
 
     //특정 멤버별 토론글 댓글 보기

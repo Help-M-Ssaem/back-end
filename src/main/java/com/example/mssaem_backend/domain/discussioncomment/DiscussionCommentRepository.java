@@ -18,7 +18,7 @@ public interface DiscussionCommentRepository extends JpaRepository<DiscussionCom
 
     Optional<DiscussionComment> findByIdAndStateIsTrue(Long id);
 
-    @Query(value = "select dc from DiscussionComment dc join fetch dc.member where dc.discussion.id = :id", countQuery = "select count(dc) from DiscussionComment dc")
+    @Query(value = "SELECT dc FROM DiscussionComment dc JOIN FETCH dc.member WHERE dc.discussion.id = :id ORDER BY dc.createdAt ASC", countQuery = "SELECT count(dc) FROM DiscussionComment dc")
     Page<DiscussionComment> findAllByDiscussionId(@Param("id") Long id, Pageable pageable);
 
     DiscussionComment findByIdAndDiscussionIdAndStateIsTrue(Long commentId, Long discussionId);
