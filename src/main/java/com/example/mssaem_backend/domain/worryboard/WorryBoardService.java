@@ -12,7 +12,6 @@ import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
-import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
@@ -53,16 +52,17 @@ public class WorryBoardService {
     }
 
     //고민게시판 - 고민 목록 조회
-    public PageResponseDto<List<GetWorriesRes>> findWorriesBySolved(boolean isSolved, int page,
+    public PageResponseDto<List<GetWorriesRes>> findWorriesBySolved(boolean isSolved, Long worryBoardId,int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<WorryBoard> result = worryBoardRepository.findByIsSolvedAndStateTrueOrderByCreatedAtDesc(
-            isSolved, pageable);
+            isSolved, worryBoardId, pageable);
         return new PageResponseDto<>(result.getNumber(), result.getTotalPages(),
             makeGetWorriesResForm(result));
     }
 
     //고민 게시판 - 고민글 상세 조회
+    @Transactional
     public GetWorryRes findWorryById(Member viewer, Long id) {
         WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
@@ -78,6 +78,9 @@ public class WorryBoardService {
         //채팅방 Id 조회
         ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(
             worryBoard.getId()).orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
+
+        //고민글 상세 조회 시 조회수 상승
+        worryBoard.increaseHits();
 
         return GetWorryRes.builder()
             .worryBoard(worryBoard)
@@ -207,7 +210,8 @@ public class WorryBoardService {
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
         match(currentMember, worryBoard.getMember());
 
-        if(!patchWorryReq.getTitle().equals(worryBoard.getTitle())){
+
+        if (!patchWorryReq.getTitle().equals(worryBoard.getTitle())) {
             ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(
                 worryBoard.getId()).orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
             chatRoom.setChatRoomTitle(patchWorryReq.getTitle());
@@ -246,7 +250,7 @@ public class WorryBoardService {
 
     // 해결된 고민글 중에서 검색하기
     public PageResponseDto<List<GetWorriesRes>> findSolvedWorriesByKeywordAndMbti(
-        SearchReq searchReq, String strFromMbti, String strToMbti, int page, int size) {
+        int searchType, String keyword, String strFromMbti, String strToMbti, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
         // ALL인 경우에 mbti에는 null값이 들어감
@@ -254,7 +258,7 @@ public class WorryBoardService {
         MbtiEnum toMbti = strToMbti.equals("ALL") ? null : MbtiEnum.valueOf(strToMbti);
 
         Page<WorryBoard> worryBoards = worryBoardRepository.searchWorriesBySolvedAndTypeAndMbti(
-            searchReq.getType(), searchReq.getKeyword(), true, fromMbti, toMbti, pageRequest);
+            searchType, keyword, true, fromMbti, toMbti, pageRequest);
 
         return new PageResponseDto<>(worryBoards.getNumber(), worryBoards.getTotalPages(),
             makeGetWorriesResForm(worryBoards));
@@ -262,7 +266,7 @@ public class WorryBoardService {
 
     // 해결 안 된 고민글 중에서 검색하기
     public PageResponseDto<List<GetWorriesRes>> findWaitingWorriesByKeywordAndMbti(
-        SearchReq searchReq, String strFromMbti, String strToMbti, int page, int size) {
+        int searchType, String keyword, String strFromMbti, String strToMbti, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
         // ALL인 경우에 mbti에는 null값이 들어감
@@ -270,7 +274,7 @@ public class WorryBoardService {
         MbtiEnum toMbti = strToMbti.equals("ALL") ? null : MbtiEnum.valueOf(strToMbti);
 
         Page<WorryBoard> worryBoards = worryBoardRepository.searchWorriesBySolvedAndTypeAndMbti(
-            searchReq.getType(), searchReq.getKeyword(), false, fromMbti, toMbti, pageRequest);
+            searchType, keyword, false, fromMbti, toMbti, pageRequest);
 
         return new PageResponseDto<>(worryBoards.getNumber(), worryBoards.getTotalPages(),
             makeGetWorriesResForm(worryBoards));

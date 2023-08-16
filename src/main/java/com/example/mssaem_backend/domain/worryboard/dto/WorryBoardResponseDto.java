@@ -27,6 +27,7 @@ public class WorryBoardResponseDto {
         private Boolean isEditAllowed;
         private Boolean isChatAllowed;
         public Long chatRoomId;
+        private Long hits;
 
         @Builder
         public GetWorryRes(WorryBoard worryBoard, List<String> imgList,
@@ -42,6 +43,7 @@ public class WorryBoardResponseDto {
             this.isEditAllowed = isEditAllowed;
             this.isChatAllowed = isChatAllowed;
             this.chatRoomId = chatRoomId;
+            this.hits = worryBoard.getHits();
         }
     }
 
@@ -88,6 +90,7 @@ public class WorryBoardResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class WorryBoardHistory {
+
         private int worryBoardCount;         // 내가 작성한 고민글의 수
         private int solvedWorryBoardCount;   // 내가 해결한 고민글의 수
         private int evaluationCount;         // 내가 남긴 평가의 수
@@ -124,6 +127,7 @@ public class WorryBoardResponseDto {
     @AllArgsConstructor
     @Getter
     public static class GetWorryBoardId {
+
         private Long worryBoardId;
     }
 

@@ -1,7 +1,6 @@
 package com.example.mssaem_backend.domain.worryboard;
 
 import com.example.mssaem_backend.domain.member.Member;
-import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorryReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PatchWorrySolvedReq;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardRequestDto.PostWorryReq;
@@ -33,15 +32,15 @@ public class WorryBoardController {
     //고민글 조회 (해결 X)
     @GetMapping("/worry-board/waiting")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesWaiting(
-        @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(false, page, size));
+        @RequestParam(required = false) Long worryBoardId, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(false, worryBoardId, page, size));
     }
 
     //고민글 조회 (해결 O)
     @GetMapping("/worry-board/solved")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesSolved(
-        @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(true, page, size));
+        @RequestParam(required = false) Long worryBoardId, @RequestParam int page, @RequestParam int size) {
+        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(true, worryBoardId, page, size));
     }
 
     //고민글 상세 조회
@@ -131,13 +130,14 @@ public class WorryBoardController {
      */
     @GetMapping("/worry-board/solved/search")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findSolvedWorriesByKeywordAndMbti(
-        @RequestBody SearchReq searchReq,
+        @RequestParam int searchType,
+        @RequestParam String keyword,
         @RequestParam String strFromMbti,
         @RequestParam String strToMbti,
         @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            worryBoardService.findSolvedWorriesByKeywordAndMbti(searchReq, strFromMbti, strToMbti,
+            worryBoardService.findSolvedWorriesByKeywordAndMbti(searchType, keyword, strFromMbti, strToMbti,
                 page, size));
     }
 
@@ -146,13 +146,14 @@ public class WorryBoardController {
      */
     @GetMapping("/worry-board/waiting/search")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWaitingWorriesByKeywordAndMbti(
-        @RequestBody SearchReq searchReq,
+        @RequestParam int searchType,
+        @RequestParam String keyword,
         @RequestParam String strFromMbti,
         @RequestParam String strToMbti,
         @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            worryBoardService.findWaitingWorriesByKeywordAndMbti(searchReq, strFromMbti, strToMbti,
+            worryBoardService.findWaitingWorriesByKeywordAndMbti(searchType, keyword, strFromMbti, strToMbti,
                 page, size));
     }
 

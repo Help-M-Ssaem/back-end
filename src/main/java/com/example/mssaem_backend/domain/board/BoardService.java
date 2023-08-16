@@ -20,7 +20,6 @@ import com.example.mssaem_backend.domain.like.LikeRepository;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
-import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchReq;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.global.common.CommentService;
@@ -238,6 +237,7 @@ public class BoardService {
     }
 
     //게시글 상세 조회
+    @Transactional
     public GetBoardRes findBoardById(Member viewer, Long id) {
         Board board = boardRepository.findById(id)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
@@ -246,6 +246,8 @@ public class BoardService {
         Boolean isAllowed = (isMatch(viewer, member));
         //게시글 좋아요 눌렀는지 확인
         Boolean isLiked = likeRepository.existsLikeByMemberAndStateIsTrueAndBoard(viewer, board);
+        //게시글 상세 조회 시 조회수 상승
+        board.increaseHits();
 
         return GetBoardRes.builder()
             .memberSimpleInfo(
@@ -268,13 +270,13 @@ public class BoardService {
 
     // Mbti 카테고리 별 검색하기
     public PageResponseDto<List<BoardSimpleInfo>> findBoardListByKeywordAndMbti(
-        SearchReq searchReq, String strMbti, int page, int size) {
+        int searchType, String keyword, String strMbti, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
         MbtiEnum mbti = strMbti.equals("ALL") ? null : MbtiEnum.valueOf(strMbti);
 
-        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchReq.getType(),
-            searchReq.getKeyword(), mbti, pageRequest);
+        Page<Board> boards = boardRepository.searchByTypeAndMbti(searchType,
+            keyword, mbti, pageRequest);
 
         return new PageResponseDto<>(
             boards.getNumber(),
