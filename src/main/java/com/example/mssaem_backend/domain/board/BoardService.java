@@ -28,7 +28,6 @@ import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BoardErrorCode;
-import com.example.mssaem_backend.global.s3.S3Service;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;

@@ -11,4 +11,6 @@ public interface WorryBoardImageRepository extends JpaRepository<WorryBoardImage
     WorryBoardImage findTopByWorryBoardOrderById(WorryBoard worryBoard);
 
     void deleteAllByWorryBoard(WorryBoard worryBoard);
+
+    void deleteWorryBoardImageByImgUrl(String imgUrl);
 }

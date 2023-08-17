@@ -74,34 +74,34 @@ public class BoardImageService {
         }
     }
 
-public String modifyBoardImageUrl(Board board, List<String> imgUrls,
-    List<String> uploadImgUrls) {
-    List<String> imgUrlsToDelete = new ArrayList<>();
-    List<String> newUploadImgUrls = new ArrayList<>();
+    public String modifyBoardImageUrl(Board board, List<String> imgUrls,
+        List<String> uploadImgUrls) {
+        List<String> imgUrlsToDelete = new ArrayList<>();
+        List<String> newUploadImgUrls = new ArrayList<>();
 
-    if (!imgUrls.isEmpty()) { // 기존에 사진이 있을 경우
-        imgUrlsToDelete = new ArrayList<>(imgUrls);
-        imgUrlsToDelete.removeAll(uploadImgUrls); // 차집합 이용
+        if (!imgUrls.isEmpty()) { // 기존에 사진이 있을 경우
+            imgUrlsToDelete = new ArrayList<>(imgUrls);
+            imgUrlsToDelete.removeAll(uploadImgUrls); // 차집합 이용
 
-        if (!uploadImgUrls.isEmpty()) { // 새로 업로드 된 이미지가 있다면 비교해서 저장
+            if (!uploadImgUrls.isEmpty()) { // 새로 업로드 된 이미지가 있다면 비교해서 저장
+                newUploadImgUrls = new ArrayList<>(uploadImgUrls);
+                newUploadImgUrls.removeAll(imgUrls); // 차집합 이용
+            }
+        } else if (!uploadImgUrls.isEmpty()) { // 기존 사진이 없지만 새로 업로드된 이미지가 있는 경우
             newUploadImgUrls = new ArrayList<>(uploadImgUrls);
-            newUploadImgUrls.removeAll(imgUrls); // 차집합 이용
         }
-    } else if (!uploadImgUrls.isEmpty()) { // 기존 사진이 없지만 새로 업로드된 이미지가 있는 경우
-        newUploadImgUrls = new ArrayList<>(uploadImgUrls);
-    }
 
-    // 기존 이미지들 중 삭제가 필요한 이미지들을 삭제
-    for (String imgUrl : imgUrlsToDelete) {
-        s3Service.deleteFile(s3Service.parseFileName(imgUrl));
-        boardImageRepository.deleteBoardImageByImageUrl(imgUrl);
-    }
+        // 기존 이미지들 중 삭제가 필요한 이미지들을 삭제
+        for (String imgUrl : imgUrlsToDelete) {
+            s3Service.deleteFile(s3Service.parseFileName(imgUrl));
+            boardImageRepository.deleteBoardImageByImageUrl(imgUrl);
+        }
 
-    // 새로운 이미지들을 저장합니다.
-    for (String uploadImgUrl : newUploadImgUrls) {
-        boardImageRepository.save(new BoardImage(board, uploadImgUrl));
-    }
+        // 새로운 이미지들을 저장합니다.
+        for (String uploadImgUrl : newUploadImgUrls) {
+            boardImageRepository.save(new BoardImage(board, uploadImgUrl));
+        }
 
-    return uploadImgUrls.isEmpty() ? null : uploadImgUrls.get(0);
-}
+        return uploadImgUrls.isEmpty() ? null : uploadImgUrls.get(0);
+    }
 }

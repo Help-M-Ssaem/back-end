@@ -52,7 +52,8 @@ public class WorryBoardService {
     }
 
     //고민게시판 - 고민 목록 조회
-    public PageResponseDto<List<GetWorriesRes>> findWorriesBySolved(boolean isSolved, Long worryBoardId,int page,
+    public PageResponseDto<List<GetWorriesRes>> findWorriesBySolved(boolean isSolved,
+        Long worryBoardId, int page,
         int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<WorryBoard> result = worryBoardRepository.findByIsSolvedAndStateTrueOrderByCreatedAtDesc(
@@ -183,7 +184,7 @@ public class WorryBoardService {
     //고민글 생성
     @Transactional
     public GetWorryBoardId createWorryBoard(Member currentMember, PostWorryReq postWorryReq,
-        List<String> imgUrls) {
+        List<String> imgUrls, List<String> uploadImgUrls) {
         //고민글 내용 저장
         WorryBoard worryBoard = WorryBoard.builder()
             .title(postWorryReq.getTitle())
@@ -195,22 +196,28 @@ public class WorryBoardService {
 
         //S3 처리 worryBoardImageService에 전달
         if (imgUrls != null) {
-            String thumbnail = worryBoardImageService.uploadWorryBoardImageUrl(worryBoard, imgUrls);
+            String thumbnail = worryBoardImageService.uploadWorryBoardImageUrl(worryBoard,
+                uploadImgUrls);
             worryBoard.changeThumbnail(thumbnail);
         }
         WorryBoard worryboard = worryBoardRepository.save(worryBoard);
+
+        if (!imgUrls.isEmpty()) {
+            //차집합을 통해 s3 에 업로드 된 모든 사진 차집합 통해 삭제
+            imgUrls.removeAll(uploadImgUrls);
+            worryBoardImageService.deleteWorryBoardImageUrl(imgUrls);
+        }
         return new GetWorryBoardId(worryboard.getId());
     }
 
     //고민글 수정
     @Transactional
     public String modifyWorryBoard(Member currentMember, Long id, PatchWorryReq patchWorryReq,
-        List<String> imgUrls) {
+        List<String> imgUrls, List<String> uploadImgUrls) {
         //현재 멤버와 작성자 일치하는 지 확인
         WorryBoard worryBoard = worryBoardRepository.findById(id)
             .orElseThrow(() -> new BaseException(WorryBoardErrorCode.EMPTY_WORRY_BOARD));
         match(currentMember, worryBoard.getMember());
-
 
         if (!patchWorryReq.getTitle().equals(worryBoard.getTitle())) {
             ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(
@@ -225,13 +232,9 @@ public class WorryBoardService {
             patchWorryReq.getTargetMbti()
         );
 
-        worryBoardImageService.deleteWorryBoardImage(worryBoard);
-        if (imgUrls != null) {
-            worryBoard.changeThumbnail(
-                worryBoardImageService.uploadWorryBoardImageUrl(worryBoard, imgUrls));
-        } else {
-            worryBoard.changeThumbnail(null);
-        }
+        worryBoard.changeThumbnail(
+            worryBoardImageService.modifyWorryBoardImageUrl(worryBoard, imgUrls, uploadImgUrls));
+
         return "고민글 수정 완료";
     }
 
