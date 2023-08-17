@@ -80,7 +80,7 @@ public class WorryBoardResponseDto {
         private Long worryBoardId;
 
         @Builder
-        public PatchWorrySolvedRes(MemberSimpleInfo memberSimpleInfo, Long worryBoardId) {
+        public PatchWorrySolvedRes(MemberSimpleInfo memberSimpleInfo, Long worryBoardId, Long writerId) {
             this.memberSimpleInfo = memberSimpleInfo;
             this.worryBoardId = worryBoardId;
         }

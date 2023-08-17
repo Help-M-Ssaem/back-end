@@ -57,11 +57,15 @@ public class BoardController {
     /**
      * 게시글 생성
      */
+    //imgUrls : 업로드 했던 Urls 들
+    //uploadImgUrls : 최종 업로드 된 imgUrls
     @PostMapping("/member/boards")
     public ResponseEntity<String> createBoard(@CurrentMember Member member,
         @RequestPart(value = "postBoardReq") PostBoardReq postBoardReq,
-        @RequestPart(value = "image", required = false) List<String> imgUrls) {
-        return ResponseEntity.ok(boardService.createBoard(member, postBoardReq, imgUrls));
+        @RequestPart(value = "image", required = false) List<String> imgUrls,
+        @RequestPart(value = "uploadImage", required = false) List<String> uploadImgUrls) {
+        return ResponseEntity.ok(
+            boardService.createBoard(member, postBoardReq, imgUrls, uploadImgUrls));
     }
 
     /**
@@ -71,9 +75,10 @@ public class BoardController {
     public ResponseEntity<String> modifyBoard(@CurrentMember Member member,
         @RequestPart(value = "patchBoardReq") PatchBoardReq patchBoardReq,
         @PathVariable(value = "id") Long id,
-        @RequestPart(value = "image", required = false) List<String> imgUrls) {
+        @RequestPart(value = "image", required = false) List<String> imgUrls,
+        @RequestPart(value = "uploadImage", required = false) List<String> uploadImgUrls) {
         return ResponseEntity.ok(
-            boardService.modifyBoard(member, patchBoardReq, id, imgUrls));
+            boardService.modifyBoard(member, patchBoardReq, id, imgUrls, uploadImgUrls));
     }
 
     /**

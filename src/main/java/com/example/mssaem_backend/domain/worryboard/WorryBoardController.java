@@ -32,15 +32,19 @@ public class WorryBoardController {
     //고민글 조회 (해결 X)
     @GetMapping("/worry-board/waiting")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesWaiting(
-        @RequestParam(required = false) Long worryBoardId, @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(false, worryBoardId, page, size));
+        @RequestParam(required = false) Long worryBoardId, @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(
+            worryBoardService.findWorriesBySolved(false, worryBoardId, page, size));
     }
 
     //고민글 조회 (해결 O)
     @GetMapping("/worry-board/solved")
     public ResponseEntity<PageResponseDto<List<GetWorriesRes>>> findWorriesSolved(
-        @RequestParam(required = false) Long worryBoardId, @RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(worryBoardService.findWorriesBySolved(true, worryBoardId, page, size));
+        @RequestParam(required = false) Long worryBoardId, @RequestParam int page,
+        @RequestParam int size) {
+        return ResponseEntity.ok(
+            worryBoardService.findWorriesBySolved(true, worryBoardId, page, size));
     }
 
     //고민글 상세 조회
@@ -102,9 +106,11 @@ public class WorryBoardController {
     @PostMapping("/member/worry-board")
     public ResponseEntity<GetWorryBoardId> createWorryBoard(@CurrentMember Member currentMember,
         @RequestPart(value = "postWorryReq") PostWorryReq postWorryReq,
-        @RequestPart(value = "image", required = false) List<String> imgUrls) {
+        @RequestPart(value = "image", required = false) List<String> imgUrls,
+        @RequestPart(value = "uploadImage", required = false) List<String> uploadImgUrls) {
         return ResponseEntity.ok(
-            worryBoardService.createWorryBoard(currentMember, postWorryReq, imgUrls));
+            worryBoardService.createWorryBoard(currentMember, postWorryReq, imgUrls,
+                uploadImgUrls));
     }
 
     //고민글 수정
@@ -112,9 +118,11 @@ public class WorryBoardController {
     public ResponseEntity<String> modifyWorryBoard(@CurrentMember Member currentMember,
         @PathVariable Long id,
         @RequestPart(value = "patchWorryReq") PatchWorryReq patchWorryReq,
-        @RequestPart(value = "image", required = false) List<String> imgUrls) {
+        @RequestPart(value = "image", required = false) List<String> imgUrls,
+        @RequestPart(value = "uploadImage", required = false) List<String> uploadImgUrls) {
         return ResponseEntity.ok(
-            worryBoardService.modifyWorryBoard(currentMember, id, patchWorryReq, imgUrls));
+            worryBoardService.modifyWorryBoard(currentMember, id, patchWorryReq, imgUrls,
+                uploadImgUrls));
     }
 
     //고민글 삭제
@@ -137,7 +145,8 @@ public class WorryBoardController {
         @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            worryBoardService.findSolvedWorriesByKeywordAndMbti(searchType, keyword, strFromMbti, strToMbti,
+            worryBoardService.findSolvedWorriesByKeywordAndMbti(searchType, keyword, strFromMbti,
+                strToMbti,
                 page, size));
     }
 
@@ -153,7 +162,8 @@ public class WorryBoardController {
         @RequestParam int page,
         @RequestParam int size) {
         return ResponseEntity.ok(
-            worryBoardService.findWaitingWorriesByKeywordAndMbti(searchType, keyword, strFromMbti, strToMbti,
+            worryBoardService.findWaitingWorriesByKeywordAndMbti(searchType, keyword, strFromMbti,
+                strToMbti,
                 page, size));
     }
 

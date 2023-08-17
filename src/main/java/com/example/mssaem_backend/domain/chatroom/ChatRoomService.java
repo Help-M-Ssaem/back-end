@@ -4,7 +4,7 @@ import static com.example.mssaem_backend.global.config.exception.errorCode.ChatR
 import static com.example.mssaem_backend.global.config.exception.errorCode.WorryBoardErrorCode.EMPTY_WORRY_BOARD;
 
 import com.example.mssaem_backend.domain.chatmessage.ChatMessageService;
-import com.example.mssaem_backend.domain.chatparticipate.ChatParticipateRepository;
+import com.example.mssaem_backend.domain.chatparticipate.ChatParticipateService;
 import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomRequestDto.ChatInfo;
 import com.example.mssaem_backend.domain.chatroom.dto.ChatRoomResponseDto.ChatRoomRes;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
@@ -23,7 +23,7 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageService chatMessageService;
     private final WorryBoardRepository worryBoardRepository;
-    private final ChatParticipateRepository chatParticipateRepository;
+    private final ChatParticipateService chatParticipateService;
 
     public ChatRoomRes createRoom(Long worryBoardId) {
         ChatRoom chatRoom = chatRoomCustomRepository.createChatRoom(worryBoardId);
@@ -49,6 +49,8 @@ public class ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
         // 모든 채팅 메시지 삭제
         chatMessageService.deleteAllChatMessage(chatRoom);
+        // 채팅 참여 삭제
+        chatParticipateService.deleteAllChatParticipateByChatRoom(chatRoom);
         // 채팅방 삭제
         chatRoomRepository.delete(chatRoom);
         return "채팅방 삭제 완료";
@@ -60,8 +62,13 @@ public class ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(worryBoardId)
             .orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
 
-        Integer count = chatParticipateRepository.countByChatRoomId(chatRoom.getId());
+        Integer count = chatParticipateService.countChatParticipate(chatRoom.getId());
         if(count == 1) return true;
         else return false;
+    }
+
+    public ChatRoom selectChatRoomByWorryBoardId(Long worryBoardId){
+        return chatRoomRepository.findByWorryBoardId(worryBoardId)
+            .orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
     }
 }

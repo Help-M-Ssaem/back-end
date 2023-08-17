@@ -1,20 +1,16 @@
 package com.example.mssaem_backend.domain.badge;
 
-import com.example.mssaem_backend.domain.badge.dto.BadgeResponse;
-import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.badge.dto.BadgeResponse.BadgeInfo;
-import com.example.mssaem_backend.domain.member.MemberRepository;
-import com.example.mssaem_backend.domain.member.MemberService;
+import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.exception.errorCode.BadgeErrorCode;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -24,14 +20,14 @@ public class BadgeService {
 
     //멤버의 대표 뱃지 가져오기
     public String findRepresentativeBadgeByMember(Member member) {
-        return badgeRepository.findNameMemberAndStateTrue(member).orElse(null);
+        return badgeRepository.findNameMemberAndStateTrue(member).orElse(null).getName();
     }
 
     public List<BadgeInfo> findAllBadge(Member member) {
         List<Badge> badges = badgeRepository.findAllByMember(member).orElse(null);
         List<BadgeInfo> result = new ArrayList<>();
         if (badges != null) {
-            badges.forEach(badge -> result.add(new BadgeInfo(badge.getId(), badge.getName(), badge.isState())));
+            badges.forEach(badge -> result.add(new BadgeInfo(badge.getId(), badge.getBadgeEnum().getName(), badge.isState())));
         }
         return result;
     }
@@ -53,8 +49,13 @@ public class BadgeService {
             }
             // 새로운 뱃지를 true 로 변경
             newBadge.changeStateTrue();
-            return newBadge.getName();
+            return newBadge.getBadgeEnum().getName();
         }
         return null;
     }
+
+    public void insertBadge(Badge badge){
+        badgeRepository.save(badge);
+    }
+    public boolean existBadgeStateTrue(Member member){ return badgeRepository.existsByMemberAndStateIsTrue(member);}
 }

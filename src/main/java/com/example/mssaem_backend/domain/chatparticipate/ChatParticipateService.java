@@ -99,13 +99,16 @@ public class ChatParticipateService {
     }
 
     @Transactional
-    public void deleteChatParticipate(String sessionId) {
-        ChatParticipate chatParticipate = chatParticipateRepository.findBySessionId(sessionId);
-        chatParticipateRepository.delete(chatParticipate);
+    public void deleteAllChatParticipateByChatRoom(ChatRoom chatRoom) {
+        chatParticipateRepository.deleteAllByChatRoom(chatRoom);
     }
 
     public Integer countChatParticipate(Long roomId) {
         return chatParticipateRepository.countByChatRoomId(roomId);
+    }
+
+    public Member getPartnerByChatRoomAndMember(Member member, ChatRoom chatRoom){
+        return chatParticipateRepository.findByMemberAndChatRoom(member, chatRoom);
     }
 
 }
