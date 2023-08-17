@@ -176,8 +176,7 @@ public class WorryBoardService {
                     solveMember.getBadgeName(),
                     solveMember.getProfileImageUrl())
             )
-            .worryBoardId(id)
-            .writerId(worryBoard.getMember().getId()).build();
+            .worryBoardId(id).build();
     }
 
     //고민글 생성

@@ -78,13 +78,11 @@ public class WorryBoardResponseDto {
 
         private MemberSimpleInfo memberSimpleInfo;
         private Long worryBoardId;
-        private Long writerId;
 
         @Builder
-        public PatchWorrySolvedRes(MemberSimpleInfo memberSimpleInfo, Long worryBoardId, Long writerId) {
+        public PatchWorrySolvedRes(MemberSimpleInfo memberSimpleInfo, Long worryBoardId) {
             this.memberSimpleInfo = memberSimpleInfo;
             this.worryBoardId = worryBoardId;
-            this.writerId = writerId;
         }
     }
 
