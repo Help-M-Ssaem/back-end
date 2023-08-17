@@ -20,7 +20,7 @@ import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.member.MemberRepository;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.notification.NotificationService;
-import com.example.mssaem_backend.domain.notification.TypeEnum;
+import com.example.mssaem_backend.domain.notification.NotificationType;
 import com.example.mssaem_backend.global.common.CommentService;
 import com.example.mssaem_backend.global.common.CommentTypeEnum;
 import com.example.mssaem_backend.global.common.Time;
@@ -312,7 +312,7 @@ public class DiscussionService {
                 notificationService.createNotification(
                     discussionId,
                     discussion.getTitle(),
-                    TypeEnum.HOT_DISCUSSION,
+                    NotificationType.HOT_DISCUSSION,
                     discussion.getMember()
                 );
             }

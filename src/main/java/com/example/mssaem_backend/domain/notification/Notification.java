@@ -38,15 +38,16 @@ public class Notification extends BaseTimeEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private TypeEnum type;
+    private NotificationType notificationType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member; // 알림을 받을 멤버
 
-    public Notification(Long resourceId, String content, TypeEnum type, Member member) {
+    public Notification(Long resourceId, String content, NotificationType notificationType,
+        Member member) {
         this.resourceId = resourceId;
         this.content = content;
-        this.type = type;
+        this.notificationType = notificationType;
         this.member = member;
     }
 

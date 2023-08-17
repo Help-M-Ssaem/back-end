@@ -2,7 +2,7 @@ package com.example.mssaem_backend.domain.notification;
 
 import lombok.Getter;
 
-public enum TypeEnum {
+public enum NotificationType {
     BOARD_COMMENT("내 게시물에 댓글이 달렸어요."),
     HOT_BOARD("내 게시글이 HOT한 게시글이 되었어요."),
 
@@ -11,12 +11,13 @@ public enum TypeEnum {
     HOT_DISCUSSION("내 토론이 HOT한 토론이 되었어요."),
     DISCUSSION_REPLY_OF_COMMENT("내 댓글에 대댓글이 달렸어요."),
     HOT_TEACHER("내가 인기 M쌤이 되었어요."),
-    CHAT("채팅을 시작했어요.");
+    CHAT("새로운 채팅이 시작됐어요."),
+    BADGE("새로운 칭호를 획득했어요");
 
     @Getter
     private final String name;
 
-    TypeEnum(String name) {
+    NotificationType(String name) {
         this.name = name;
     }
 }
