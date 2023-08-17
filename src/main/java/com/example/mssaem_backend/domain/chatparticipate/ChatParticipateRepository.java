@@ -4,6 +4,7 @@ import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.member.Member;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,4 +22,11 @@ public interface ChatParticipateRepository extends JpaRepository<ChatParticipate
     ChatParticipate findByChatRoom(ChatRoom chatRoom);
 
     Integer countByChatRoomId(Long chatRoomId);
+
+    @Modifying
+    void deleteAllByChatRoom(ChatRoom chatRoom);
+
+    @Query("select cp.member from ChatParticipate cp where cp.member <> :member and cp.chatRoom = :chatroom")
+    Member findByMemberAndChatRoom(@Param("member") Member member,
+        @Param("chatroom") ChatRoom chatroom);
 }

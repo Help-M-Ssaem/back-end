@@ -3,7 +3,6 @@ package com.example.mssaem_backend.domain.discussion;
 import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.CheckWriter.match;
 
-import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionDetailInfo;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionResponseDto.DiscussionHistory;
@@ -47,7 +46,6 @@ public class DiscussionService {
     private final DiscussionOptionRepository discussionOptionRepository;
     private final DiscussionOptionSelectedRepository discussionOptionSelectedRepository;
     private final DiscussionCommentRepository discussionCommentRepository;
-    private final BadgeRepository badgeRepository;
     private final NotificationService notificationService;
     private final MemberRepository memberRepository;
     private final CommentService commentService;
@@ -119,8 +117,7 @@ public class DiscussionService {
                         discussion.getMember().getId(),
                         discussion.getMember().getNickName(),
                         discussion.getMember().getDetailMbti(),
-                        badgeRepository.findNameMemberAndStateTrue(discussion.getMember())
-                            .orElse(null),
+                        discussion.getMember().getBadgeName(),
                         discussion.getMember().getProfileImageUrl()
                     ),
                     selectedOptionIdx != -1
