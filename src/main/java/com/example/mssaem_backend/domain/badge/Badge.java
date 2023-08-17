@@ -2,8 +2,9 @@ package com.example.mssaem_backend.domain.badge;
 
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,11 +24,11 @@ public class Badge extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "badge_id")
     private Long id;
 
     @NotNull
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private BadgeEnum badgeEnum;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
@@ -40,5 +41,11 @@ public class Badge extends BaseTimeEntity {
 
     public void changeStateFalse() {
         this.state = false;
+    }
+
+    public Badge(BadgeEnum badgeEnum, Member member, boolean state){
+        this.badgeEnum = badgeEnum;
+        this.member = member;
+        this.state = state;
     }
 }

@@ -10,14 +10,16 @@ import org.springframework.data.repository.query.Param;
 
 public interface BadgeRepository extends JpaRepository<Badge, Long> {
 
-    @Query("SELECT b.name FROM Badge b WHERE b.member = :member AND b.state = true")
-    Optional<String> findNameMemberAndStateTrue(@Param("member") Member member);
+    @Query("SELECT b.badgeEnum FROM Badge b WHERE b.member = :member AND b.state = true")
+    Optional<BadgeEnum> findNameMemberAndStateTrue(@Param("member") Member member);
 
-    @Query("SELECT b.name FROM Badge b WHERE b.id = :id AND b.member = :member AND b.state = false")
-    Optional<String> findNameByIdAndMember(@Param("id") Long id, @Param("member") Member member);
+    @Query("SELECT b.badgeEnum FROM Badge b WHERE b.id = :id AND b.member = :member AND b.state = false")
+    Optional<BadgeEnum> findNameByIdAndMember(@Param("id") Long id, @Param("member") Member member);
 
     Optional<List<Badge>> findAllByMember(@Param("member") Member member);
 
     Optional<Badge> findByMemberAndStateTrue(Member member);
     Optional<Badge> findByIdAndMember(Long id, Member member);
+
+    boolean existsByMemberAndStateIsTrue(Member member);
 }
