@@ -25,6 +25,7 @@ public class ChatParticipateResponseDto {
         private String targetMbti;
         private MemberSimpleInfo memberSimpleInfo;
         private Long worryBoardId;
+        private Long writerId;
 
         public ChatParticipateRes(ChatParticipate chatParticipate,
             MemberSimpleInfo memberSimpleInfo, ChatMessage message, WorryBoard worryBoard) {
@@ -37,6 +38,7 @@ public class ChatParticipateResponseDto {
             this.targetMbti = worryBoard.getTargetMbti().toString();
             this.memberSimpleInfo = memberSimpleInfo;
             this.worryBoardId = worryBoard.getId();
+            this.writerId = worryBoard.getMember().getId();
         }
 
     }
