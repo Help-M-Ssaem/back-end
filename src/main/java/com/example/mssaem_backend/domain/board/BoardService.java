@@ -124,7 +124,7 @@ public class BoardService {
 
     @Transactional
     public String createBoard(Member member, PostBoardReq postBoardReq,
-        List<String> imgUrls) {
+        List<String> imgUrls, List<String> uploadImgUrls) {
 
         Board board = Board.builder()
             .title(postBoardReq.getTitle())
@@ -134,32 +134,32 @@ public class BoardService {
             .thumbnail(null)
             .build();
 
-        if (imgUrls != null) {
-            String thumbnail = boardImageService.uploadBoardImageUrl(board, imgUrls);
+        if (uploadImgUrls != null) {
+            //최종 upload Image Urls 들만 DB에 저장
+            String thumbnail = boardImageService.uploadBoardImageUrl(board, uploadImgUrls);
             board.changeThumbnail(thumbnail);
         }
         boardRepository.save(board);
+
+        if (!imgUrls.isEmpty()) {
+            //차집합을 통해 s3 에 업로드 된 모든 사진 차집합 통해 삭제
+            imgUrls.removeAll(uploadImgUrls);
+            boardImageService.deleteBoardImageUrl(imgUrls);
+        }
         return "게시글 생성 완료";
     }
 
     @Transactional
     public String modifyBoard(Member member, PatchBoardReq patchBoardReq, Long boardId,
-        List<String> imgUrls) {
+        List<String> imgUrls, List<String> uploadImgUrls) {
         Board board = boardRepository.findById(boardId)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         //현재 로그인한 멤버와 해당 게시글의 멤버가 같은지 확인
         if (isMatch(member, board.getMember())) {
             board.modifyBoard(patchBoardReq.getTitle(), patchBoardReq.getContent(),
                 patchBoardReq.getMbti());
-            //현재 저장된 이미지 삭제
-            boardImageService.deleteBoardImage(board);
-            //새로운 이미지 업로드
-            if (imgUrls != null) {
-                //이미지 DB에 저장
-                board.changeThumbnail(boardImageService.uploadBoardImageUrl(board, imgUrls));
-            } else {
-                board.changeThumbnail(null); //게시글 수정 시 이미지 없으면 다시 썸네일 제거
-            }
+            board.changeThumbnail(
+                boardImageService.modifyBoardImageUrl(board, imgUrls, uploadImgUrls));
             return "게시글 수정 완료";
         } else {
             throw new BaseException(BoardErrorCode.INVALID_MEMBER);
