@@ -40,7 +40,8 @@ public class NotificationService {
     public PageResponseDto<List<NotificationInfo>> findNotifications(Member member, int page,
         int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Notification> notifications = notificationRepository.findByMember(member, pageRequest);
+        Page<Notification> notifications = notificationRepository.findByMemberOrderByCreatedAtDesc(
+            member, pageRequest);
 
         return new PageResponseDto<>(
             notifications.getNumber(),
