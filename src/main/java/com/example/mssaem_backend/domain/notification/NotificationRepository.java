@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    Page<Notification> findByMember(Member member, PageRequest pageRequest);
+    Page<Notification> findByMemberOrderByCreatedAtDesc(Member member, PageRequest pageRequest);
 
     List<Notification> findByMember(Member member);
 
