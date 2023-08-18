@@ -26,6 +26,7 @@ public class ChatParticipateResponseDto {
         private MemberSimpleInfo memberSimpleInfo;
         private Long worryBoardId;
         private Long writerId;
+        private boolean worryBoardState;
 
         public ChatParticipateRes(ChatParticipate chatParticipate,
             MemberSimpleInfo memberSimpleInfo, ChatMessage message, WorryBoard worryBoard) {
@@ -39,6 +40,7 @@ public class ChatParticipateResponseDto {
             this.memberSimpleInfo = memberSimpleInfo;
             this.worryBoardId = worryBoard.getId();
             this.writerId = worryBoard.getMember().getId();
+            this.worryBoardState = worryBoard.getIsSolved();
         }
 
     }
