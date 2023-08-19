@@ -26,6 +26,7 @@ public class WorryBoardResponseDto {
         private List<String> imgList;
         private Boolean isEditAllowed;
         private Boolean isChatAllowed;
+        private Boolean isSolved;
         public Long chatRoomId;
         private Long hits;
 
@@ -42,6 +43,7 @@ public class WorryBoardResponseDto {
             this.imgList = imgList;
             this.isEditAllowed = isEditAllowed;
             this.isChatAllowed = isChatAllowed;
+            this.isSolved = worryBoard.getIsSolved();
             this.chatRoomId = chatRoomId;
             this.hits = worryBoard.getHits();
         }
