@@ -36,14 +36,14 @@ public class ChatParticipateService {
         Member member = memberRepository.findByNickName(memberName);
         ChatParticipate chatParticipate = new ChatParticipate(sessionID, chatRoom, member);
 
-        // 채팅방이 만들어져 있고 해당 채팅방의 두번째 참가자(고민을 올린 사람)일 경우 채팅 시작 알림 전송
+        // 채팅방이 만들어져 있고 해당 채팅방의 첫번째 참가자(고민을 올린 사람)일 경우 채팅 시작 알림 전송
         ChatParticipate prevParticipate = chatParticipateRepository.findByChatRoom(chatRoom);
         if (prevParticipate != null) {
             notificationService.createNotification(
                 chatRoom.getId(),
                 chatRoom.getTitle(),
                 NotificationType.CHAT,
-                member
+                prevParticipate.getMember()
             );
         }
         chatParticipateRepository.save(chatParticipate);
