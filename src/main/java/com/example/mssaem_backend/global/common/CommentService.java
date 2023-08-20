@@ -181,16 +181,17 @@ public class CommentService {
                 boardCommentRepository.save(boardComment);
 
                 //board 알림
-                //일반 댓글인 경우
-                if (!isMatch(board.getMember(), member)) {
-                    notificationService.createNotification(objectId, content,
-                        NotificationType.BOARD_COMMENT, board.getMember());
-                }
                 //대댓글인 경우
                 if (isReply && !isMatch(parentComment.getMember(), member)) {
                     notificationService.createNotification(objectId, content,
                         NotificationType.BOARD_REPLY_OF_COMMENT, board.getMember());
                 }
+                //일반 댓글인 경우
+                else if (!isMatch(board.getMember(), member)) {
+                    notificationService.createNotification(objectId, content,
+                        NotificationType.BOARD_COMMENT, board.getMember());
+                }
+
             }
             case DISCUSSION -> {
                 Discussion discussion = discussionRepository.findByIdAndStateIsTrue(objectId)
@@ -209,16 +210,17 @@ public class CommentService {
                 discussionCommentRepository.save(discussionComment);
 
                 //discussion 알림
-                //일반 댓글인 경우
-                if (!isMatch(discussion.getMember(), member)) {
-                    notificationService.createNotification(objectId, content,
-                        NotificationType.DISCUSSION_COMMENT, discussion.getMember());
-                }
                 //대댓글인 경우
                 if (isReply && !isMatch(parentComment.getMember(), member)) {
                     notificationService.createNotification(objectId, content,
                         NotificationType.DISCUSSION_REPLY_OF_COMMENT, discussion.getMember());
                 }
+                //일반 댓글인 경우
+                else if (!isMatch(discussion.getMember(), member)) {
+                    notificationService.createNotification(objectId, content,
+                        NotificationType.DISCUSSION_COMMENT, discussion.getMember());
+                }
+
             }
         }
         return "댓글 작성에 성공";
