@@ -1,29 +1,30 @@
 package com.example.mssaem_backend.domain.member;
 
-import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfile;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.CheckNickName;
+import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.ModifyProfile;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.RegisterMember;
 import com.example.mssaem_backend.domain.member.dto.MemberRequestDto.SocialLoginToken;
-import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
-import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberProfileInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.CheckNickNameRes;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberProfileInfo;
+import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TeacherInfo;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.TokenInfo;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import com.example.mssaem_backend.global.config.security.oauth.SocialLoginType;
 import jakarta.validation.Valid;
-
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
@@ -109,7 +110,8 @@ public class MemberController {
      */
     @PostMapping("/member/profile/file")
     public ResponseEntity<String> uploadFiles(@CurrentMember Member member,
-            @RequestPart(value = "image", required = false) MultipartFile multipartFile) {
+            @RequestPart(value = "image", required = false) MultipartFile multipartFile)
+        throws IOException {
         return new ResponseEntity<>(memberService.uploadFile(member, multipartFile), HttpStatus.OK);
     }
 

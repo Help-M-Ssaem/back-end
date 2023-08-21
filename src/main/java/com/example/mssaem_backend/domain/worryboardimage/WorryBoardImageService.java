@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.worryboardimage;
 
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
 import com.example.mssaem_backend.global.s3.S3Service;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +64,7 @@ public class WorryBoardImageService {
         worryBoardImageRepository.deleteAllByWorryBoard(worryBoard);
     }
 
-    public String uploadFile(MultipartFile multipartFile) {
+    public String uploadFile(MultipartFile multipartFile) throws IOException {
         return s3Service.uploadImage(multipartFile);
     }
 

@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.boardimage;
 
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.global.s3.S3Service;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +50,7 @@ public class BoardImageService {
     }
 
     //이미지 S3에 저장 후 해당 파일에 대한 url 바로 반환
-    public String uploadFile(MultipartFile multipartFile) {
+    public String uploadFile(MultipartFile multipartFile) throws IOException {
         return s3Service.uploadImage(multipartFile);
     }
 

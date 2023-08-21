@@ -4,6 +4,7 @@ import com.example.mssaem_backend.domain.discussion.Discussion;
 import com.example.mssaem_backend.domain.discussion.dto.DiscussionRequestDto.DiscussionReq;
 import com.example.mssaem_backend.domain.discussionoption.dto.DiscussionOptionRequestDto.GetOptionReq;
 import com.example.mssaem_backend.global.s3.S3Service;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,7 +53,7 @@ public class DiscussionOptionService {
         discussionOptionRepository.deleteAllByDiscussion(discussion);
     }
 
-    public String uploadFile(MultipartFile multipartFile) {
+    public String uploadFile(MultipartFile multipartFile) throws IOException {
         return s3Service.uploadImage(multipartFile);
     }
 }
