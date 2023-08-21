@@ -27,7 +27,9 @@ public class BadgeService {
         List<Badge> badges = badgeRepository.findAllByMember(member).orElse(null);
         List<BadgeInfo> result = new ArrayList<>();
         if (badges != null) {
-            badges.forEach(badge -> result.add(new BadgeInfo(badge.getId(), badge.getBadgeEnum().getName(), badge.isState())));
+            badges.forEach(badge -> result.add(
+                new BadgeInfo(badge.getId(), badge.getBadgeEnum().getName(), badge.isState(),
+                    badge.getBadgeEnum().getUrl())));
         }
         return result;
     }
@@ -40,7 +42,7 @@ public class BadgeService {
         if (badgeId != null) {
             // 새로운 뱃지 받아오기, 멤버가 획득한 뱃지가 맞는지 유효성 검사
             Badge newBadge = badgeRepository.findByIdAndMember(badgeId, member)
-                    .orElseThrow(() -> new BaseException(BadgeErrorCode.EMPTY_BADGE));
+                .orElseThrow(() -> new BaseException(BadgeErrorCode.EMPTY_BADGE));
             // 예전 뱃지 받아오기
             Badge oldBadge = badgeRepository.findByMemberAndStateTrue(member).orElse(null);
             // 예전 뱃지가 존재한다면 false 로 설정
@@ -54,8 +56,11 @@ public class BadgeService {
         return null;
     }
 
-    public void insertBadge(Badge badge){
+    public void insertBadge(Badge badge) {
         badgeRepository.save(badge);
     }
-    public boolean existBadgeStateTrue(Member member){ return badgeRepository.existsByMemberAndStateIsTrue(member);}
+
+    public boolean existBadgeStateTrue(Member member) {
+        return badgeRepository.existsByMemberAndStateIsTrue(member);
+    }
 }
