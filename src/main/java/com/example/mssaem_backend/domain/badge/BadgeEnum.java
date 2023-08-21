@@ -7,7 +7,8 @@ public enum BadgeEnum {
     MBTIRANO("엠비티라노", "화끈해요", 10, ""),
     MBTADULT("엠비티어른", "유익해요", 10, ""),
     MBTMI("MBTMI", "성의있어요", 10, ""),
-    FUNFUN("FUNFUN", "재밌어요", 10, "");
+    FUNFUN("FUNFUN", "재밌어요", 10, ""),
+    NEWBIE("NEWBIE", "뉴비",0, "");
 
     private final String name;
     private final String evaluation;

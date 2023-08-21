@@ -291,7 +291,7 @@ public class BoardService {
         return new BoardHistory(
             boardRepository.countAllByStateIsTrueAndMember(member),
             boardCommentRepository.countAllByStateIsTrueAndMember(member),
-            boardRepository.sumLikeCountByMember(member)
+            boardRepository.sumLikeCountByMember(member).orElse(0L)
         );
     }
 

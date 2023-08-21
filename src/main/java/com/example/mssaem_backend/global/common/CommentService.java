@@ -184,7 +184,7 @@ public class CommentService {
                 //대댓글인 경우
                 if (isReply && !isMatch(parentComment.getMember(), member)) {
                     notificationService.createNotification(objectId, content,
-                        NotificationType.BOARD_REPLY_OF_COMMENT, board.getMember());
+                        NotificationType.BOARD_REPLY_OF_COMMENT, parentComment.getMember());
                 }
                 //일반 댓글인 경우
                 else if (!isMatch(board.getMember(), member)) {
@@ -213,7 +213,7 @@ public class CommentService {
                 //대댓글인 경우
                 if (isReply && !isMatch(parentComment.getMember(), member)) {
                     notificationService.createNotification(objectId, content,
-                        NotificationType.DISCUSSION_REPLY_OF_COMMENT, discussion.getMember());
+                        NotificationType.DISCUSSION_REPLY_OF_COMMENT, parentComment.getMember());
                 }
                 //일반 댓글인 경우
                 else if (!isMatch(discussion.getMember(), member)) {
