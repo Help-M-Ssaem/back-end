@@ -102,23 +102,25 @@ public class S3Service {
     //파일 하나만 받아 S3에 저장 후 url 반환
     public String uploadImage(MultipartFile multipartFile) throws IOException {
         S3Result fileResult;
+        // multipartFile를 File로 변경
         File imageFile  = convert(multipartFile);
 
         int orientation = 1;
         Metadata metadata;
         ExifIFD0Directory directory;
 
+        // 회전 했는지 체크
         try {
             metadata = ImageMetadataReader.readMetadata(imageFile);
             directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
             if(directory != null){
                 orientation = directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
             }
-
         }catch (Exception e) {
             orientation=1;
         }
 
+        // 회전 되어 있으면 원상태로 돌린다.
         BufferedImage bfImage = ImageIO.read(imageFile);
         BufferedImage srcImg = bfImage;
         switch (orientation) {
@@ -137,22 +139,25 @@ public class S3Service {
                 orientation = 1;
                 break;
         }
+
+        // 파일을 format 알아내기
         String fileFormatName = multipartFile.getContentType()
             .substring(multipartFile.getContentType().lastIndexOf("/") + 1);
-        
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(srcImg, fileFormatName, byteArrayOutputStream);
 
+        // 회전시킨 BufferedImage를 다시 multipartFile로 변경
         CustomMultipartFile customMultipartFile = new CustomMultipartFile(
             byteArrayOutputStream.toByteArray(), multipartFile.getName(),
             multipartFile.getOriginalFilename(),
             multipartFile.getContentType(), multipartFile.getSize());
 
+        // Resizing
         MultipartFile resizeMultipartFile = resizeImage(customMultipartFile.getName(), fileFormatName,
             customMultipartFile, 480);
 
         String fileName = createFileName(resizeMultipartFile.getOriginalFilename());
-
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(resizeMultipartFile.getSize());
@@ -168,8 +173,7 @@ public class S3Service {
         return fileResult.getImgUrl();
     }
 
-
-
+    // 사진을 resize 시키기
     MultipartFile resizeImage(String fileName, String fileFormatName, MultipartFile originalImage,
         int targetWidth) {
         try {
