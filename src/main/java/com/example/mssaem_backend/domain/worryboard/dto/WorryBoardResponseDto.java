@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.worryboard.dto;
 
+import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.mbti.MbtiEnum;
 import com.example.mssaem_backend.domain.member.dto.MemberResponseDto.MemberSimpleInfo;
 import com.example.mssaem_backend.domain.worryboard.WorryBoard;
@@ -33,7 +34,7 @@ public class WorryBoardResponseDto {
         @Builder
         public GetWorryRes(WorryBoard worryBoard, List<String> imgList,
             MemberSimpleInfo memberSimpleInfo, String createdAt, Boolean isEditAllowed,
-            Boolean isChatAllowed, Long chatRoomId) {
+            Boolean isChatAllowed, ChatRoom chatRoom) {
             this.worryBoardId = worryBoard.getId();
             this.memberSimpleInfo = memberSimpleInfo;
             this.targetMbti = worryBoard.getTargetMbti();
@@ -44,7 +45,7 @@ public class WorryBoardResponseDto {
             this.isEditAllowed = isEditAllowed;
             this.isChatAllowed = isChatAllowed;
             this.isSolved = worryBoard.getIsSolved();
-            this.chatRoomId = chatRoomId;
+            this.chatRoomId = chatRoom == null ? null : chatRoom.getId();
             this.hits = worryBoard.getHits();
         }
     }
