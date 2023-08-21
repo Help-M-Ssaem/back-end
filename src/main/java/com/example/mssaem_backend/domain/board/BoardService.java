@@ -237,7 +237,7 @@ public class BoardService {
     //게시글 상세 조회
     @Transactional
     public GetBoardRes findBoardById(Member viewer, Long id) {
-        Board board = boardRepository.findById(id)
+        Board board = boardRepository.findByIdAndStateIsTrue(id)
             .orElseThrow(() -> new BaseException(BoardErrorCode.EMPTY_BOARD));
         Member member = board.getMember();
         //게시글 수정, 삭제 권한 확인
