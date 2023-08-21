@@ -84,21 +84,25 @@ public class EvaluationService {
             badgeService.insertBadge(badge);
             notificationService.createNotification(badge.getId(), badge.getBadgeEnum().getName(),
                 NotificationType.BADGE, partner);
+            if(check) partner.updateBadge(badge.getBadgeEnum().getName());
         } else if (evaluationCount.getHotCount() == BadgeEnum.MBTIRANO.getStandard()) {
             Badge badge = new Badge(BadgeEnum.MBTIRANO, partner, check);
             badgeService.insertBadge(badge);
             notificationService.createNotification(badge.getId(), badge.getBadgeEnum().getName(),
                 NotificationType.BADGE, partner);
+            if(check) partner.updateBadge(badge.getBadgeEnum().getName());
         } else if (evaluationCount.getUsefulCount() == BadgeEnum.MBTADULT.getStandard()) {
             Badge badge = new Badge(BadgeEnum.MBTADULT, partner, check);
             badgeService.insertBadge(badge);
             notificationService.createNotification(badge.getId(), badge.getBadgeEnum().getName(),
                 NotificationType.BADGE, partner);
+            if(check) partner.updateBadge(badge.getBadgeEnum().getName());
         } else if (evaluationCount.getSincereCount() == BadgeEnum.MBTMI.getStandard()) {
             Badge badge = new Badge(BadgeEnum.MBTMI, partner, check);
             badgeService.insertBadge(badge);
             notificationService.createNotification(badge.getId(), badge.getBadgeEnum().getName(),
                 NotificationType.BADGE, partner);
+            if(check) partner.updateBadge(badge.getBadgeEnum().getName());
         }
     }
 
