@@ -112,4 +112,8 @@ public class Member extends BaseTimeEntity {
         this.defaultProfile = true;
     }
 
+    public void updateBadge(String badgeName) {
+        this.badgeName = badgeName;
+    }
+
 }
