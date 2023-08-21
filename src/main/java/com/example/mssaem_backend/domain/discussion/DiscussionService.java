@@ -159,7 +159,7 @@ public class DiscussionService {
             discussionOption = discussionOptions.get(i);
             // 참여자 퍼센트 계산
             selectedPercent = String.format("%.2f",
-                (double) discussionOption.getSelectCount() / (double) participants * 100.0);
+                (double) discussionOption.getSelectCount() / (double) participants * 100.0) + "%";
 
             // 유저가 선택을 완료한 고민글 Dto 처리
             DiscussionOptionLoginInfos.add(
