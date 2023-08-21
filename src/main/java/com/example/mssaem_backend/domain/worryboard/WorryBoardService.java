@@ -3,7 +3,6 @@ package com.example.mssaem_backend.domain.worryboard;
 import static com.example.mssaem_backend.global.common.CheckWriter.isMatch;
 import static com.example.mssaem_backend.global.common.CheckWriter.match;
 import static com.example.mssaem_backend.global.common.Time.calculateTime;
-import static com.example.mssaem_backend.global.config.exception.errorCode.ChatRoomErrorCode.EMPTY_CHATROOM;
 
 import com.example.mssaem_backend.domain.chatroom.ChatRoom;
 import com.example.mssaem_backend.domain.chatroom.ChatRoomRepository;
@@ -77,8 +76,7 @@ public class WorryBoardService {
             .equals(worryBoard.getTargetMbti()));
 
         //채팅방 Id 조회
-        ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(
-            worryBoard.getId()).orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
+        ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(worryBoard.getId());
 
         //고민글 상세 조회 시 조회수 상승
         worryBoard.increaseHits();
@@ -93,7 +91,7 @@ public class WorryBoardService {
                     member.getProfileImageUrl()))
             .isEditAllowed(isEditAllowed)
             .isChatAllowed(isChatAllowed)
-            .chatRoomId(chatRoom.getId())
+            .chatRoom(chatRoom)
             .build();
     }
 
@@ -220,9 +218,8 @@ public class WorryBoardService {
         match(currentMember, worryBoard.getMember());
 
         if (!patchWorryReq.getTitle().equals(worryBoard.getTitle())) {
-            ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(
-                worryBoard.getId()).orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
-            chatRoom.setChatRoomTitle(patchWorryReq.getTitle());
+            ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(worryBoard.getId());
+            if(chatRoom != null) chatRoom.setChatRoomTitle(patchWorryReq.getTitle());
         }
 
         //worryBoard 수정하기

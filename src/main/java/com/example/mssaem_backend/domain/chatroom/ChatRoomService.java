@@ -59,16 +59,18 @@ public class ChatRoomService {
     public Boolean selectChatRoomStateByWorryBoard(Long worryBoardId) {
         WorryBoard worryBoard = worryBoardRepository.findById(worryBoardId)
             .orElseThrow(() -> new BaseException(EMPTY_WORRY_BOARD));
-        ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(worryBoardId)
-            .orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
-
+        ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(worryBoardId);
+        if(chatRoom == null) {
+            throw new BaseException(EMPTY_CHATROOM);
+        }
         Integer count = chatParticipateService.countChatParticipate(chatRoom.getId());
         if(count == 1) return true;
         else return false;
     }
 
     public ChatRoom selectChatRoomByWorryBoardId(Long worryBoardId){
-        return chatRoomRepository.findByWorryBoardId(worryBoardId)
-            .orElseThrow(() -> new BaseException(EMPTY_CHATROOM));
+        ChatRoom chatRoom = chatRoomRepository.findByWorryBoardId(worryBoardId);
+        if(chatRoom == null) throw new BaseException(EMPTY_CHATROOM);
+        return chatRoom;
     }
 }
