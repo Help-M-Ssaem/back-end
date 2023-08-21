@@ -13,5 +13,6 @@ public class BadgeResponse {
         private Long id;
         private String name;
         private boolean status;
+        private String imgUrl;
     }
 }

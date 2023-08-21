@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.member;
 
+import com.example.mssaem_backend.domain.badge.Badge;
 import com.example.mssaem_backend.domain.badge.BadgeEnum;
 import com.example.mssaem_backend.domain.badge.BadgeRepository;
 import com.example.mssaem_backend.domain.badge.BadgeService;
@@ -74,6 +75,7 @@ public class MemberService {
         TokenInfo tokenInfo = jwtTokenProvider.generateToken(member.getId());
         member.changeRefreshToken(tokenInfo.getRefreshToken());
         member.updateBadge(BadgeEnum.NEWBIE.getName());
+        badgeService.insertBadge(new Badge(BadgeEnum.NEWBIE, member,true));
         return tokenInfo;
     }
 
