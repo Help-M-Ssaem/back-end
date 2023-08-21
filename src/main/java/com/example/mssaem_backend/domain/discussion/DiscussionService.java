@@ -381,7 +381,7 @@ public class DiscussionService {
 
     //토론글 상세 조회
     public DiscussionDetailInfo findDiscussion(Member viewer, Long id) {
-        Discussion discussion = discussionRepository.findById(id)
+        Discussion discussion = discussionRepository.findByIdAndStateIsTrue(id)
             .orElseThrow(() -> new BaseException(DiscussionErrorCode.EMPTY_DISCUSSION));
 
         boolean isParticipantExist = discussion.getParticipantCount() > 0;

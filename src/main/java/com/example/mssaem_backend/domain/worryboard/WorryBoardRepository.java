@@ -59,9 +59,9 @@ public interface WorryBoardRepository extends JpaRepository<WorryBoard, Long> {
 
 
     @Query(value = "select w from WorryBoard w join fetch w.member "
-        + "where (lower(w.title) like lower(concat('%', :keyword, '%')))"
+        + "where( (lower(w.title) like lower(concat('%', :keyword, '%')))"
         + "or (lower(w.content) like lower(concat('%', :keyword, '%')))"
-        + "or (lower(w.member.nickName) like lower(concat('%', :keyword, '%')))"
+        + "or (lower(w.member.nickName) like lower(concat('%', :keyword, '%'))) )"
         + "and w.state = true order by w.createdAt desc",
         countQuery = "select count(w) from WorryBoard w")
     Page<WorryBoard> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
