@@ -158,8 +158,8 @@ public class DiscussionService {
         for (int i = 0; i < discussionOptions.size(); i++) {
             discussionOption = discussionOptions.get(i);
             // 참여자 퍼센트 계산
-            selectedPercent = String.format("%.2f",
-                (double) discussionOption.getSelectCount() / (double) participants * 100.0) + "%";
+            selectedPercent = String.format("%.0f %%",
+                (double) discussionOption.getSelectCount() / (double) participants * 100.0);
 
             // 유저가 선택을 완료한 고민글 Dto 처리
             DiscussionOptionLoginInfos.add(
@@ -268,7 +268,7 @@ public class DiscussionService {
         return new DiscussionHistory(
             discussionRepository.countAllByStateIsTrueAndMember(member),
             discussionCommentRepository.countAllByStateIsTrueAndMember(member),
-            discussionRepository.sumParticipantCountByMember(member)
+            discussionRepository.sumParticipantCountByMember(member).orElse(0L)
         );
     }
 
