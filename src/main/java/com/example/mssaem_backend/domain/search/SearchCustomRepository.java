@@ -48,7 +48,7 @@ public class SearchCustomRepository implements Serializable {
    * 실시간 인기 검색어 출력
    */
   public List<SearchPopular> selectAllPopular(){
-    return zSetOperations.reverseRange(KEYWORD, 0, 10).stream()
+    return zSetOperations.reverseRange(KEYWORD, 0, 9).stream()
         .map(s -> new SearchPopular(s,zSetOperations.score(KEYWORD,s)))
         .collect(Collectors.toList());
   }
