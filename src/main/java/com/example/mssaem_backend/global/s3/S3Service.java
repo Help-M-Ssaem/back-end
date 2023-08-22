@@ -182,6 +182,9 @@ public class S3Service {
 
             int originWidth = image.getWidth();
             int originHeight = image.getHeight();
+            double ratio = (double) originHeight / originWidth;
+            int targetHeight = (int) (targetWidth * ratio);
+
 
             if (originWidth < targetWidth) {
                 return originalImage;
@@ -192,7 +195,7 @@ public class S3Service {
             Scale scale = new Scale();
             scale.load();
             scale.setAttribute("newWidth", targetWidth);
-            scale.setAttribute("newHeight", targetWidth * originWidth / originHeight);
+            scale.setAttribute("newHeight", targetHeight);
             scale.process(imageMarvin.clone(), imageMarvin, null, null, false);
 
             BufferedImage imageNoAlpha = imageMarvin.getBufferedImageNoAlpha();
