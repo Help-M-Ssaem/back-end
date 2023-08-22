@@ -94,7 +94,7 @@ public class BoardService {
                 .stream().toList();
         List<Discussion> discussions = discussionService.findHotDiscussions(pageRequest)
             .stream().toList();
-        WorryBoard worryBoard = worryBoardRepository.findTopByStateFalseOrderByCreatedAtDesc();
+        WorryBoard worryBoard = worryBoardRepository.findTopByStateTrueAndIsSolvedFalseOrderByCreatedAtDesc();
 
         return ThreeHotInfo.builder()
             .boardId(!boards.isEmpty() ? boards.get(0).getId() : null)

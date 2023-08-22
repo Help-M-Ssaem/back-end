@@ -1,5 +1,6 @@
 package com.example.mssaem_backend.domain.discussionoption;
 
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,8 @@ public class DiscussionOptionController {
 
     @PostMapping("/member/discussion-options/files")
     public ResponseEntity<String> uploadFiles(
-        @RequestPart(value="image", required = false)MultipartFile multipartFile) {
+        @RequestPart(value="image", required = false)MultipartFile multipartFile)
+        throws IOException {
         return ResponseEntity.ok(discussionOptionService.uploadFile(multipartFile));
     }
 }

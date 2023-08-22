@@ -31,14 +31,15 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
         Pageable pageable);
 
     // 검색하기
-    @Query("SELECT b FROM Board b WHERE"
-        + "(    (:type = 0 AND (LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
-        + " OR (:type = 1 AND LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')))"
-        + " OR (:type = 2 AND LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%')))"
-        + " OR (:type = 3 AND LOWER(b.member.nickName) LIKE LOWER(CONCAT('%', :keyword, '%'))) )"
-        + " AND b.state = true AND (:mbti IS NULL OR b.mbti = :mbti) ORDER BY b.createdAt DESC ")
+    @Query(value = "SELECT b FROM Board b WHERE"
+        + "(    (:searchType = 0 AND (LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
+        + " OR (:searchType = 1 AND LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:searchType = 2 AND LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:searchType = 3 AND LOWER(b.member.nickName) LIKE LOWER(CONCAT('%', :keyword, '%'))) )"
+        + " AND b.state = true AND (:mbti IS NULL OR b.mbti = :mbti) ORDER BY b.createdAt DESC ",
+    countQuery = "SELECT COUNT(b) FROM Board b")
     Page<Board> searchByTypeAndMbti(
-        @Param("type") int type,
+        @Param("searchType") int searchType,
         @Param("keyword") String keyword,
         @Param("mbti") MbtiEnum mbti,
         Pageable pageable);

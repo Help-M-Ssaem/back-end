@@ -64,10 +64,16 @@ dependencies {
     implementation 'org.projectreactor:reactor-spring:1.0.1.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-webflux:3.1.2'
 
+    implementation 'com.github.downgoon:marvin:1.5.5'
+    implementation 'com.github.downgoon:MarvinPlugins:1.5.5'
+    implementation 'com.drewnoakes:metadata-extractor:2.18.0'
+    implementation 'org.imgscalr:imgscalr-lib:4.2'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
 }
 
 processResources.dependsOn('copyGitSubmodule')

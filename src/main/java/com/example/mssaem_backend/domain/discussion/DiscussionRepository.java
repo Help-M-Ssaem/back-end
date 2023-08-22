@@ -15,14 +15,15 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
     Page<Discussion> findDiscussionByParticipantCountGreaterThanEqualAndStateIsTrueOrderByCreatedAtDesc(
         Long participantCount, PageRequest pageRequest);
 
-    @Query("SELECT d FROM Discussion d WHERE"
-        + "(    (:type = 0 AND (LOWER(d.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(d.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
-        + " OR (:type = 1 AND LOWER(d.title) LIKE LOWER(CONCAT('%', :keyword, '%')))"
-        + " OR (:type = 2 AND LOWER(d.content) LIKE LOWER(CONCAT('%', :keyword, '%')))"
-        + " OR (:type = 3 AND LOWER(d.member.nickName) LIKE LOWER(CONCAT('%', :keyword, '%'))) )"
-        + " AND d.state = true ORDER BY d.createdAt DESC ")
+    @Query(value = "SELECT d FROM Discussion d WHERE"
+        + "(    (:searchType = 0 AND (LOWER(d.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(d.content) LIKE LOWER(CONCAT('%', :keyword, '%'))))"
+        + " OR (:searchType = 1 AND LOWER(d.title) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:searchType = 2 AND LOWER(d.content) LIKE LOWER(CONCAT('%', :keyword, '%')))"
+        + " OR (:searchType = 3 AND LOWER(d.member.nickName) LIKE LOWER(CONCAT('%', :keyword, '%'))) )"
+        + " AND d.state = true ORDER BY d.createdAt DESC ",
+    countQuery = "SELECT COUNT(d) FROM Discussion d")
     Page<Discussion> searchByType(
-        @Param("type") int type,
+        @Param("searchType") int searchType,
         @Param("keyword") String keyword,
         Pageable pageable);
 
