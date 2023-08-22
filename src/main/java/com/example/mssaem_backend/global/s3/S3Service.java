@@ -185,6 +185,7 @@ public class S3Service {
             double ratio = (double) originHeight / originWidth;
             int targetHeight = (int) (targetWidth * ratio);
 
+
             if (originWidth < targetWidth) {
                 return originalImage;
             }
