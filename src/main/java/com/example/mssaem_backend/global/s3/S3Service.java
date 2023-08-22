@@ -146,12 +146,13 @@ public class S3Service {
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(srcImg, fileFormatName, byteArrayOutputStream);
+        byteArrayOutputStream.flush();
 
         // 회전시킨 BufferedImage를 다시 multipartFile로 변경
         CustomMultipartFile customMultipartFile = new CustomMultipartFile(
             byteArrayOutputStream.toByteArray(), multipartFile.getName(),
             multipartFile.getOriginalFilename(),
-            multipartFile.getContentType(), multipartFile.getSize());
+            multipartFile.getContentType(), byteArrayOutputStream.toByteArray().length);
 
         // Resizing
         MultipartFile resizeMultipartFile = resizeImage(customMultipartFile.getName(), fileFormatName,
@@ -202,6 +203,7 @@ public class S3Service {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(imageNoAlpha, fileFormatName, baos);
             baos.flush();
+
             return new CustomMultipartFile(baos.toByteArray(), fileName,
                 originalImage.getOriginalFilename(), fileFormatName, baos.toByteArray().length);
         } catch (IOException e) {
