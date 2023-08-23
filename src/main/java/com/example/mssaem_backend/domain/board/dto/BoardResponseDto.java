@@ -54,18 +54,18 @@ public class BoardResponseDto {
             String discussionTitle, Long worryBoardId, String worryBoardTitle) {
             this.boardId = boardId;
             this.boardTitle =
-                boardTitle != null && boardTitle.length() >= 35
-                    ? boardTitle.substring(0, 35)
+                boardTitle != null && boardTitle.length() >= 30
+                    ? boardTitle.substring(0, 30)
                     : boardTitle;
             this.discussionId = discussionId;
             this.discussionTitle =
-                discussionTitle != null && discussionTitle.length() >= 35
-                    ? discussionTitle.substring(0, 35)
+                discussionTitle != null && discussionTitle.length() >= 30
+                    ? discussionTitle.substring(0, 30)
                     : discussionTitle;
             this.worryBoardId = worryBoardId;
             this.worryBoardTitle =
-                worryBoardTitle != null && worryBoardTitle.length() >= 35
-                    ? worryBoardTitle.substring(0, 35)
+                worryBoardTitle != null && worryBoardTitle.length() >= 30
+                    ? worryBoardTitle.substring(0, 30)
                     : worryBoardTitle;
         }
     }
