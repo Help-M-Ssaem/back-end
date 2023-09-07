@@ -1,7 +1,5 @@
 package com.example.mssaem_backend.domain.search;
 
-import static com.example.mssaem_backend.global.config.exception.errorCode.SearchErrorCode.EMPTY_KEYWORD;
-
 import com.example.mssaem_backend.domain.board.Board;
 import com.example.mssaem_backend.domain.board.BoardRepository;
 import com.example.mssaem_backend.domain.board.dto.BoardResponseDto.BoardSimpleInfo;
@@ -20,7 +18,6 @@ import com.example.mssaem_backend.domain.worryboard.WorryBoardRepository;
 import com.example.mssaem_backend.domain.worryboard.dto.WorryBoardResponseDto.GetWorriesSearchRes;
 import com.example.mssaem_backend.global.common.Time;
 import com.example.mssaem_backend.global.common.dto.PageResponseDto;
-import com.example.mssaem_backend.global.config.exception.BaseException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -103,9 +100,6 @@ public class SearchService {
   }
 
   public void insertRedisSearch(SearchInfo searchInfo) {
-    if (searchInfo.getKeyword().matches("^\\s*$")) {
-      throw new BaseException(EMPTY_KEYWORD);
-    }
     searchCustomRepository.insertRedis(searchInfo);
   }
 

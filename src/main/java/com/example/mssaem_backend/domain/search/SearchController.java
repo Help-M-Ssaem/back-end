@@ -1,10 +1,13 @@
 package com.example.mssaem_backend.domain.search;
 
+import static com.example.mssaem_backend.global.config.exception.errorCode.SearchErrorCode.EMPTY_KEYWORD;
+
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.domain.search.dto.SearchRequestDto.SearchInfo;
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchPopular;
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRecent;
 import com.example.mssaem_backend.domain.search.dto.SearchResponseDto.SearchRes;
+import com.example.mssaem_backend.global.config.exception.BaseException;
 import com.example.mssaem_backend.global.config.security.auth.CurrentMember;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,9 @@ public class SearchController {
     @PostMapping("/keywords")
     public ResponseEntity<SearchRes> selectKeywords(@CurrentMember Member member,
         @RequestBody SearchInfo searchInfo) {
+        if (searchInfo.getKeyword().matches("^\\s*$")) {
+            throw new BaseException(EMPTY_KEYWORD);
+        }
         if (member != null) {
             searchService.insertKeywords(member, searchInfo);
         }
