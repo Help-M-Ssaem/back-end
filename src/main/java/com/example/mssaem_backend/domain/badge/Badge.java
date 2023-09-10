@@ -2,6 +2,7 @@ package com.example.mssaem_backend.domain.badge;
 
 import com.example.mssaem_backend.domain.member.Member;
 import com.example.mssaem_backend.global.common.BaseTimeEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,7 +16,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @AllArgsConstructor
@@ -27,9 +27,10 @@ public class Badge extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @UniqueElements
+
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Column(unique = true)
     private BadgeEnum badgeEnum;
 
     @ManyToOne(fetch = FetchType.LAZY)
