@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 
 @Getter
 @AllArgsConstructor
@@ -26,6 +27,7 @@ public class Badge extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @UniqueElements
     @NotNull
     @Enumerated(EnumType.STRING)
     private BadgeEnum badgeEnum;
