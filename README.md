@@ -59,6 +59,15 @@ MBTI를 잘 아는 선생님 → MBTI쌤 → 줄여서 M쌤이 되었습니다.
 ## 🎯 ERD
 <img alt="erd" src = "https://github.com/Help-M-Ssaem/back-end/assets/49395754/2e45e62a-4057-40bc-b0d2-506124457240">
 
-## 🖥️ 서버 흐름도
-![M쌤 서버흐름도](https://github.com/Help-M-Ssaem/back-end/assets/49395754/13b7196b-b43b-4e6a-99ca-d09bc25693eb)
+<br>
+
+## 🖥️ 운영 아키텍처
+<p align="center">
+<img src="https://github.com/Help-M-Ssaem/back-end/assets/49395754/c57fc1f8-fc77-471b-83ab-e2250571966b" alt="운영 아키텍처">
+</p>
+
+<br>
+
+## ⌨️ CI/CD 파이프라인
+![image](https://github.com/Help-M-Ssaem/back-end/assets/49395754/7abb557d-355e-4033-a230-9caa53b9ad64)
 
